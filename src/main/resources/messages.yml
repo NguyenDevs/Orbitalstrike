@@ -1,0 +1,35 @@
+prefix: "<gradient:#FF0000:#AA0000>[OrbitalStrike]</gradient> &r"
+no-permission: "&cYou do not have permission to use this command."
+no-permission-craft: "&cYou do not have permission to craft this item."
+invalid-args: "&cInvalid arguments! &e&oUsage: %usage%"
+player-only: "&cThis command can only be used by players."
+reload:
+  success: "&aConfiguration reloaded successfully!"
+
+cannon:
+  created: "&aCannon &e%name% &acreated successfully."
+  removed: "&aCannon &e%name% &chas been removed."
+  not-found: "&cCannon &e%name% &cnot found."
+  list-header: "&6=== Orbital Strike Cannons ==="
+  list-item: "&e- %name% &7&o(Payload: &2&o%payload%&7&o)"
+  fired: "&c&lFIRING ORBITAL STRIKE! &eTarget: %x%, %y%, %z%"
+  given: "&aYou have been given the Orbital Strike Designator for &e%name%&a."
+  no-permission: "&cYou do not have permission to use this cannon."
+  
+tool:
+  name: "<#FF5555>Orbital Strike Designator"
+  lore:
+    - "&7Right-click to mark target"
+    - "&7Cannon: &e%cannon%"
+    - "&7Payload: &c%payload%"
+    - "&7Consumes rod on use"
+  
+payload:
+  stab: "Stab (Precision Strike)"
+  nuke: "Nuke (Area Destruction)"
+  invalid: "&cInvalid payload type! Available: stab, nuke"
+
+error:
+  cannon-exists: "&cCannon already exists!"
+  player-not-found: "&cPlayer not found!"
+  world-disabled: "&cCannon cannot be used in this world!"

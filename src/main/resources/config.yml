@@ -1,0 +1,39 @@
+# ==========================================
+# Orbital Strike Cannon Configuration
+# ==========================================
+
+settings:
+
+  # Automatically load the target chunk before firing
+  force-load-target: true
+  
+  # List of worlds where the cannon can be activated
+  enabled-worlds:
+    - world
+    - world_nether
+    - world_the_end
+
+payloads:
+  stab:
+    # Explosion power
+    yield: 8.0
+    # Horizontal offset for the double helix pattern
+    offset: 0.3
+    # Vertical distance between TNT spawns
+    vertical-step: 2
+    
+  nuke:
+    # Explosion power
+    yield: 8.0
+    # Height above target to spawn the nuke array
+    height: 60.0
+    # Number of rings in the nuke array
+    rings: 10
+    # Base amount of TNT in the inner ring
+    base-tnt: 20
+    # Amount of TNT to add per ring
+    tnt-increase: 3
+    # Fuse time in ticks (20 ticks = 1 second)
+    fuse-ticks: 80
+    # Delay before launching the TNT array in ticks
+    launch-delay: 10

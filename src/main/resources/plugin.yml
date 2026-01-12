@@ -1,0 +1,35 @@
+name: OrbitalStrike
+version: 1.0.0
+main: com.NguyenDevs.orbitalstrike.OrbitalStrike
+api-version: '1.21'
+author: NguyenDevs
+description: Advanced Orbital Strike Cannon system
+website: https://github.com/NguyenDevs/OrbitalStrike
+
+commands:
+  cannon:
+    description: Main orbital strike cannon command
+    usage: |-
+      /cannon create <name> [payload] - Create a cannon at your location
+      /cannon remove <name> - Remove a cannon
+      /cannon list - List all cannons
+      /cannon fire <payload> - Fire payload at crosshair
+      /cannon target <x> <y> <z> <payload> - Fire at coordinates
+      /cannon info <cannon> - View cannon information
+      /cannon give <player> <cannon> - Give targeting tool for a cannon
+      /cannon reload - Reload configuration
+    aliases: [osc, os]
+permissions:
+  orbitalstrike.*:
+    description: All orbital strike permissions
+    children:
+      orbitalstrike.use: true
+      orbitalstrike.admin: true
+
+  orbitalstrike.use:
+    description: Use orbital strike cannons
+    default: op
+
+  orbitalstrike.admin:
+    description: Create and manage cannons
+    default: op

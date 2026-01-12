@@ -1,0 +1,13 @@
+recipes:
+  example_cannon:
+    enabled: true
+    cannon: "example"
+    require-permission: false
+    permission: "orbitalstrike.craft.example"
+    shape:
+      - "  D"
+      - " S "
+      - "S  "
+    ingredients:
+      D: DIAMOND
+      S: STICK
