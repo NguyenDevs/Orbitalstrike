@@ -17,6 +17,7 @@ commands:
       /cannon info <cannon> - Show info for a cannon
       /cannon target <cannon> <x> <y> <z> - Fire at coordinates
       /cannon give <player> <cannon> - Give targeting tool for a cannon
+      /cannon set <cannon> <parameter> <value> - Set a parameter for a cannon
       /cannon reload - Reload configuration
     aliases: [osc, os]
 permissions:
