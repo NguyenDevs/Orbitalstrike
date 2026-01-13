@@ -78,8 +78,11 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
             case "reload":
                 handleReload(sender);
                 break;
+            case "set":
+                handleSet(sender, args);
+                break;
             default:
-                sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "/cannon <create|remove|list|fire|target|info|give|reload>"));
+                sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "/cannon <create|remove|list|fire|target|info|give|reload|set>"));
                 playErrorSound(sender);
                 break;
         }
@@ -164,17 +167,15 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length < 2) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "/cannon fire <payload>"));
+            sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "/cannon fire <cannon>"));
             playErrorSound(sender);
             return;
         }
 
-        String payloadStr = args[1].toUpperCase();
-        PayloadType payloadType;
-        try {
-            payloadType = PayloadType.valueOf(payloadStr);
-        } catch (IllegalArgumentException e) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("payload.invalid"));
+        String cannonName = args[1];
+        Cannon cannon = plugin.getCannonManager().getCannon(cannonName);
+        if (cannon == null) {
+            sender.sendMessage(plugin.getMessageManager().getMessage("cannon.not-found", "%name%", cannonName));
             playErrorSound(sender);
             return;
         }
@@ -188,11 +189,9 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         }
 
         Location target = player.getTargetBlock(null, 100).getLocation();
+        StrikeData strikeData = new StrikeData(cannon.getPayloadType());
 
-        Cannon dummyCannon = new Cannon("ADMIN_FIRE", payloadType);
-        StrikeData strikeData = new StrikeData(payloadType);
-
-        plugin.getPayloadManager().initiateStrike(dummyCannon, strikeData, target);
+        plugin.getPayloadManager().initiateStrike(cannon, strikeData, target);
         sender.sendMessage(plugin.getMessageManager().getMessage("cannon.fired",
                 "%x%", String.valueOf(target.getBlockX()),
                 "%y%", String.valueOf(target.getBlockY()),
@@ -203,28 +202,26 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
 
     private void handleTarget(CommandSender sender, String[] args) {
         if (args.length < 5) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "/cannon target <x> <y> <z> <payload>"));
+            sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "/cannon target <cannon> <x> <y> <z>"));
+            playErrorSound(sender);
+            return;
+        }
+
+        String cannonName = args[1];
+        Cannon cannon = plugin.getCannonManager().getCannon(cannonName);
+        if (cannon == null) {
+            sender.sendMessage(plugin.getMessageManager().getMessage("cannon.not-found", "%name%", cannonName));
             playErrorSound(sender);
             return;
         }
 
         double x, y, z;
         try {
-            x = Double.parseDouble(args[1]);
-            y = Double.parseDouble(args[2]);
-            z = Double.parseDouble(args[3]);
+            x = Double.parseDouble(args[2]);
+            y = Double.parseDouble(args[3]);
+            z = Double.parseDouble(args[4]);
         } catch (NumberFormatException e) {
             sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "Coordinates must be numbers"));
-            playErrorSound(sender);
-            return;
-        }
-
-        String payloadStr = args[4].toUpperCase();
-        PayloadType payloadType;
-        try {
-            payloadType = PayloadType.valueOf(payloadStr);
-        } catch (IllegalArgumentException e) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("payload.invalid"));
             playErrorSound(sender);
             return;
         }
@@ -242,10 +239,9 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        Cannon dummyCannon = new Cannon("ADMIN_TARGET", payloadType);
-        StrikeData strikeData = new StrikeData(payloadType);
+        StrikeData strikeData = new StrikeData(cannon.getPayloadType());
 
-        plugin.getPayloadManager().initiateStrike(dummyCannon, strikeData, target);
+        plugin.getPayloadManager().initiateStrike(cannon, strikeData, target);
         sender.sendMessage(plugin.getMessageManager().getMessage("cannon.fired",
                 "%x%", String.valueOf(target.getBlockX()),
                 "%y%", String.valueOf(target.getBlockY()),
@@ -313,28 +309,56 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         playSound(sender);
     }
 
+    private void handleSet(CommandSender sender, String[] args) {
+        if (args.length < 4) {
+            sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "/cannon set <cannon> <parameter> <value>"));
+            playErrorSound(sender);
+            return;
+        }
+
+        String cannonName = args[1];
+        Cannon cannon = plugin.getCannonManager().getCannon(cannonName);
+        if (cannon == null) {
+            sender.sendMessage(plugin.getMessageManager().getMessage("cannon.not-found", "%name%", cannonName));
+            playErrorSound(sender);
+            return;
+        }
+
+        String parameter = args[2].toLowerCase();
+        String valueStr = args[3];
+        Object value = null;
+
+        try {
+            if (valueStr.contains(".")) {
+                value = Double.parseDouble(valueStr);
+            } else {
+                value = Integer.parseInt(valueStr);
+            }
+        } catch (NumberFormatException e) {
+            sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "Value must be a number"));
+            playErrorSound(sender);
+            return;
+        }
+
+        cannon.setParameter(parameter, value);
+        plugin.getCannonManager().saveCannons();
+        sender.sendMessage(ColorUtils.colorize("&aSet parameter &e" + parameter + "&a to &e" + value + "&a for cannon &e" + cannonName));
+        playSound(sender);
+    }
+
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("create", "remove", "list", "fire", "target", "give", "reload");
+            return Arrays.asList("create", "remove", "list", "fire", "target", "give", "reload", "set");
         }
 
         if (args.length == 2) {
-            if (Arrays.asList("remove").contains(args[0].toLowerCase())) {
+            if (Arrays.asList("remove", "set", "fire", "target").contains(args[0].toLowerCase())) {
                 return new ArrayList<>(plugin.getCannonManager().getCannons().keySet());
             }
             if (args[0].equalsIgnoreCase("give")) {
                 return null;
-            }
-            if (args[0].equalsIgnoreCase("fire")) {
-                return Arrays.stream(PayloadType.values())
-                        .map(Enum::name)
-                        .map(String::toLowerCase)
-                        .collect(Collectors.toList());
-            }
-            if (args[0].equalsIgnoreCase("target")) {
-                return Collections.emptyList();
             }
         }
 
@@ -351,6 +375,13 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
             if (args[0].equalsIgnoreCase("target")) {
                 return Collections.emptyList();
             }
+            if (args[0].equalsIgnoreCase("set")) {
+                String cannonName = args[1];
+                Cannon cannon = plugin.getCannonManager().getCannon(cannonName);
+                if (cannon != null) {
+                    return new ArrayList<>(cannon.getParameters().keySet());
+                }
+            }
         }
 
         if (args.length == 4) {
@@ -360,10 +391,7 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 5 && args[0].equalsIgnoreCase("target")) {
-            return Arrays.stream(PayloadType.values())
-                    .map(Enum::name)
-                    .map(String::toLowerCase)
-                    .collect(Collectors.toList());
+            return Collections.emptyList();
         }
 
         return null;

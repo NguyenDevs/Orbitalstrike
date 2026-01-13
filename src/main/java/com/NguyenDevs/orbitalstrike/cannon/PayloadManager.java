@@ -63,17 +63,18 @@ public class PayloadManager {
         PayloadType type = strike.getData().getPayloadType();
 
         if (type == PayloadType.STAB) {
-            spawnStab(world, target);
+            spawnStab(world, target, strike.getCannon());
         } else if (type == PayloadType.NUKE) {
-            spawnNuke(world, target);
+            spawnNuke(world, target, strike.getCannon());
         }
     }
 
-    private void spawnStab(World world, Location center) {
+    private void spawnStab(World world, Location center, Cannon cannon) {
         Location ground = findGroundLevel(world, center);
-        float yield = (float) plugin.getConfigManager().getStabYield();
-        double offset = plugin.getConfigManager().getStabOffset();
-        int verticalStep = plugin.getConfigManager().getStabVerticalStep();
+        
+        float yield = getFloatParameter(cannon, "yield", (float) plugin.getConfigManager().getStabYield());
+        double offset = getDoubleParameter(cannon, "offset", plugin.getConfigManager().getStabOffset());
+        int verticalStep = getIntParameter(cannon, "vertical-step", plugin.getConfigManager().getStabVerticalStep());
 
         int y = (int) ground.getY();
         int minY = world.getMinHeight();
@@ -96,14 +97,14 @@ public class PayloadManager {
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
-    private void spawnNuke(World world, Location center) {
-        int rings = plugin.getConfigManager().getNukeRings();
-        double height = plugin.getConfigManager().getNukeHeight();
-        float yield = (float) plugin.getConfigManager().getNukeYield();
-        int baseTnt = plugin.getConfigManager().getNukeBaseTnt();
-        int increase = plugin.getConfigManager().getNukeTntIncrease();
-        int initialFuse = plugin.getConfigManager().getNukeFuseTicks();
-        int launchDelay = plugin.getConfigManager().getNukeLaunchDelay();
+    private void spawnNuke(World world, Location center, Cannon cannon) {
+        int rings = getIntParameter(cannon, "rings", plugin.getConfigManager().getNukeRings());
+        double height = getDoubleParameter(cannon, "height", plugin.getConfigManager().getNukeHeight());
+        float yield = getFloatParameter(cannon, "yield", (float) plugin.getConfigManager().getNukeYield());
+        int baseTnt = getIntParameter(cannon, "base-tnt", plugin.getConfigManager().getNukeBaseTnt());
+        int increase = getIntParameter(cannon, "tnt-increase", plugin.getConfigManager().getNukeTntIncrease());
+        int initialFuse = getIntParameter(cannon, "fuse-ticks", plugin.getConfigManager().getNukeFuseTicks());
+        int launchDelay = getIntParameter(cannon, "launch-delay", plugin.getConfigManager().getNukeLaunchDelay());
 
         Location spawnCenter = center.clone().add(0, height, 0);
         if (spawnCenter.getY() > world.getMaxHeight()) {
@@ -165,6 +166,30 @@ public class PayloadManager {
                 }
             }
         }.runTaskLater(plugin, (long) launchDelay);
+    }
+
+    private double getDoubleParameter(Cannon cannon, String key, double defaultValue) {
+        Object val = cannon.getParameter(key);
+        if (val instanceof Number) {
+            return ((Number) val).doubleValue();
+        }
+        return defaultValue;
+    }
+
+    private float getFloatParameter(Cannon cannon, String key, float defaultValue) {
+        Object val = cannon.getParameter(key);
+        if (val instanceof Number) {
+            return ((Number) val).floatValue();
+        }
+        return defaultValue;
+    }
+
+    private int getIntParameter(Cannon cannon, String key, int defaultValue) {
+        Object val = cannon.getParameter(key);
+        if (val instanceof Number) {
+            return ((Number) val).intValue();
+        }
+        return defaultValue;
     }
 
     private static class TntLaunchData {

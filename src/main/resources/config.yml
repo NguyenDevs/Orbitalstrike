@@ -14,6 +14,8 @@ settings:
     - world_nether
     - world_the_end
 
+#These are the default values for cannons when they are created.
+#If you want to customize each cannon individually, please go to "cannons.yml".
 payloads:
   stab:
     # Explosion power

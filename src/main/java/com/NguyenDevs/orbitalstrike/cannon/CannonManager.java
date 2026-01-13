@@ -30,6 +30,22 @@ public class CannonManager {
 
     public void createCannon(String name, PayloadType payloadType) {
         Cannon cannon = new Cannon(name, payloadType);
+        
+        // Load default parameters from config based on payload type
+        if (payloadType == PayloadType.STAB) {
+            cannon.setParameter("yield", plugin.getConfigManager().getStabYield());
+            cannon.setParameter("offset", plugin.getConfigManager().getStabOffset());
+            cannon.setParameter("vertical-step", plugin.getConfigManager().getStabVerticalStep());
+        } else if (payloadType == PayloadType.NUKE) {
+            cannon.setParameter("yield", plugin.getConfigManager().getNukeYield());
+            cannon.setParameter("height", plugin.getConfigManager().getNukeHeight());
+            cannon.setParameter("rings", plugin.getConfigManager().getNukeRings());
+            cannon.setParameter("base-tnt", plugin.getConfigManager().getNukeBaseTnt());
+            cannon.setParameter("tnt-increase", plugin.getConfigManager().getNukeTntIncrease());
+            cannon.setParameter("fuse-ticks", plugin.getConfigManager().getNukeFuseTicks());
+            cannon.setParameter("launch-delay", plugin.getConfigManager().getNukeLaunchDelay());
+        }
+
         cannons.put(name.toLowerCase(), cannon);
         saveCannons();
     }
@@ -82,7 +98,18 @@ public class CannonManager {
             }
 
             if (name != null) {
-                cannons.put(name.toLowerCase(), new Cannon(name, payloadType));
+                Cannon cannon = new Cannon(name, payloadType);
+                
+                // Load parameters
+                ConfigurationSection paramSection = section.getConfigurationSection(key);
+                if (paramSection != null) {
+                    for (String paramKey : paramSection.getKeys(false)) {
+                        if (paramKey.equals("name") || paramKey.equals("payload")) continue;
+                        cannon.setParameter(paramKey, paramSection.get(paramKey));
+                    }
+                }
+                
+                cannons.put(name.toLowerCase(), cannon);
             }
         }
     }
@@ -95,6 +122,10 @@ public class CannonManager {
             String key = cannon.getName().toLowerCase();
             section.set(key + ".name", cannon.getName());
             section.set(key + ".payload", cannon.getPayloadType().name());
+            
+            for (Map.Entry<String, Object> entry : cannon.getParameters().entrySet()) {
+                section.set(key + "." + entry.getKey(), entry.getValue());
+            }
         }
 
         try {
