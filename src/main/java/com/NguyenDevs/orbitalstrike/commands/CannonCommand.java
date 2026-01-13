@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -80,6 +81,9 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
                 break;
             case "set":
                 handleSet(sender, args);
+                break;
+            case "info":
+                handleInfo(sender, args);
                 break;
             default:
                 sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "/cannon <create|remove|list|fire|target|info|give|reload|set>"));
@@ -346,15 +350,43 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         playSound(sender);
     }
 
+    private void handleInfo(CommandSender sender, String[] args) {
+        if (args.length < 2) {
+            sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "/cannon info <cannon>"));
+            playErrorSound(sender);
+            return;
+        }
+
+        String cannonName = args[1];
+        Cannon cannon = plugin.getCannonManager().getCannon(cannonName);
+        if (cannon == null) {
+            sender.sendMessage(plugin.getMessageManager().getMessage("cannon.not-found", "%name%", cannonName));
+            playErrorSound(sender);
+            return;
+        }
+
+        sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.header", "%name%", cannon.getName()));
+        sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.payload", "%payload%", cannon.getPayloadType().name()));
+        sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.parameters-header"));
+
+        for (Map.Entry<String, Object> entry : cannon.getParameters().entrySet()) {
+            sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.parameter",
+                    "%key%", entry.getKey(),
+                    "%value%", String.valueOf(entry.getValue())
+            ));
+        }
+        playSound(sender);
+    }
+
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("create", "remove", "list", "fire", "target", "give", "reload", "set");
+            return Arrays.asList("create", "remove", "list", "fire", "target", "give", "reload", "set", "info");
         }
 
         if (args.length == 2) {
-            if (Arrays.asList("remove", "set", "fire", "target").contains(args[0].toLowerCase())) {
+            if (Arrays.asList("remove", "set", "fire", "target", "info").contains(args[0].toLowerCase())) {
                 return new ArrayList<>(plugin.getCannonManager().getCannons().keySet());
             }
             if (args[0].equalsIgnoreCase("give")) {
