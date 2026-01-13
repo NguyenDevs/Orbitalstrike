@@ -9,6 +9,7 @@ import com.NguyenDevs.orbitalstrike.configuration.MessageManager;
 import com.NguyenDevs.orbitalstrike.listeners.CannonInteractListener;
 import com.NguyenDevs.orbitalstrike.listeners.CraftListener;
 import com.NguyenDevs.orbitalstrike.listeners.TNTListener;
+import com.NguyenDevs.orbitalstrike.utils.SpigotPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -43,6 +44,9 @@ public final class OrbitalStrike extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new CannonInteractListener(this), this);
         getServer().getPluginManager().registerEvents(new TNTListener(this), this);
         getServer().getPluginManager().registerEvents(new CraftListener(this), this);
+
+        new SpigotPlugin(131685, this).checkForUpdate();
+
         printLogo();
         Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&bOrbital&3Strike&9Cannon&8] &aOrbitalStrikeCannon plugin enabled successfully!"));
     }

@@ -3,6 +3,7 @@
 # ==========================================
 
 settings:
+  update-notify: true
 
   # Automatically load the target chunk before firing
   force-load-target: true
