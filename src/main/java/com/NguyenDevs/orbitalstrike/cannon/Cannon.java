@@ -29,7 +29,7 @@ public class Cannon {
         // Default values will be set by CannonManager
         this.itemMaterial = Material.FISHING_ROD;
         this.durabilityEnabled = true;
-        this.maxDurability = 5;
+        this.maxDurability = 1;
         this.cooldown = -1;
     }
 
