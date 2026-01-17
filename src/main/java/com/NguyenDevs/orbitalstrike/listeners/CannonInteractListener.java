@@ -63,7 +63,7 @@ public class CannonInteractListener implements Listener {
         
         if (item.getType() == Material.FISHING_ROD) return;
         
-        Location target = player.getTargetBlock(null, 500).getLocation();
+        Location target = player.getTargetBlock(null, 1000).getLocation();
         handleCannonUse(player, item, target);
     }
 
@@ -114,12 +114,9 @@ public class CannonInteractListener implements Listener {
                 }
             }
             playerCooldowns.put(cannon.getName(), currentTime);
-            
-            // Set item cooldown animation (like Ender Pearl)
             player.setCooldown(item.getType(), cannon.getCooldown() * 20);
         }
 
-        // Handle durability
         if (cannon.isDurabilityEnabled()) {
             int uses = 0;
             if (meta.getPersistentDataContainer().has(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER)) {
@@ -139,15 +136,13 @@ public class CannonInteractListener implements Listener {
                     int maxVanilla = item.getType().getMaxDurability();
                     
                     if (maxVanilla > 0) {
-                        // Simply increase damage by 1
                         int currentDamage = damageable.getDamage();
                         damageable.setDamage(currentDamage + 1);
-                        
-                        // If for some reason the item is now fully broken according to vanilla durability, break it
+
                         if (damageable.getDamage() >= maxVanilla) {
                             item.setAmount(0);
                             player.playSound(player.getLocation(), "entity.item.break", 1.0f, 1.0f);
-                            return; // Stop execution
+                            return;
                         }
                     }
                 }
