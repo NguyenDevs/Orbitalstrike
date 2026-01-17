@@ -9,6 +9,7 @@ import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,42 +40,37 @@ public class CannonInteractListener implements Listener {
         if (event.getState() != PlayerFishEvent.State.REEL_IN && event.getState() != PlayerFishEvent.State.IN_GROUND) {
             return;
         }
-        
+
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-        
+
         if (item.getType() != Material.FISHING_ROD) {
             item = player.getInventory().getItemInOffHand();
         }
-        
+
         if (item.getType() != Material.FISHING_ROD) return;
-        
-        handleCannonUse(player, item, event.getHook().getLocation());
+
+        Location target = player.getTargetBlock(null, 1000).getLocation();
+
+        handleCannonUse(player, item, target);
     }
-    
+
+
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
-        
+
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-        
+
         if (item == null || item.getType() == Material.AIR) return;
-        
+
         if (item.getType() == Material.FISHING_ROD) return;
-        
-        Location target = null;
-        if (event.getClickedBlock() != null) {
-            target = event.getClickedBlock().getLocation();
-        } else {
-            RayTraceResult result = player.rayTraceBlocks(1000, FluidCollisionMode.ALWAYS);
-            if (result != null && result.getHitBlock() != null) {
-                target = result.getHitBlock().getLocation();
-            }
-        }
-        
+
+        Location target = player.getTargetBlock(null, 1000).getLocation();
+
         if (target == null) return;
 
         handleCannonUse(player, item, target);
@@ -137,10 +133,10 @@ public class CannonInteractListener implements Listener {
             }
             
             uses++;
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
             
             if (uses >= cannon.getMaxDurability()) {
                 item.setAmount(0);
-                player.playSound(player.getLocation(), "entity.item.break", 1.0f, 1.0f);
             } else {
                 meta.getPersistentDataContainer().set(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER, uses);
                 
@@ -154,7 +150,6 @@ public class CannonInteractListener implements Listener {
 
                         if (damageable.getDamage() >= maxVanilla) {
                             item.setAmount(0);
-                            player.playSound(player.getLocation(), "entity.item.break", 1.0f, 1.0f);
                             return;
                         }
                     }
