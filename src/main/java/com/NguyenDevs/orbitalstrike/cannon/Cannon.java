@@ -10,8 +10,7 @@ public class Cannon {
     private final String name;
     private PayloadType payloadType;
     private final Map<String, Object> parameters;
-    
-    // Item settings
+
     private Material itemMaterial;
     private boolean durabilityEnabled;
     private int maxDurability;
@@ -25,8 +24,7 @@ public class Cannon {
         this.name = name;
         this.payloadType = payloadType;
         this.parameters = new HashMap<>();
-        
-        // Default values will be set by CannonManager
+
         this.itemMaterial = Material.FISHING_ROD;
         this.durabilityEnabled = true;
         this.maxDurability = 1;
