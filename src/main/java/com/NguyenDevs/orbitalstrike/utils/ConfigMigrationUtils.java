@@ -57,7 +57,6 @@ public class ConfigMigrationUtils {
                 itemList.add(Map.of("material", plugin.getConfigManager().getDefaultItemMaterial().name()));
                 itemList.add(Map.of("durability", plugin.getConfigManager().isDefaultItemDurabilityEnabled()));
                 itemList.add(Map.of("max-durability", plugin.getConfigManager().getDefaultItemMaxDurability()));
-                itemList.add(Map.of("max-distance", plugin.getConfigManager().getDefaultItemMaxDistance()));
                 newCannon.set("item", itemList);
                 
                 newCannon.set("cooldown", plugin.getConfigManager().getDefaultItemCooldown());
