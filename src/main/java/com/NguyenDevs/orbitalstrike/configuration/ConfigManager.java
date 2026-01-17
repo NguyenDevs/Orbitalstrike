@@ -65,7 +65,7 @@ public class ConfigManager {
     }
 
     public int getDefaultItemMaxDurability() {
-        return plugin.getConfig().getInt("items.max-durability", 5);
+        return plugin.getConfig().getInt("items.max-durability", 1);
     }
 
     public int getDefaultItemCooldown() {
