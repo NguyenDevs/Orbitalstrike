@@ -17,10 +17,10 @@ public class ConfigManager {
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
         FileConfiguration config = plugin.getConfig();
-        
-        // Add default values if missing
+
         config.addDefault("settings.force-load-target", true);
         config.addDefault("settings.enabled-worlds", Arrays.asList("world", "world_nether", "world_the_end"));
+        config.addDefault("settings.logs", true);
 
         config.addDefault("items.material", "FISHING_ROD");
         config.addDefault("items.durability", true);
@@ -38,6 +38,14 @@ public class ConfigManager {
         config.addDefault("payloads.nuke.tnt-increase", 3);
         config.addDefault("payloads.nuke.fuse-ticks", 80);
         config.addDefault("payloads.nuke.launch-delay", 10);
+
+        config.addDefault("payloads.recursion.yield", 10.0);
+        config.addDefault("payloads.recursion.height", 111.0);
+        config.addDefault("payloads.recursion.level", 3);
+        config.addDefault("payloads.recursion.amount", 5);
+        config.addDefault("payloads.recursion.velocity", 0.8);
+        config.addDefault("payloads.recursion.split-fuse-ticks", 20);
+        config.addDefault("payloads.recursion.last-fuse-ticks", 60);
         
         config.options().copyDefaults(true);
         plugin.saveConfig();
@@ -49,6 +57,10 @@ public class ConfigManager {
 
     public List<String> getEnabledWorlds() {
         return plugin.getConfig().getStringList("settings.enabled-worlds");
+    }
+
+    public boolean isLogsEnabled() {
+        return plugin.getConfig().getBoolean("settings.logs", true);
     }
 
     public Material getDefaultItemMaterial() {
@@ -83,6 +95,8 @@ public class ConfigManager {
     public int getStabVerticalStep() {
         return plugin.getConfig().getInt("payloads.stab.vertical-step");
     }
+
+
     
     public double getNukeYield() {
         return plugin.getConfig().getDouble("payloads.nuke.yield");
@@ -110,5 +124,35 @@ public class ConfigManager {
     
     public int getNukeLaunchDelay() {
         return plugin.getConfig().getInt("payloads.nuke.launch-delay");
+    }
+
+
+
+    public double getRecursionYield() {
+        return plugin.getConfig().getDouble("payloads.recursion.yield");
+    }
+
+    public double getRecursionHeight() {
+        return plugin.getConfig().getDouble("payloads.recursion.height");
+    }
+
+    public int getRecursionLevel() {
+        return plugin.getConfig().getInt("payloads.recursion.level");
+    }
+
+    public int getRecursionAmount() {
+        return plugin.getConfig().getInt("payloads.recursion.amount");
+    }
+
+    public double getRecursionVelocity() {
+        return plugin.getConfig().getDouble("payloads.recursion.velocity");
+    }
+
+    public int getRecursionSplitFuseTicks() {
+        return plugin.getConfig().getInt("payloads.recursion.split-fuse-ticks");
+    }
+
+    public int getRecursionLastFuseTicks(){
+        return plugin.getConfig().getInt("payloads.recursion.last-fuse-ticks");
     }
 }

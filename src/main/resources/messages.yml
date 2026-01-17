@@ -38,7 +38,8 @@ tool:
 payload:
   stab: "Stab (Precision Strike)"
   nuke: "Nuke (Area Destruction)"
-  invalid: "&cInvalid payload type! Available: stab, nuke"
+  recursion: "Recursion (Chain Reaction)"
+  invalid: "&cInvalid payload type! Available: stab, nuke, recursion"
 
 error:
   cannon-exists: "&cCannon already exists!"

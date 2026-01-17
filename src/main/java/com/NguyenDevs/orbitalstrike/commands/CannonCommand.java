@@ -48,7 +48,6 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        // Tất cả lệnh đều yêu cầu quyền admin
         if (!sender.hasPermission("orbitalstrike.admin")) {
             sender.sendMessage(plugin.getMessageManager().getMessage("no-permission"));
             playErrorSound(sender);
@@ -297,17 +296,13 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         if (meta != null) {
             if (cannon.isDurabilityEnabled()) {
                 meta.getPersistentDataContainer().set(DURABILITY_KEY, PersistentDataType.INTEGER, 0);
-                
-                // Set initial damage so the item appears to have 'max-durability' uses left
+
                 if (meta instanceof Damageable) {
                     Damageable damageable = (Damageable) meta;
                     int maxVanilla = item.getType().getMaxDurability();
                     int customMax = cannon.getMaxDurability();
                     
                     if (maxVanilla > 0) {
-                        // If customMax is 5, and maxVanilla is 64.
-                        // We want 5 uses left. So we damage it by 64 - 5 = 59.
-                        // If customMax > maxVanilla, we just give a full item (0 damage).
                         int initialDamage = Math.max(0, maxVanilla - customMax);
                         damageable.setDamage(initialDamage);
                     }
@@ -371,12 +366,9 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
                 value = Integer.parseInt(valueStr);
             }
         } catch (NumberFormatException e) {
-            // Try boolean
             if (valueStr.equalsIgnoreCase("true") || valueStr.equalsIgnoreCase("false")) {
                 value = Boolean.parseBoolean(valueStr);
             } else {
-                // Try string or material if needed, but for now let's assume numbers/booleans for params
-                // Actually, we might want to set item material
                 if (parameter.equals("material")) {
                     try {
                         value = Material.valueOf(valueStr.toUpperCase());
@@ -392,8 +384,7 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
                 }
             }
         }
-        
-        // Handle special parameters
+
         if (parameter.equals("material")) {
             if (value instanceof Material) {
                 cannon.setItemMaterial((Material) value);
@@ -463,63 +454,88 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
             return Arrays.asList("create", "remove", "list", "fire", "target", "give", "reload", "set", "info");
         }
 
+        String subCmd = args[0].toLowerCase();
+
         if (args.length == 2) {
-            if (Arrays.asList("remove", "set", "fire", "target", "info").contains(args[0].toLowerCase())) {
-                return new ArrayList<>(plugin.getCannonManager().getCannons().keySet());
-            }
-            if (args[0].equalsIgnoreCase("give")) {
-                return null;
+            switch (subCmd) {
+                case "remove":
+                case "fire":
+                case "info":
+                    return new ArrayList<>(plugin.getCannonManager().getCannons().keySet());
+
+                case "give":
+                    return null;
+
+                case "set":
+                case "target":
+                    return new ArrayList<>(plugin.getCannonManager().getCannons().keySet());
+
+                default:
+                    return Collections.emptyList();
             }
         }
 
         if (args.length == 3) {
-            if (args[0].equalsIgnoreCase("create")) {
-                return Arrays.stream(PayloadType.values())
-                        .map(Enum::name)
-                        .map(String::toLowerCase)
-                        .collect(Collectors.toList());
-            }
-            if (args[0].equalsIgnoreCase("give")) {
-                return new ArrayList<>(plugin.getCannonManager().getCannons().keySet());
-            }
-            if (args[0].equalsIgnoreCase("target")) {
-                return Collections.emptyList();
-            }
-            if (args[0].equalsIgnoreCase("set")) {
-                String cannonName = args[1];
-                Cannon cannon = plugin.getCannonManager().getCannon(cannonName);
-                if (cannon != null) {
-                    List<String> params = new ArrayList<>(cannon.getParameters().keySet());
-                    params.add("material");
-                    params.add("durability");
-                    params.add("max-durability");
-                    params.add("cooldown");
-                    return params;
-                }
+            switch (subCmd) {
+                case "create":
+                    return Arrays.stream(PayloadType.values())
+                            .map(Enum::name)
+                            .map(String::toLowerCase)
+                            .collect(Collectors.toList());
+
+                case "give":
+                    return new ArrayList<>(plugin.getCannonManager().getCannons().keySet());
+
+                case "set":
+                    String cannonName = args[1];
+                    Cannon cannon = plugin.getCannonManager().getCannon(cannonName);
+                    if (cannon != null) {
+                        List<String> params = new ArrayList<>(cannon.getParameters().keySet());
+                        params.add("material");
+                        params.add("durability");
+                        params.add("max-durability");
+                        params.add("cooldown");
+                        return params;
+                    }
+                    return Collections.emptyList();
+
+                case "target":
+                    return Collections.emptyList();
+
+                default:
+                    return Collections.emptyList();
             }
         }
 
         if (args.length == 4) {
-            if (args[0].equalsIgnoreCase("target")) {
-                return Collections.emptyList();
-            }
-            if (args[0].equalsIgnoreCase("set")) {
-                if (args[2].equalsIgnoreCase("material")) {
-                    return Arrays.stream(Material.values())
-                            .map(Enum::name)
-                            .collect(Collectors.toList());
-                }
-                if (args[2].equalsIgnoreCase("durability")) {
-                    return Arrays.asList("true", "false");
-                }
+            switch (subCmd) {
+                case "set":
+                    if (args[2].equalsIgnoreCase("material")) {
+                        return Arrays.stream(Material.values())
+                                .map(Enum::name)
+                                .collect(Collectors.toList());
+                    }
+                    if (args[2].equalsIgnoreCase("durability")) {
+                        return Arrays.asList("true", "false");
+                    }
+                    return Collections.emptyList();
+
+                case "target":
+                    return Collections.emptyList();
+
+                default:
+                    return Collections.emptyList();
             }
         }
 
-        if (args.length == 5 && args[0].equalsIgnoreCase("target")) {
+        if (args.length == 5) {
+            if (subCmd.equals("target")) {
+                return Collections.emptyList();
+            }
             return Collections.emptyList();
         }
 
-        return null;
+        return Collections.emptyList();
     }
 
     private void playSound(CommandSender sender) {

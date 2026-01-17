@@ -20,15 +20,51 @@ public class PayloadManager {
     private final OrbitalStrike plugin;
     private final List<ActiveStrike> activeStrikes;
     private final NamespacedKey orbitalStrikeKey;
+    private final NamespacedKey recursionLevelKey;
+    private final NamespacedKey recursionAmountKey;
+    private final NamespacedKey recursionYieldKey;
+    private final NamespacedKey recursionVelocityKey;
+    private final NamespacedKey recursionSplitFuseKey;
+    private final NamespacedKey recursionLastFuseKey;
 
     public PayloadManager(OrbitalStrike plugin) {
         this.plugin = plugin;
         this.activeStrikes = new ArrayList<>();
         this.orbitalStrikeKey = new NamespacedKey(plugin, "orbital_strike_tnt");
+        this.recursionLevelKey = new NamespacedKey(plugin, "recursion_level");
+        this.recursionAmountKey = new NamespacedKey(plugin, "recursion_amount");
+        this.recursionYieldKey = new NamespacedKey(plugin, "recursion_yield");
+        this.recursionVelocityKey = new NamespacedKey(plugin, "recursion_velocity");
+        this.recursionSplitFuseKey = new NamespacedKey(plugin, "recursion_split_fuse");
+        this.recursionLastFuseKey = new NamespacedKey(plugin, "recursion_last_fuse");
     }
 
     public NamespacedKey getOrbitalStrikeKey() {
         return orbitalStrikeKey;
+    }
+
+    public NamespacedKey getRecursionLevelKey() {
+        return recursionLevelKey;
+    }
+
+    public NamespacedKey getRecursionAmountKey() {
+        return recursionAmountKey;
+    }
+
+    public NamespacedKey getRecursionYieldKey() {
+        return recursionYieldKey;
+    }
+
+    public NamespacedKey getRecursionVelocityKey() {
+        return recursionVelocityKey;
+    }
+
+    public NamespacedKey getRecursionSplitFuseKey() {
+        return recursionSplitFuseKey;
+    }
+
+    public NamespacedKey getRecursionLastFuseKey() {
+        return recursionLastFuseKey;
     }
 
     public void initiateStrike(Cannon cannon, StrikeData data, Location target) {
@@ -36,7 +72,10 @@ public class PayloadManager {
             return;
         }
 
-        plugin.getLogger().info("Initiating strike at " + target.toString());
+        if (plugin.getConfigManager().isLogsEnabled()) {
+            plugin.getLogger().info("Initiating strike at " + target.toString());
+        }
+
         ActiveStrike strike = new ActiveStrike(cannon, data, target);
         activeStrikes.add(strike);
 
@@ -66,12 +105,14 @@ public class PayloadManager {
             spawnStab(world, target, strike.getCannon());
         } else if (type == PayloadType.NUKE) {
             spawnNuke(world, target, strike.getCannon());
+        } else if (type == PayloadType.RECURSION) {
+            spawnRecursion(world, target, strike.getCannon());
         }
     }
 
     private void spawnStab(World world, Location center, Cannon cannon) {
         Location ground = findGroundLevel(world, center);
-        
+
         float yield = getFloatParameter(cannon, "yield", (float) plugin.getConfigManager().getStabYield());
         double offset = getDoubleParameter(cannon, "offset", plugin.getConfigManager().getStabOffset());
         int verticalStep = getIntParameter(cannon, "vertical-step", plugin.getConfigManager().getStabVerticalStep());
@@ -166,6 +207,82 @@ public class PayloadManager {
                 }
             }
         }.runTaskLater(plugin, (long) launchDelay);
+    }
+
+    private void spawnRecursion(World world, Location center, Cannon cannon) {
+        float yield = getFloatParameter(cannon, "yield", (float) plugin.getConfigManager().getRecursionYield());
+        double height = getDoubleParameter(cannon, "height", plugin.getConfigManager().getRecursionHeight());
+        int level = getIntParameter(cannon, "level", plugin.getConfigManager().getRecursionLevel());
+        int amount = getIntParameter(cannon, "amount", plugin.getConfigManager().getRecursionAmount());
+        double velocity = getDoubleParameter(cannon, "velocity", plugin.getConfigManager().getRecursionVelocity());
+        int splitFuseTicks = getIntParameter(cannon, "split-fuse-ticks", plugin.getConfigManager().getRecursionSplitFuseTicks());
+        int lastFuseTicks = getIntParameter(cannon, "last-fuse-ticks", plugin.getConfigManager().getRecursionLastFuseTicks());
+
+        Location spawnLocation = center.clone().add(0, height, 0);
+
+        TNTPrimed tnt = spawnTNTAt(world, spawnLocation, yield, 80, false);
+        if (tnt != null) {
+            tnt.getPersistentDataContainer().set(recursionLevelKey, PersistentDataType.INTEGER, level);
+            tnt.getPersistentDataContainer().set(recursionAmountKey, PersistentDataType.INTEGER, amount);
+            tnt.getPersistentDataContainer().set(recursionYieldKey, PersistentDataType.FLOAT, yield);
+            tnt.getPersistentDataContainer().set(recursionVelocityKey, PersistentDataType.DOUBLE, velocity);
+            tnt.getPersistentDataContainer().set(recursionSplitFuseKey, PersistentDataType.INTEGER, splitFuseTicks);
+            tnt.getPersistentDataContainer().set(recursionLastFuseKey, PersistentDataType.INTEGER, lastFuseTicks);
+        }
+    }
+
+    public void handleRecursionExplosion(TNTPrimed explodedTnt) {
+        if (!explodedTnt.getPersistentDataContainer().has(recursionLevelKey, PersistentDataType.INTEGER)) {
+            return;
+        }
+
+        int level = explodedTnt.getPersistentDataContainer().get(recursionLevelKey, PersistentDataType.INTEGER);
+        if (level <= 0) {
+            return;
+        }
+
+        int amount = explodedTnt.getPersistentDataContainer().get(recursionAmountKey, PersistentDataType.INTEGER);
+        float yield = explodedTnt.getPersistentDataContainer().get(recursionYieldKey, PersistentDataType.FLOAT);
+
+        double velocityMult = 1.0;
+        if (explodedTnt.getPersistentDataContainer().has(recursionVelocityKey, PersistentDataType.DOUBLE)) {
+            velocityMult = explodedTnt.getPersistentDataContainer().get(recursionVelocityKey, PersistentDataType.DOUBLE);
+        }
+
+        int splitFuseTicks = 60;
+        if (explodedTnt.getPersistentDataContainer().has(recursionSplitFuseKey, PersistentDataType.INTEGER)) {
+            splitFuseTicks = explodedTnt.getPersistentDataContainer().get(recursionSplitFuseKey, PersistentDataType.INTEGER);
+        }
+
+        int lastFuseTicks = 60;
+        if (explodedTnt.getPersistentDataContainer().has(recursionLastFuseKey, PersistentDataType.INTEGER)) {
+            lastFuseTicks = explodedTnt.getPersistentDataContainer().get(recursionLastFuseKey, PersistentDataType.INTEGER);
+        }
+
+        Location center = explodedTnt.getLocation();
+        World world = center.getWorld();
+
+        double angleStep = 360.0 / amount;
+        int fuseToUse = (level - 1 == 0) ? lastFuseTicks : splitFuseTicks;
+
+        for (int i = 0; i < amount; i++) {
+            double angle = i * angleStep;
+            double radians = Math.toRadians(angle);
+            double x = Math.cos(radians);
+            double z = Math.sin(radians);
+            Vector velocity = new Vector(x, 0.5, z).normalize().multiply(velocityMult);
+
+            TNTPrimed newTnt = spawnTNTAt(world, center.clone().add(0, 0.5, 0), yield, fuseToUse, false);
+            if (newTnt != null) {
+                newTnt.setVelocity(velocity);
+                newTnt.getPersistentDataContainer().set(recursionLevelKey, PersistentDataType.INTEGER, level - 1);
+                newTnt.getPersistentDataContainer().set(recursionAmountKey, PersistentDataType.INTEGER, amount);
+                newTnt.getPersistentDataContainer().set(recursionYieldKey, PersistentDataType.FLOAT, yield);
+                newTnt.getPersistentDataContainer().set(recursionVelocityKey, PersistentDataType.DOUBLE, velocityMult);
+                newTnt.getPersistentDataContainer().set(recursionSplitFuseKey, PersistentDataType.INTEGER, splitFuseTicks);
+                newTnt.getPersistentDataContainer().set(recursionLastFuseKey, PersistentDataType.INTEGER, lastFuseTicks);
+            }
+        }
     }
 
     private double getDoubleParameter(Cannon cannon, String key, double defaultValue) {

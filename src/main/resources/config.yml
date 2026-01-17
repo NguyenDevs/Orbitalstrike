@@ -1,48 +1,135 @@
 # ==========================================
 # Orbital Strike Cannon Configuration
 # ==========================================
+# This is the main configuration file for the Orbital Strike plugin.
+# For individual cannon customization, edit "cannons.yml" instead.
 
 settings:
+  # Enable update notifications for server administrators
   update-notify: true
 
-  # Automatically load the target chunk before firing
+  # Automatically load the target chunk before firing to ensure strike success
+  # Recommended: true (prevents strikes from failing in unloaded chunks)
   force-load-target: true
-  
-  # List of worlds where the cannon can be activated
+
+  # List of worlds where cannons can be activated
+  # Add or remove world names to control where strikes are allowed
   enabled-worlds:
     - world
     - world_nether
     - world_the_end
 
-#These are the default values for cannons when they are created.
-#If you want to customize each cannon individually, please go to "cannons.yml".
+  # Enable cannon trigger console log
+  logs: true
+
+# ==========================================
+# Default Item Settings
+# ==========================================
+# These settings apply to all newly created cannons
+# To customize individual cannons, edit "cannons.yml"
 
 items:
+  # Material type for the cannon item
+  # Can be any valid Minecraft material (e.g., FISHING_ROD, STICK, BLAZE_ROD)
   material: FISHING_ROD
+
+  # Enable item durability system
+  # If true, the cannon item will break after reaching max-durability uses
   durability: true
+
+  # Maximum number of uses before the item breaks
   max-durability: 1
+
+  # Cooldown between uses in second
+  # Set to -1 to disable cooldown
   cooldown: -1
+
+# ==========================================
+# Payload Type Settings
+# ==========================================
+# Configure the behavior of each payload type
+# These are default values for newly created cannons
+
 payloads:
+  # ========================================
+  # STAB Payload
+  # ========================================
+  # Creates a vertical pattern drilling down to bedrock
   stab:
-    # Explosion power
+    # Explosion power of each TNT (default Minecraft TNT is 4.0)
     yield: 8.0
-    # Horizontal offset for the double helix pattern
+
+    # Horizontal offset for the pattern (in blocks)
     offset: 0.3
-    # Vertical distance between TNT spawns
+
+    # Vertical distance between TNT spawns (in blocks)
+    # Smaller values = more dense, larger values = more spread out
     vertical-step: 2
-    
+
+  # ========================================
+  # NUKE Payload
+  # ========================================
+  # Spawns a massive array of TNT in concentric rings above the target
   nuke:
-    # Explosion power
+    # Explosion power of each TNT
     yield: 8.0
-    # Height above target to spawn the nuke array
+
+    # Height above target to spawn the nuke array (in blocks)
+    # Higher values give TNT more time to spread before impact
     height: 60.0
-    # Number of rings in the nuke array
+
+    # Number of concentric rings in the nuke array
+    # More rings = larger explosion radius
     rings: 10
-    # Base amount of TNT in the inner ring
+
+    # Base amount of TNT in the innermost ring
     base-tnt: 20
-    # Amount of TNT to add per ring
+
+    # Amount of additional TNT to add per ring
+    # Ring 1 has base-tnt, Ring 2 has base-tnt + tnt-increase, etc.
     tnt-increase: 3
-    # Fuse time in ticks (20 ticks = 1 second)
+
+    # Fuse time in ticks before TNT explodes (20 ticks = 1 second)
+    # Controls how long TNT stays suspended before launching
     fuse-ticks: 80
-    # Delay before launching the TNT array in ticks
+
+    # Delay before launching the TNT array downward (in ticks)
+    # Longer delays allow more time to observe the formation
     launch-delay: 10
+
+  # ========================================
+  # RECURSION Payload
+  # ========================================
+  # Creates a chain reaction where each TNT splits into multiple TNTs
+  recursion:
+    # Explosion power of each TNT
+    # Lower values recommended to prevent server lag
+    yield: 10.0
+
+    # Height above target to spawn the initial TNT (in blocks)
+    height: 111.0
+
+    # Number of recursion levels (to prevent infinite recursion)
+    # Example with level 3:
+    # - Level 1: 1 TNT splits into 'amount' TNTs
+    # - Level 2: Each TNT splits into 'amount' TNTs
+    # - Level 3: Final explosion (no more splitting)
+    level: 3
+
+    # Number of TNTs to spawn after each explosion
+    # Total TNT count = amount^level (e.g., 5^3 = 125 TNTs at level 3)
+    amount: 5
+
+    # Velocity multiplier for the split TNTs
+    # Higher values make TNTs spread faster and farther
+    velocity: 0.8
+
+    # Fuse time in ticks for the split TNTs (intermediate levels)
+    # This applies to all levels EXCEPT the last level
+    # Shorter fuse = faster chain reaction
+    split-fuse-ticks: 20
+
+    # Fuse time in ticks for the last level TNTs (final explosion)
+    # This applies ONLY to the final level before explosion
+    # Longer fuse gives time for TNTs to spread before detonating
+    last-fuse-ticks: 60

@@ -26,7 +26,8 @@ public class TNTListener implements Listener {
                 plugin.getPayloadManager().getOrbitalStrikeKey(),
                 PersistentDataType.BYTE)) {
 
-           // plugin.getLogger().info("Orbital strike TNT exploded normally");
+            plugin.getPayloadManager().handleRecursionExplosion(tnt);
+
             return;
         }
     }

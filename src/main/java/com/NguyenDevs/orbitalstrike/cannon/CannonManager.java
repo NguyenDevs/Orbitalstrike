@@ -29,12 +29,12 @@ public class CannonManager {
 
     public void createCannon(String name, PayloadType payloadType) {
         Cannon cannon = new Cannon(name, payloadType);
-        
-        // Load default parameters from config based on payload type
+
         if (payloadType == PayloadType.STAB) {
             cannon.setParameter("yield", plugin.getConfigManager().getStabYield());
             cannon.setParameter("offset", plugin.getConfigManager().getStabOffset());
             cannon.setParameter("vertical-step", plugin.getConfigManager().getStabVerticalStep());
+
         } else if (payloadType == PayloadType.NUKE) {
             cannon.setParameter("yield", plugin.getConfigManager().getNukeYield());
             cannon.setParameter("height", plugin.getConfigManager().getNukeHeight());
@@ -43,9 +43,17 @@ public class CannonManager {
             cannon.setParameter("tnt-increase", plugin.getConfigManager().getNukeTntIncrease());
             cannon.setParameter("fuse-ticks", plugin.getConfigManager().getNukeFuseTicks());
             cannon.setParameter("launch-delay", plugin.getConfigManager().getNukeLaunchDelay());
+
+        } else if (payloadType == PayloadType.RECURSION) {
+            cannon.setParameter("yield", plugin.getConfigManager().getRecursionYield());
+            cannon.setParameter("height", plugin.getConfigManager().getRecursionHeight());
+            cannon.setParameter("level", plugin.getConfigManager().getRecursionLevel());
+            cannon.setParameter("amount", plugin.getConfigManager().getRecursionAmount());
+            cannon.setParameter("velocity", plugin.getConfigManager().getRecursionVelocity());
+            cannon.setParameter("split-fuse-ticks", plugin.getConfigManager().getRecursionSplitFuseTicks());
+            cannon.setParameter("last-fuse-ticks", plugin.getConfigManager().getRecursionLastFuseTicks());
         }
-        
-        // Load default item settings
+
         cannon.setItemMaterial(plugin.getConfigManager().getDefaultItemMaterial());
         cannon.setDurabilityEnabled(plugin.getConfigManager().isDefaultItemDurabilityEnabled());
         cannon.setMaxDurability(plugin.getConfigManager().getDefaultItemMaxDurability());
@@ -94,8 +102,7 @@ public class CannonManager {
 
         for (String key : section.getKeys(false)) {
             String name = section.getString(key + ".name");
-            
-            // Load payload type from new structure
+
             String payloadStr = section.getString(key + ".payload.type", "STAB");
             PayloadType payloadType;
             try {
@@ -106,8 +113,7 @@ public class CannonManager {
 
             if (name != null) {
                 Cannon cannon = new Cannon(name, payloadType);
-                
-                // Load item settings
+
                 List<Map<?, ?>> itemList = section.getMapList(key + ".item");
                 for (Map<?, ?> itemProp : itemList) {
                     if (itemProp.containsKey("material")) {
@@ -147,8 +153,7 @@ public class CannonManager {
         for (Cannon cannon : cannons.values()) {
             String key = cannon.getName().toLowerCase();
             section.set(key + ".name", cannon.getName());
-            
-            // Save item settings
+
             List<Map<String, Object>> itemList = new ArrayList<>();
             itemList.add(Map.of("material", cannon.getItemMaterial().name()));
             itemList.add(Map.of("durability", cannon.isDurabilityEnabled()));
@@ -156,8 +161,7 @@ public class CannonManager {
             section.set(key + ".item", itemList);
             
             section.set(key + ".cooldown", cannon.getCooldown());
-            
-            // Save payload settings
+
             ConfigurationSection payloadSection = section.createSection(key + ".payload");
             payloadSection.set("type", cannon.getPayloadType().name());
             
