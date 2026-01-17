@@ -15,6 +15,8 @@ cannon:
   fired: "&c&lFIRING ORBITAL STRIKE! &eTarget: %x%, %y%, %z%"
   given: "&aYou have been given the Orbital Strike Designator for &e%name%&a."
   no-permission: "&cYou do not have permission to use this cannon."
+  cooldown: "&cYou must wait %time% seconds before using this cannon again."
+  out-of-range: "&cTarget is out of range! Max distance: %distance% blocks."
   info:
     header: "&6=== Cannon Info: &e%name% &6==="
     payload: "&7Payload: &e%payload%"
