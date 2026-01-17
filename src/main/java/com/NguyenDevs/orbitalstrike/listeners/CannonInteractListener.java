@@ -5,6 +5,7 @@ import com.NguyenDevs.orbitalstrike.cannon.Cannon;
 import com.NguyenDevs.orbitalstrike.cannon.CannonRecipeManager;
 import com.NguyenDevs.orbitalstrike.utils.ColorUtils;
 import com.NguyenDevs.orbitalstrike.utils.StrikeData;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -18,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.RayTraceResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,13 +59,24 @@ public class CannonInteractListener implements Listener {
         }
         
         Player player = event.getPlayer();
-        ItemStack item = player.getItemInHand();
+        ItemStack item = player.getInventory().getItemInMainHand();
         
         if (item == null || item.getType() == Material.AIR) return;
         
         if (item.getType() == Material.FISHING_ROD) return;
         
-        Location target = player.getTargetBlock(null, 1000).getLocation();
+        Location target = null;
+        if (event.getClickedBlock() != null) {
+            target = event.getClickedBlock().getLocation();
+        } else {
+            RayTraceResult result = player.rayTraceBlocks(1000, FluidCollisionMode.ALWAYS);
+            if (result != null && result.getHitBlock() != null) {
+                target = result.getHitBlock().getLocation();
+            }
+        }
+        
+        if (target == null) return;
+
         handleCannonUse(player, item, target);
     }
 

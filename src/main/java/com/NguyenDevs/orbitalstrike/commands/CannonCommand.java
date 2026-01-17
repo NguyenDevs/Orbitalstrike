@@ -10,6 +10,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -22,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.RayTraceResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -194,7 +196,18 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        Location target = player.getTargetBlock(null, 100).getLocation();
+        Location target = null;
+        RayTraceResult result = player.rayTraceBlocks(100, FluidCollisionMode.ALWAYS);
+        if (result != null && result.getHitBlock() != null) {
+            target = result.getHitBlock().getLocation();
+        }
+
+        if (target == null) {
+            sender.sendMessage(ColorUtils.colorize("&cNo target block found in range!"));
+            playErrorSound(sender);
+            return;
+        }
+
         StrikeData strikeData = new StrikeData(cannon.getPayloadType());
 
         plugin.getPayloadManager().initiateStrike(cannon, strikeData, target);
@@ -424,13 +437,13 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.header", "%name%", cannon.getName()));
         sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.payload", "%payload%", cannon.getPayloadType().name()));
         
-        sender.sendMessage(ColorUtils.colorize("&eItem Settings:"));
-        sender.sendMessage(ColorUtils.colorize("  &7Material: &f" + cannon.getItemMaterial().name()));
-        sender.sendMessage(ColorUtils.colorize("  &7Durability: &f" + cannon.isDurabilityEnabled()));
+        sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.item-settings-header"));
+        sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.item-material", "%material%", cannon.getItemMaterial().name()));
+        sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.item-durability", "%enabled%", String.valueOf(cannon.isDurabilityEnabled())));
         if (cannon.isDurabilityEnabled()) {
-            sender.sendMessage(ColorUtils.colorize("  &7Max Durability: &f" + cannon.getMaxDurability()));
+            sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.item-max-durability", "%amount%", String.valueOf(cannon.getMaxDurability())));
         }
-        sender.sendMessage(ColorUtils.colorize("  &7Cooldown: &f" + cannon.getCooldown()));
+        sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.item-cooldown", "%time%", String.valueOf(cannon.getCooldown())));
         
         sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.parameters-header"));
 
