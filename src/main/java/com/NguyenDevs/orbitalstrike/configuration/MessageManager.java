@@ -23,6 +23,7 @@ public class MessageManager {
     private static final Set<String> MESSAGES_WITH_PREFIX = new HashSet<>();
 
     static {
+        MESSAGES_WITH_PREFIX.add("cooldown");
         MESSAGES_WITH_PREFIX.add("no-permission");
         MESSAGES_WITH_PREFIX.add("no-permission-craft");
         MESSAGES_WITH_PREFIX.add("invalid-args");
