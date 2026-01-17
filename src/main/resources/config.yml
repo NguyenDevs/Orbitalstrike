@@ -22,7 +22,6 @@ items:
   durability: true
   max-durability: 1
   cooldown: -1
-
 payloads:
   stab:
     # Explosion power
