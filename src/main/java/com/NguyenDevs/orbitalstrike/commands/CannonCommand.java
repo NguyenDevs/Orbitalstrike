@@ -284,6 +284,21 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         if (meta != null) {
             if (cannon.isDurabilityEnabled()) {
                 meta.getPersistentDataContainer().set(DURABILITY_KEY, PersistentDataType.INTEGER, 0);
+                
+                // Set initial damage so the item appears to have 'max-durability' uses left
+                if (meta instanceof Damageable) {
+                    Damageable damageable = (Damageable) meta;
+                    int maxVanilla = item.getType().getMaxDurability();
+                    int customMax = cannon.getMaxDurability();
+                    
+                    if (maxVanilla > 0) {
+                        // If customMax is 5, and maxVanilla is 64.
+                        // We want 5 uses left. So we damage it by 64 - 5 = 59.
+                        // If customMax > maxVanilla, we just give a full item (0 damage).
+                        int initialDamage = Math.max(0, maxVanilla - customMax);
+                        damageable.setDamage(initialDamage);
+                    }
+                }
             }
 
             meta.setDisplayName(ColorUtils.colorize(plugin.getMessageManager().getMessage("tool.name") + " (" + cannon.getName() + ")"));

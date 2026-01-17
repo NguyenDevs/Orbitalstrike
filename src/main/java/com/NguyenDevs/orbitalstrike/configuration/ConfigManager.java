@@ -24,7 +24,7 @@ public class ConfigManager {
 
         config.addDefault("items.material", "FISHING_ROD");
         config.addDefault("items.durability", true);
-        config.addDefault("items.max-durability", 5);
+        config.addDefault("items.max-durability", 1);
         config.addDefault("items.cooldown", -1);
         
         config.addDefault("payloads.stab.yield", 8.0);

@@ -136,20 +136,19 @@ public class CannonInteractListener implements Listener {
                 
                 if (meta instanceof Damageable) {
                     Damageable damageable = (Damageable) meta;
-                    int maxDurability = item.getType().getMaxDurability();
+                    int maxVanilla = item.getType().getMaxDurability();
                     
-                    if (maxDurability > 0) {
-                        // Calculate damage to apply based on max durability and max uses
-                        // We want the bar to reflect the remaining uses
-                        // damage = maxDurability * (uses / maxUses)
+                    if (maxVanilla > 0) {
+                        // Simply increase damage by 1
+                        int currentDamage = damageable.getDamage();
+                        damageable.setDamage(currentDamage + 1);
                         
-                        double damageRatio = (double) uses / cannon.getMaxDurability();
-                        int newDamage = (int) (maxDurability * damageRatio);
-                        
-                        // Ensure we don't accidentally break it visually before it's actually broken
-                        if (newDamage >= maxDurability) newDamage = maxDurability - 1;
-                        
-                        damageable.setDamage(newDamage);
+                        // If for some reason the item is now fully broken according to vanilla durability, break it
+                        if (damageable.getDamage() >= maxVanilla) {
+                            item.setAmount(0);
+                            player.playSound(player.getLocation(), "entity.item.break", 1.0f, 1.0f);
+                            return; // Stop execution
+                        }
                     }
                 }
                 

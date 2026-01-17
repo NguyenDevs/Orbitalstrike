@@ -62,14 +62,23 @@ public class CannonRecipeManager {
             ItemMeta meta = item.getItemMeta();
             
             if (meta != null) {
-                // Set initial damage if it's a damageable item and we want it to look used?
-                // Actually, if we are using custom durability, we might want it to look full or empty?
-                // The previous code set it to maxDurability - 1 (almost broken).
-                // But now we have custom durability.
-                // If durability is enabled, we start with 0 uses.
-                
                 if (cannon.isDurabilityEnabled()) {
                     meta.getPersistentDataContainer().set(DURABILITY_KEY, PersistentDataType.INTEGER, 0);
+                    
+                    // Set initial damage so the item appears to have 'max-durability' uses left
+                    if (meta instanceof Damageable) {
+                        Damageable damageable = (Damageable) meta;
+                        int maxVanilla = item.getType().getMaxDurability();
+                        int customMax = cannon.getMaxDurability();
+                        
+                        if (maxVanilla > 0) {
+                            // If customMax is 5, and maxVanilla is 64.
+                            // We want 5 uses left. So we damage it by 64 - 5 = 59.
+                            // If customMax > maxVanilla, we just give a full item (0 damage).
+                            int initialDamage = Math.max(0, maxVanilla - customMax);
+                            damageable.setDamage(initialDamage);
+                        }
+                    }
                 }
                 
                 String displayName = plugin.getMessageManager().getMessage("tool.name") + " (" + config.getCannonName() + ")";
