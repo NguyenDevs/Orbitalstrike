@@ -9,7 +9,8 @@
 > **STAB (Precision Strike):** A focused attack that drops a continuous column of TNT onto a single point, drilling deep into the ground (ideal for breaching bunkers or reinforced bases).  
 >  
 > **NUKE (Area Bombardment):** A massive area-of-effect strike. It drops a main warhead from high altitude, accompanied by expanding rings of TNT to carpet-bomb a large area (ideal for surface annihilation).
-
+>
+> **RECURSION (Chain Reaction):** Creates devastating chain-detonation effects
 **Firing Mechanisms**  
 > **By Command:** Fire immediately at the crosshair location or at specific X, Y, Z coordinates.  
 >  
