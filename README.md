@@ -24,9 +24,11 @@
 - `/cannon create <name> [payload]` - Create a cannon at your location
 - `/cannon remove <name>` - Remove a cannon
 - `/cannon list` - List all cannons
-- `/cannon fire <payload>` - Fire payload at crosshair
-- `/cannon target <x> <y> <z> <payload>` - Fire at coordinates
+- `/cannon fire <cannon>` - Fire payload at crosshair
+- `/cannon info <cannon>` - Show info for a cannon
+- `/cannon target <cannon> <x> <y> <z>` - Fire at coordinates
 - `/cannon give <player> <cannon>` - Give targeting tool for a cannon
+- `/cannon set <cannon> <parameter> <value>` - Set a parameter for a cannon
 - `/cannon reload` - Reload configuration
 
 ## Permissions
