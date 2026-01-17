@@ -1,6 +1,7 @@
 package com.NguyenDevs.orbitalstrike.cannon;
 
 import com.NguyenDevs.orbitalstrike.utils.PayloadType;
+import org.bukkit.Material;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,12 @@ public class Cannon {
     private final String name;
     private PayloadType payloadType;
     private final Map<String, Object> parameters;
+    
+    // Item settings
+    private Material itemMaterial;
+    private boolean durabilityEnabled;
+    private int maxDurability;
+    private int cooldown;
 
     public Cannon(String name) {
         this(name, PayloadType.STAB);
@@ -18,6 +25,12 @@ public class Cannon {
         this.name = name;
         this.payloadType = payloadType;
         this.parameters = new HashMap<>();
+        
+        // Default values will be set by CannonManager
+        this.itemMaterial = Material.FISHING_ROD;
+        this.durabilityEnabled = true;
+        this.maxDurability = 5;
+        this.cooldown = -1;
     }
 
     public String getName() {
@@ -42,5 +55,37 @@ public class Cannon {
 
     public Object getParameter(String key) {
         return parameters.get(key);
+    }
+
+    public Material getItemMaterial() {
+        return itemMaterial;
+    }
+
+    public void setItemMaterial(Material itemMaterial) {
+        this.itemMaterial = itemMaterial;
+    }
+
+    public boolean isDurabilityEnabled() {
+        return durabilityEnabled;
+    }
+
+    public void setDurabilityEnabled(boolean durabilityEnabled) {
+        this.durabilityEnabled = durabilityEnabled;
+    }
+
+    public int getMaxDurability() {
+        return maxDurability;
+    }
+
+    public void setMaxDurability(int maxDurability) {
+        this.maxDurability = maxDurability;
+    }
+
+    public int getCooldown() {
+        return cooldown;
+    }
+
+    public void setCooldown(int cooldown) {
+        this.cooldown = cooldown;
     }
 }

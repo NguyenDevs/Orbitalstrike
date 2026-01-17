@@ -2,15 +2,14 @@ package com.NguyenDevs.orbitalstrike.cannon;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import com.NguyenDevs.orbitalstrike.utils.PayloadType;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 public class CannonManager {
@@ -45,6 +44,12 @@ public class CannonManager {
             cannon.setParameter("fuse-ticks", plugin.getConfigManager().getNukeFuseTicks());
             cannon.setParameter("launch-delay", plugin.getConfigManager().getNukeLaunchDelay());
         }
+        
+        // Load default item settings
+        cannon.setItemMaterial(plugin.getConfigManager().getDefaultItemMaterial());
+        cannon.setDurabilityEnabled(plugin.getConfigManager().isDefaultItemDurabilityEnabled());
+        cannon.setMaxDurability(plugin.getConfigManager().getDefaultItemMaxDurability());
+        cannon.setCooldown(plugin.getConfigManager().getDefaultItemCooldown());
 
         cannons.put(name.toLowerCase(), cannon);
         saveCannons();
@@ -89,7 +94,9 @@ public class CannonManager {
 
         for (String key : section.getKeys(false)) {
             String name = section.getString(key + ".name");
-            String payloadStr = section.getString(key + ".payload", "STAB");
+            
+            // Load payload type from new structure
+            String payloadStr = section.getString(key + ".payload.type", "STAB");
             PayloadType payloadType;
             try {
                 payloadType = PayloadType.valueOf(payloadStr);
@@ -100,12 +107,31 @@ public class CannonManager {
             if (name != null) {
                 Cannon cannon = new Cannon(name, payloadType);
                 
-                // Load parameters
-                ConfigurationSection paramSection = section.getConfigurationSection(key);
-                if (paramSection != null) {
-                    for (String paramKey : paramSection.getKeys(false)) {
-                        if (paramKey.equals("name") || paramKey.equals("payload")) continue;
-                        cannon.setParameter(paramKey, paramSection.get(paramKey));
+                // Load item settings
+                List<Map<?, ?>> itemList = section.getMapList(key + ".item");
+                for (Map<?, ?> itemProp : itemList) {
+                    if (itemProp.containsKey("material")) {
+                        try {
+                            cannon.setItemMaterial(Material.valueOf((String) itemProp.get("material")));
+                        } catch (Exception e) {
+                            cannon.setItemMaterial(Material.FISHING_ROD);
+                        }
+                    }
+                    if (itemProp.containsKey("durability")) {
+                        cannon.setDurabilityEnabled((Boolean) itemProp.get("durability"));
+                    }
+                    if (itemProp.containsKey("max-durability")) {
+                        cannon.setMaxDurability((Integer) itemProp.get("max-durability"));
+                    }
+                }
+                
+                cannon.setCooldown(section.getInt(key + ".cooldown", -1));
+                
+                // Load payload parameters
+                List<Map<?, ?>> payloadSettings = section.getMapList(key + ".payload.settings");
+                for (Map<?, ?> setting : payloadSettings) {
+                    for (Map.Entry<?, ?> entry : setting.entrySet()) {
+                        cannon.setParameter((String) entry.getKey(), entry.getValue());
                     }
                 }
                 
@@ -121,11 +147,25 @@ public class CannonManager {
         for (Cannon cannon : cannons.values()) {
             String key = cannon.getName().toLowerCase();
             section.set(key + ".name", cannon.getName());
-            section.set(key + ".payload", cannon.getPayloadType().name());
             
+            // Save item settings
+            List<Map<String, Object>> itemList = new ArrayList<>();
+            itemList.add(Map.of("material", cannon.getItemMaterial().name()));
+            itemList.add(Map.of("durability", cannon.isDurabilityEnabled()));
+            itemList.add(Map.of("max-durability", cannon.getMaxDurability()));
+            section.set(key + ".item", itemList);
+            
+            section.set(key + ".cooldown", cannon.getCooldown());
+            
+            // Save payload settings
+            ConfigurationSection payloadSection = section.createSection(key + ".payload");
+            payloadSection.set("type", cannon.getPayloadType().name());
+            
+            List<Map<String, Object>> payloadSettings = new ArrayList<>();
             for (Map.Entry<String, Object> entry : cannon.getParameters().entrySet()) {
-                section.set(key + "." + entry.getKey(), entry.getValue());
+                payloadSettings.add(Map.of(entry.getKey(), entry.getValue()));
             }
+            payloadSection.set("settings", payloadSettings);
         }
 
         try {

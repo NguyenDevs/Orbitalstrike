@@ -11,16 +11,22 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class CannonInteractListener implements Listener {
     private final OrbitalStrike plugin;
+    private final Map<UUID, Map<String, Long>> cooldowns = new HashMap<>();
 
     public CannonInteractListener(OrbitalStrike plugin) {
         this.plugin = plugin;
@@ -31,23 +37,39 @@ public class CannonInteractListener implements Listener {
         if (event.getState() != PlayerFishEvent.State.REEL_IN && event.getState() != PlayerFishEvent.State.IN_GROUND) {
             return;
         }
-
+        
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-
+        
         if (item.getType() != Material.FISHING_ROD) {
             item = player.getInventory().getItemInOffHand();
         }
-
+        
         if (item.getType() != Material.FISHING_ROD) return;
-
-        ItemMeta meta = item.getItemMeta();
-        if (!(meta instanceof Damageable)) return;
-        Damageable damageable = (Damageable) meta;
-
-        if (item.getType().getMaxDurability() - damageable.getDamage() > 1) {
+        
+        handleCannonUse(player, item, event.getHook().getLocation());
+    }
+    
+    @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
+        
+        Player player = event.getPlayer();
+        ItemStack item = player.getItemInHand();
+        
+        if (item == null || item.getType() == Material.AIR) return;
+        
+        if (item.getType() == Material.FISHING_ROD) return;
+        
+        Location target = player.getTargetBlock(null, 500).getLocation();
+        handleCannonUse(player, item, target);
+    }
+
+    private void handleCannonUse(Player player, ItemStack item, Location target) {
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
 
         Cannon cannon = null;
 
@@ -63,7 +85,7 @@ public class CannonInteractListener implements Listener {
         } else {
             return;
         }
-
+        
         if (!player.hasPermission("orbitalstrike.use." + cannon.getName()) && !player.hasPermission("orbitalstrike.use.*")) {
             player.sendMessage(plugin.getMessageManager().getMessage("cannon.no-permission"));
             playErrorSound(player);
@@ -75,11 +97,65 @@ public class CannonInteractListener implements Listener {
             playErrorSound(player);
             return;
         }
+        
+        // Check cooldown
+        if (cannon.getCooldown() > 0) {
+            long currentTime = System.currentTimeMillis();
+            cooldowns.putIfAbsent(player.getUniqueId(), new HashMap<>());
+            Map<String, Long> playerCooldowns = cooldowns.get(player.getUniqueId());
+            
+            if (playerCooldowns.containsKey(cannon.getName())) {
+                long lastUse = playerCooldowns.get(cannon.getName());
+                long cooldownTime = cannon.getCooldown() * 1000L;
+                if (currentTime - lastUse < cooldownTime) {
+                    long remaining = (cooldownTime - (currentTime - lastUse)) / 1000;
+                    player.sendMessage(plugin.getMessageManager().getMessage("cannon.cooldown", "%time%", String.valueOf(remaining)));
+                    return;
+                }
+            }
+            playerCooldowns.put(cannon.getName(), currentTime);
+            
+            // Set item cooldown animation (like Ender Pearl)
+            player.setCooldown(item.getType(), cannon.getCooldown() * 20);
+        }
 
-        Location target = player.getTargetBlock(null, 500).getLocation();
-
-        item.setAmount(0);
-        player.playSound(player.getLocation(), "entity.item.break", 1.0f, 1.0f);
+        // Handle durability
+        if (cannon.isDurabilityEnabled()) {
+            int uses = 0;
+            if (meta.getPersistentDataContainer().has(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER)) {
+                uses = meta.getPersistentDataContainer().get(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER);
+            }
+            
+            uses++;
+            
+            if (uses >= cannon.getMaxDurability()) {
+                item.setAmount(0);
+                player.playSound(player.getLocation(), "entity.item.break", 1.0f, 1.0f);
+            } else {
+                meta.getPersistentDataContainer().set(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER, uses);
+                
+                if (meta instanceof Damageable) {
+                    Damageable damageable = (Damageable) meta;
+                    int maxDurability = item.getType().getMaxDurability();
+                    
+                    if (maxDurability > 0) {
+                        // Calculate damage to apply based on max durability and max uses
+                        // We want the bar to reflect the remaining uses
+                        // damage = maxDurability * (uses / maxUses)
+                        
+                        double damageRatio = (double) uses / cannon.getMaxDurability();
+                        int newDamage = (int) (maxDurability * damageRatio);
+                        
+                        // Ensure we don't accidentally break it visually before it's actually broken
+                        if (newDamage >= maxDurability) newDamage = maxDurability - 1;
+                        
+                        damageable.setDamage(newDamage);
+                    }
+                }
+                
+                item.setItemMeta(meta);
+            }
+        }
 
         StrikeData strikeData = new StrikeData(cannon.getPayloadType());
 

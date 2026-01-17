@@ -2,6 +2,7 @@ package com.NguyenDevs.orbitalstrike.commands;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import com.NguyenDevs.orbitalstrike.cannon.Cannon;
+import com.NguyenDevs.orbitalstrike.cannon.CannonRecipeManager;
 import com.NguyenDevs.orbitalstrike.utils.ColorUtils;
 import com.NguyenDevs.orbitalstrike.utils.PayloadType;
 import com.NguyenDevs.orbitalstrike.utils.StrikeData;
@@ -33,6 +34,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import static com.NguyenDevs.orbitalstrike.cannon.CannonRecipeManager.CANNON_KEY;
+import static com.NguyenDevs.orbitalstrike.cannon.CannonRecipeManager.DURABILITY_KEY;
 
 public class CannonCommand implements CommandExecutor, TabCompleter {
 
@@ -276,13 +278,15 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        ItemStack rod = new ItemStack(Material.FISHING_ROD);
-        ItemMeta meta = rod.getItemMeta();
-        if (meta instanceof Damageable) {
-            Damageable damageable = (Damageable) meta;
-            damageable.setDamage(rod.getType().getMaxDurability() - 1);
+        ItemStack item = new ItemStack(cannon.getItemMaterial());
+        ItemMeta meta = item.getItemMeta();
+        
+        if (meta != null) {
+            if (cannon.isDurabilityEnabled()) {
+                meta.getPersistentDataContainer().set(DURABILITY_KEY, PersistentDataType.INTEGER, 0);
+            }
 
-            meta.setDisplayName(plugin.getMessageManager().getMessage("tool.name"));
+            meta.setDisplayName(ColorUtils.colorize(plugin.getMessageManager().getMessage("tool.name") + " (" + cannon.getName() + ")"));
 
             List<String> loreConfig = plugin.getMessageManager().getMessageList("tool.lore");
             List<String> finalLore = new ArrayList<>();
@@ -296,10 +300,10 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
 
             meta.getPersistentDataContainer().set(CANNON_KEY, PersistentDataType.STRING, cannon.getName());
 
-            rod.setItemMeta(meta);
+            item.setItemMeta(meta);
         }
 
-        targetPlayer.getInventory().addItem(rod);
+        targetPlayer.getInventory().addItem(item);
         sender.sendMessage(plugin.getMessageManager().getMessage("cannon.given", "%name%", cannonName));
         playSound(sender);
     }
@@ -339,12 +343,49 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
                 value = Integer.parseInt(valueStr);
             }
         } catch (NumberFormatException e) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "Value must be a number"));
-            playErrorSound(sender);
-            return;
+            // Try boolean
+            if (valueStr.equalsIgnoreCase("true") || valueStr.equalsIgnoreCase("false")) {
+                value = Boolean.parseBoolean(valueStr);
+            } else {
+                // Try string or material if needed, but for now let's assume numbers/booleans for params
+                // Actually, we might want to set item material
+                if (parameter.equals("material")) {
+                    try {
+                        value = Material.valueOf(valueStr.toUpperCase());
+                    } catch (IllegalArgumentException ex) {
+                        sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "Invalid material"));
+                        playErrorSound(sender);
+                        return;
+                    }
+                } else {
+                    sender.sendMessage(plugin.getMessageManager().getMessage("invalid-args", "%usage%", "Value must be a number or boolean"));
+                    playErrorSound(sender);
+                    return;
+                }
+            }
         }
-
-        cannon.setParameter(parameter, value);
+        
+        // Handle special parameters
+        if (parameter.equals("material")) {
+            if (value instanceof Material) {
+                cannon.setItemMaterial((Material) value);
+            }
+        } else if (parameter.equals("durability")) {
+            if (value instanceof Boolean) {
+                cannon.setDurabilityEnabled((Boolean) value);
+            }
+        } else if (parameter.equals("max-durability")) {
+            if (value instanceof Integer) {
+                cannon.setMaxDurability((Integer) value);
+            }
+        } else if (parameter.equals("cooldown")) {
+            if (value instanceof Integer) {
+                cannon.setCooldown((Integer) value);
+            }
+        } else {
+            cannon.setParameter(parameter, value);
+        }
+        
         plugin.getCannonManager().saveCannons();
         sender.sendMessage(ColorUtils.colorize("&aSet parameter &e" + parameter + "&a to &e" + value + "&a for cannon &e" + cannonName));
         playSound(sender);
@@ -367,6 +408,15 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
 
         sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.header", "%name%", cannon.getName()));
         sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.payload", "%payload%", cannon.getPayloadType().name()));
+        
+        sender.sendMessage(ColorUtils.colorize("&eItem Settings:"));
+        sender.sendMessage(ColorUtils.colorize("  &7Material: &f" + cannon.getItemMaterial().name()));
+        sender.sendMessage(ColorUtils.colorize("  &7Durability: &f" + cannon.isDurabilityEnabled()));
+        if (cannon.isDurabilityEnabled()) {
+            sender.sendMessage(ColorUtils.colorize("  &7Max Durability: &f" + cannon.getMaxDurability()));
+        }
+        sender.sendMessage(ColorUtils.colorize("  &7Cooldown: &f" + cannon.getCooldown()));
+        
         sender.sendMessage(plugin.getMessageManager().getMessage("cannon.info.parameters-header"));
 
         for (Map.Entry<String, Object> entry : cannon.getParameters().entrySet()) {
@@ -411,7 +461,12 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
                 String cannonName = args[1];
                 Cannon cannon = plugin.getCannonManager().getCannon(cannonName);
                 if (cannon != null) {
-                    return new ArrayList<>(cannon.getParameters().keySet());
+                    List<String> params = new ArrayList<>(cannon.getParameters().keySet());
+                    params.add("material");
+                    params.add("durability");
+                    params.add("max-durability");
+                    params.add("cooldown");
+                    return params;
                 }
             }
         }
@@ -419,6 +474,16 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         if (args.length == 4) {
             if (args[0].equalsIgnoreCase("target")) {
                 return Collections.emptyList();
+            }
+            if (args[0].equalsIgnoreCase("set")) {
+                if (args[2].equalsIgnoreCase("material")) {
+                    return Arrays.stream(Material.values())
+                            .map(Enum::name)
+                            .collect(Collectors.toList());
+                }
+                if (args[2].equalsIgnoreCase("durability")) {
+                    return Arrays.asList("true", "false");
+                }
             }
         }
 

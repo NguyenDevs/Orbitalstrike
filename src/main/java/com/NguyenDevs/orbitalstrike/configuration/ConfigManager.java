@@ -1,6 +1,7 @@
 package com.NguyenDevs.orbitalstrike.configuration;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,11 @@ public class ConfigManager {
         // Add default values if missing
         config.addDefault("settings.force-load-target", true);
         config.addDefault("settings.enabled-worlds", Arrays.asList("world", "world_nether", "world_the_end"));
+
+        config.addDefault("items.material", "FISHING_ROD");
+        config.addDefault("items.durability", true);
+        config.addDefault("items.max-durability", 5);
+        config.addDefault("items.cooldown", -1);
         
         config.addDefault("payloads.stab.yield", 8.0);
         config.addDefault("payloads.stab.offset", 0.3);
@@ -43,6 +49,27 @@ public class ConfigManager {
 
     public List<String> getEnabledWorlds() {
         return plugin.getConfig().getStringList("settings.enabled-worlds");
+    }
+
+    public Material getDefaultItemMaterial() {
+        String matName = plugin.getConfig().getString("items.material", "FISHING_ROD");
+        try {
+            return Material.valueOf(matName);
+        } catch (IllegalArgumentException e) {
+            return Material.FISHING_ROD;
+        }
+    }
+
+    public boolean isDefaultItemDurabilityEnabled() {
+        return plugin.getConfig().getBoolean("items.durability", true);
+    }
+
+    public int getDefaultItemMaxDurability() {
+        return plugin.getConfig().getInt("items.max-durability", 5);
+    }
+
+    public int getDefaultItemCooldown() {
+        return plugin.getConfig().getInt("items.cooldown", -1);
     }
     
     public double getStabYield() {

@@ -9,6 +9,7 @@ import com.NguyenDevs.orbitalstrike.configuration.MessageManager;
 import com.NguyenDevs.orbitalstrike.listeners.CannonInteractListener;
 import com.NguyenDevs.orbitalstrike.listeners.CraftListener;
 import com.NguyenDevs.orbitalstrike.listeners.TNTListener;
+import com.NguyenDevs.orbitalstrike.utils.ConfigMigrationUtils;
 import com.NguyenDevs.orbitalstrike.utils.SpigotPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -29,6 +30,9 @@ public final class OrbitalStrike extends JavaPlugin {
 
         this.configManager = new ConfigManager(this);
         this.configManager.loadConfig();
+        
+        // Migrate cannons.yml if needed
+        ConfigMigrationUtils.migrateCannonsYml(this);
         
         this.messageManager = new MessageManager(this);
         this.messageManager.loadMessages();
