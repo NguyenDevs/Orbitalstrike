@@ -16,6 +16,13 @@ settings:
 
 #These are the default values for cannons when they are created.
 #If you want to customize each cannon individually, please go to "cannons.yml".
+
+items:
+  material: FISHING_ROD
+  durability: true
+  max-durability: 1
+  cooldown: -1
+
 payloads:
   stab:
     # Explosion power
