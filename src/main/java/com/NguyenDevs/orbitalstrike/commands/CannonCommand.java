@@ -404,9 +404,13 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         } else {
             cannon.setParameter(parameter, value);
         }
-        
+
         plugin.getCannonManager().saveCannons();
-        sender.sendMessage(ColorUtils.colorize("&aSet parameter &e" + parameter + "&a to &e" + value + "&a for cannon &e" + cannonName));
+        sender.sendMessage(plugin.getMessageManager().getMessage("cannon.set-success",
+                "%parameter%", parameter,
+                "%value%", String.valueOf(value),
+                "%cannon%", cannonName
+        ));
         playSound(sender);
     }
 

@@ -33,6 +33,7 @@ public class MessageManager {
         MESSAGES_WITH_PREFIX.add("cannon.not-found");
         MESSAGES_WITH_PREFIX.add("cannon.given");
         MESSAGES_WITH_PREFIX.add("cannon.no-permission");
+        MESSAGES_WITH_PREFIX.add("cannon.set-success");
         MESSAGES_WITH_PREFIX.add("payload.invalid");
         MESSAGES_WITH_PREFIX.add("error.world-disabled");
         MESSAGES_WITH_PREFIX.add("error.cannon-exists");
