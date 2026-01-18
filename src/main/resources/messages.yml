@@ -42,6 +42,7 @@ payload:
   recursion: "Recursion (Chain Reaction)"
   invalid: "&cInvalid payload type! Available: stab, nuke, recursion"
 
+log: "Initiating strike at %target%"
 error:
   cannon-exists: "&cCannon already exists!"
   player-not-found: "&cPlayer not found!"

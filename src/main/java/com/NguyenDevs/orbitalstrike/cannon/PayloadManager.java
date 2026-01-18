@@ -3,12 +3,10 @@ package com.NguyenDevs.orbitalstrike.cannon;
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import com.NguyenDevs.orbitalstrike.utils.PayloadType;
 import com.NguyenDevs.orbitalstrike.utils.StrikeData;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.NamespacedKey;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -73,7 +71,10 @@ public class PayloadManager {
         }
 
         if (plugin.getConfigManager().isLogsEnabled()) {
-            plugin.getLogger().info("Initiating strike at " + target.toString());
+            Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&bOrbital&3Strike&9Cannon&8]")
+                    + " " + plugin.getMessageManager().getMessage("log",
+                    "%target%",  target.toString()
+            ));
         }
 
         ActiveStrike strike = new ActiveStrike(cannon, data, target);
