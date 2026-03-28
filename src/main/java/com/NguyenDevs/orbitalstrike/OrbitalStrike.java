@@ -11,6 +11,7 @@ import com.NguyenDevs.orbitalstrike.listeners.CraftListener;
 import com.NguyenDevs.orbitalstrike.listeners.TNTListener;
 import com.NguyenDevs.orbitalstrike.utils.ConfigMigrationUtils;
 import com.NguyenDevs.orbitalstrike.utils.SpigotPlugin;
+import com.NguyenDevs.orbitalstrike.utils.WorldGuardManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,10 +24,21 @@ public final class OrbitalStrike extends JavaPlugin {
     private CannonManager cannonManager;
     private PayloadManager payloadManager;
     private CannonRecipeManager cannonRecipeManager;
+    private WorldGuardManager worldGuardManager;
+
+    @Override
+    public void onLoad() {
+        if (getServer().getPluginManager().getPlugin("WorldGuard") != null) {
+            WorldGuardManager.registerFlag();
+        }
+    }
 
     @Override
     public void onEnable() {
         instance = this;
+
+        this.worldGuardManager = new WorldGuardManager(this);
+        this.worldGuardManager.init();
 
         this.configManager = new ConfigManager(this);
         this.configManager.loadConfig();
@@ -88,7 +100,10 @@ public final class OrbitalStrike extends JavaPlugin {
     
     public CannonRecipeManager getCannonRecipeManager() {
         return cannonRecipeManager;
+    }
 
+    public WorldGuardManager getWorldGuardManager() {
+        return worldGuardManager;
     }
 
     public void printLogo() {
