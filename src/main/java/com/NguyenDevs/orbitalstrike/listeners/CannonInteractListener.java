@@ -106,6 +106,13 @@ public class CannonInteractListener implements Listener {
             playErrorSound(player);
             return;
         }
+
+        // WorldGuard: check osc-enable flag at the target location
+        if (!plugin.getWorldGuardManager().isAllowed(player, target)) {
+            player.sendMessage(plugin.getMessageManager().getMessage("prefix") + plugin.getMessageManager().getMessage("error.worldguard-denied"));
+            playErrorSound(player);
+            return;
+        }
         
         // Check cooldown
         if (cannon.getCooldown() > 0) {
