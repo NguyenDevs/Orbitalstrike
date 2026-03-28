@@ -47,3 +47,4 @@ error:
   cannon-exists: "&cCannon already exists!"
   player-not-found: "&cPlayer not found!"
   world-disabled: "&cCannon cannot be used in this world!"
+  worldguard-denied: "&cOrbital Strike Cannon is disabled in this region!"
