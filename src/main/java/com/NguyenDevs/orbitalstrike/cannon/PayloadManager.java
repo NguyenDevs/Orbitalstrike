@@ -221,7 +221,7 @@ public class PayloadManager {
                 // Particles appear around center and shrink inward each tick
                 double gatherRadius = maxRadius * 0.35 * (1.0 - (double) tick / gatherTicks);
                 int particleCount = 10 + tick * 4;
-                Particle.DustOptions gatherDust = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.0f);
+                Particle.DustOptions gatherDust = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.2f);
                 for (int i = 0; i < particleCount; i++) {
                     double phi = Math.acos(1 - 2.0 * Math.random());
                     double theta = 2 * Math.PI * Math.random();
@@ -229,7 +229,7 @@ public class PayloadManager {
                     double px = center.getX() + r * Math.sin(phi) * Math.cos(theta);
                     double py = center.getY() + r * Math.cos(phi);
                     double pz = center.getZ() + r * Math.sin(phi) * Math.sin(theta);
-                    world.spawnParticle(Particle.DUST, px, py, pz, 1, 0, 0, 0, 0, gatherDust);
+                    world.spawnParticle(Particle.REDSTONE, px, py, pz, 1, 0, 0, 0, 0, gatherDust);
                 }
 
                 // Rising hum sound during charge-up
@@ -247,18 +247,16 @@ public class PayloadManager {
      * Spawns a single thin spherical shell at the given radius using
      * Fibonacci sphere distribution — perfectly uniform, no visible "layers".
      *
-     * Dùng DUST (không có trail/velocity) thay END_ROD để tránh hiệu ứng đuôi
-     * làm trông như nhiều tầng lồng nhau.
+     * Dùng ENTITY_EFFECT (Color DataType) — static hoàn toàn, không trail,
+     * compatible 1.20.5+ kể cả 1.21.x
      */
     private void spawnSphereShell(World world, Location center, double radius) {
         if (radius <= 0) return;
 
-        // Scale point count với surface area, capped tránh lag
         int totalPoints = (int) Math.min(500, Math.max(40, Math.PI * radius * radius * 2.5));
 
-        // Dust trắng sáng — không có trailing effect
-        Particle.DustOptions whiteDust  = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.2f);
-        Particle.DustOptions cyanDust   = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.0f);
+        Particle.DustOptions whiteDust = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.5f);
+        Particle.DustOptions cyanDust  = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.5f);
 
         double goldenRatio = (1.0 + Math.sqrt(5)) / 2.0;
         for (int i = 0; i < totalPoints; i++) {
@@ -269,11 +267,8 @@ public class PayloadManager {
             double py = center.getY() + radius * Math.cos(phi);
             double pz = center.getZ() + radius * Math.sin(phi) * Math.sin(theta);
 
-            // count=1, offsetX/Y/Z=0 — không spread, đúng vị trí shell
-            world.spawnParticle(Particle.DUST, px, py, pz, 1, 0, 0, 0, 0, whiteDust);
-            if (i % 10 == 0) {
-                world.spawnParticle(Particle.DUST, px, py, pz, 1, 0, 0, 0, 0, cyanDust);
-            }
+            world.spawnParticle(Particle.REDSTONE, px, py, pz, 1, 0, 0, 0, 0,
+                    (i % 8 == 0) ? cyanDust : whiteDust);
         }
     }
 
