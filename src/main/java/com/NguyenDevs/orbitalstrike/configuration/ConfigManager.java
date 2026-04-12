@@ -19,7 +19,7 @@ public class ConfigManager {
         FileConfiguration config = plugin.getConfig();
 
         config.addDefault("settings.force-load-target", true);
-        config.addDefault("settings.enabled-worlds", Arrays.asList("world", "world_nether", "world_the_end"));
+        config.addDefault("settings.disabled-worlds", Arrays.asList("example", "example_nether", "example_the_end"));
         config.addDefault("settings.logs", true);
 
         config.addDefault("items.material", "FISHING_ROD");
@@ -61,6 +61,10 @@ public class ConfigManager {
 
         config.addDefault("payloads.emp.radius", 12.0);
         config.addDefault("payloads.emp.duration", 200);
+        config.addDefault("payloads.emp.pulses", 5);
+        config.addDefault("payloads.emp.pulse-delay", 10);
+        config.addDefault("payloads.emp.pulse-speed", 2.0);
+
 
         
         config.options().copyDefaults(true);
@@ -71,8 +75,8 @@ public class ConfigManager {
         return plugin.getConfig().getBoolean("settings.force-load-target");
     }
 
-    public List<String> getEnabledWorlds() {
-        return plugin.getConfig().getStringList("settings.enabled-worlds");
+    public List<String> getDisabledWorlds() {
+        return plugin.getConfig().getStringList("settings.disabled-worlds");
     }
 
     public boolean isLogsEnabled() {
@@ -213,5 +217,18 @@ public class ConfigManager {
     public int getEmpDuration() {
         return plugin.getConfig().getInt("payloads.emp.duration");
     }
+
+    public int getEmpPulses() {
+        return plugin.getConfig().getInt("payloads.emp.pulses", 5);
+    }
+
+    public int getEmpPulseDelay() {
+        return plugin.getConfig().getInt("payloads.emp.pulse-delay", 10);
+    }
+
+    public double getEmpPulseSpeed() {
+        return plugin.getConfig().getDouble("payloads.emp.pulse-speed", 2.0);
+    }
+
 }
 

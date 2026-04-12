@@ -23,10 +23,17 @@ public class EmpPayload implements IPayload {
         if (tnt != null) {
             double radius = PayloadUtils.getDoubleParameter(cannon, "radius", plugin.getConfigManager().getEmpRadius());
             int duration = PayloadUtils.getIntParameter(cannon, "duration", plugin.getConfigManager().getEmpDuration());
-            
+            int pulses = PayloadUtils.getIntParameter(cannon, "pulses", plugin.getConfigManager().getEmpPulses());
+            int delay = PayloadUtils.getIntParameter(cannon, "pulse-delay", plugin.getConfigManager().getEmpPulseDelay());
+            double speed = PayloadUtils.getDoubleParameter(cannon, "pulse-speed", plugin.getConfigManager().getEmpPulseSpeed());
+
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpTntKey(), PersistentDataType.BYTE, (byte) 1);
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpRadiusKey(), PersistentDataType.DOUBLE, radius);
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpDurationKey(), PersistentDataType.INTEGER, duration);
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpPulsesKey(), PersistentDataType.INTEGER, pulses);
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpPulseDelayKey(), PersistentDataType.INTEGER, delay);
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpPulseSpeedKey(), PersistentDataType.DOUBLE, speed);
+
 
         }
     }

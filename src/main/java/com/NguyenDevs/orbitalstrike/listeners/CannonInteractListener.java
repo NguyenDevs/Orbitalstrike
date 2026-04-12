@@ -101,11 +101,12 @@ public class CannonInteractListener implements Listener {
             return;
         }
 
-        if (!plugin.getConfigManager().getEnabledWorlds().contains(player.getWorld().getName())) {
+        if (plugin.getConfigManager().getDisabledWorlds().contains(player.getWorld().getName())) {
             player.sendMessage(plugin.getMessageManager().getMessage("error.world-disabled"));
             playErrorSound(player);
             return;
         }
+
 
         // WorldGuard: check osc-enable flag at the target location
         if (!plugin.getWorldGuardManager().isAllowed(player, target)) {

@@ -189,11 +189,12 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
 
         Player player = (Player) sender;
 
-        if (!plugin.getConfigManager().getEnabledWorlds().contains(player.getWorld().getName())) {
+        if (plugin.getConfigManager().getDisabledWorlds().contains(player.getWorld().getName())) {
             sender.sendMessage(plugin.getMessageManager().getMessage("error.world-disabled"));
             playErrorSound(sender);
             return;
         }
+
 
         Location target = null;
         RayTraceResult result = player.rayTraceBlocks(100, FluidCollisionMode.ALWAYS);
@@ -251,11 +252,12 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
             target = new Location(plugin.getServer().getWorlds().get(0), x, y, z);
         }
 
-        if (!plugin.getConfigManager().getEnabledWorlds().contains(target.getWorld().getName())) {
+        if (plugin.getConfigManager().getDisabledWorlds().contains(target.getWorld().getName())) {
             sender.sendMessage(plugin.getMessageManager().getMessage("error.world-disabled"));
             playErrorSound(sender);
             return;
         }
+
 
         StrikeData strikeData = new StrikeData(cannon.getPayloadType());
 

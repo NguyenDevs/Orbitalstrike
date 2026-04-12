@@ -41,8 +41,15 @@ public class TNTListener implements Listener {
                     plugin.getPayloadManager().getEmpRadiusKey(), PersistentDataType.DOUBLE, 12.0);
             int duration = tnt.getPersistentDataContainer().getOrDefault(
                     plugin.getPayloadManager().getEmpDurationKey(), PersistentDataType.INTEGER, 200);
-            
-            plugin.getPayloadManager().triggerEmpShockwave(event.getLocation(), radius, duration);
+            int pulses = tnt.getPersistentDataContainer().getOrDefault(
+                    plugin.getPayloadManager().getEmpPulsesKey(), PersistentDataType.INTEGER, 5);
+            int delay = tnt.getPersistentDataContainer().getOrDefault(
+                    plugin.getPayloadManager().getEmpPulseDelayKey(), PersistentDataType.INTEGER, 10);
+            double speed = tnt.getPersistentDataContainer().getOrDefault(
+                    plugin.getPayloadManager().getEmpPulseSpeedKey(), PersistentDataType.DOUBLE, 2.0);
+
+            plugin.getPayloadManager().triggerEmpShockwave(event.getLocation(), radius, duration, pulses, delay, speed);
+
         }
 
     }

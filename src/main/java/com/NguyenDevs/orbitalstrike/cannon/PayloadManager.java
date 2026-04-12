@@ -30,6 +30,10 @@ public class PayloadManager {
     private final NamespacedKey empTntKey;
     private final NamespacedKey empRadiusKey;
     private final NamespacedKey empDurationKey;
+    private final NamespacedKey empPulsesKey;
+    private final NamespacedKey empPulseDelayKey;
+    private final NamespacedKey empPulseSpeedKey;
+
 
 
 
@@ -48,6 +52,10 @@ public class PayloadManager {
         this.empTntKey = new NamespacedKey(plugin, "emp_tnt");
         this.empRadiusKey = new NamespacedKey(plugin, "emp_radius");
         this.empDurationKey = new NamespacedKey(plugin, "emp_duration");
+        this.empPulsesKey = new NamespacedKey(plugin, "emp_pulses");
+        this.empPulseDelayKey = new NamespacedKey(plugin, "emp_pulse_delay");
+        this.empPulseSpeedKey = new NamespacedKey(plugin, "emp_pulse_speed");
+
 
 
 
@@ -104,12 +112,26 @@ public class PayloadManager {
         return empDurationKey;
     }
 
+    public NamespacedKey getEmpPulsesKey() {
+        return empPulsesKey;
+    }
+
+    public NamespacedKey getEmpPulseDelayKey() {
+        return empPulseDelayKey;
+    }
+
+    public NamespacedKey getEmpPulseSpeedKey() {
+        return empPulseSpeedKey;
+    }
+
+
 
 
     public void initiateStrike(Cannon cannon, StrikeData data, Location target) {
-        if (!plugin.getConfigManager().getEnabledWorlds().contains(target.getWorld().getName())) {
+        if (plugin.getConfigManager().getDisabledWorlds().contains(target.getWorld().getName())) {
             return;
         }
+
 
         if (plugin.getConfigManager().isLogsEnabled()) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&bOrbital&3Strike&9Cannon&8]")
@@ -181,37 +203,62 @@ public class PayloadManager {
         }
     }
 
-    public void triggerEmpShockwave(Location center, double maxRadius, int duration) {
+    public void triggerEmpShockwave(Location center, double maxRadius, int duration, int totalPulses, int pulseDelay, double step) {
         World world = center.getWorld();
         if (world == null) return;
 
         new BukkitRunnable() {
+            int currentPulse = 0;
             double currentRadius = 0;
-            final double step = 1.5;
+            int waitTicks = 0;
 
             @Override
             public void run() {
-                if (currentRadius >= maxRadius) {
-                    this.cancel();
+                // Handle waiting between pulses
+                if (waitTicks > 0) {
+                    waitTicks--;
                     return;
+                }
+
+                // If a pulse finishes, reset radius and increment pulse count
+                if (currentRadius >= maxRadius) {
+                    currentRadius = 0;
+                    currentPulse++;
+                    
+                    if (currentPulse >= totalPulses) {
+                        this.cancel();
+                        return;
+                    }
+                    
+                    // Trigger wait period
+                    if (pulseDelay > 0) {
+                        waitTicks = pulseDelay;
+                        return;
+                    }
+                }
+
+                if (currentRadius == 0) {
+                    // Start of a pulse sounds
+                    world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2.0f, 0.5f + (currentPulse * 0.2f));
+                    world.playSound(center, Sound.ITEM_TRIDENT_RIPTIDE_1, 1.5f, 1.2f);
                 }
 
                 currentRadius += step;
 
-                // 3 rings of particles
-                for (int ring = 0; ring < 3; ring++) {
-                    double r = currentRadius - (ring * 1.5);
-                    if (r <= 0) continue;
 
-                    for (double angle = 0; angle < 360; angle += 10.0 / r) {
-                        double rad = Math.toRadians(angle);
-                        double x = r * Math.cos(rad);
-                        double z = r * Math.sin(rad);
-                        world.spawnParticle(Particle.END_ROD, center.clone().add(x, 0.2, z), 1, 0, 0, 0, 0);
+                // Single expanding ring of particles
+                for (double angle = 0; angle < 360; angle += 8.0 / currentRadius) {
+                    double rad = Math.toRadians(angle);
+                    double x = currentRadius * Math.cos(rad);
+                    double z = currentRadius * Math.sin(rad);
+                    world.spawnParticle(Particle.END_ROD, center.clone().add(x, 0.2, z), 1, 0, 0, 0, 0);
+                    // Add secondary particle for "bloom" effect
+                    if (currentRadius > 5 && angle % 30 == 0) {
+                        world.spawnParticle(Particle.ELECTRIC_SPARK, center.clone().add(x, 0.5, z), 1, 0.1, 0.1, 0.1, 0.02);
                     }
                 }
 
-                // Block processing at exactly currentRadius shell
+                // Block processing at the current wave front
                 int boxRadius = (int) Math.ceil(currentRadius);
                 for (int x = -boxRadius; x <= boxRadius; x++) {
                     for (int y = -3; y <= 3; y++) {
@@ -223,12 +270,10 @@ public class PayloadManager {
                                 org.bukkit.block.Block block = loc.getBlock();
                                 Material type = block.getType();
                                 
-                                // Redstone and Torches
                                 if (type.name().contains("REDSTONE") || type.name().contains("TORCH")) {
                                     block.breakNaturally();
                                 }
                                 
-                                // Glass shattering
                                 if (type.name().contains("GLASS")) {
                                     block.setType(Material.AIR);
                                     world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.0f, 1.0f);
@@ -248,15 +293,16 @@ public class PayloadManager {
                             living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SLOW, duration, 2));
                         }
                         
-                        // Knockback
+                        // Stronger knockback per pulse to simulate "waves" pushing
                         Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize();
-                        direction.setY(0.3); // Slight upward lift
-                        entity.setVelocity(direction.multiply(1.2));
+                        direction.setY(0.25);
+                        entity.setVelocity(direction.multiply(0.8));
                     }
                 });
             }
         }.runTaskTimer(plugin, 0L, 1L);
     }
+
 
     public void clearAll() {
 

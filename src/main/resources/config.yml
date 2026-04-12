@@ -14,10 +14,11 @@ settings:
 
   # List of worlds where cannons can be activated
   # Add or remove world names to control where strikes are allowed
-  enabled-worlds:
-    - world
-    - world_nether
-    - world_the_end
+  disabled-worlds:
+    - example
+    - example_nether
+    - example_the_end
+
 
   # Enable cannon trigger console log
   logs: true
@@ -171,4 +172,11 @@ payloads:
     # Radius of the EMP wave
     radius: 12.0
     # Duration of the debuff effects in ticks
-    duration: 200
+    duration: 200
+    # Number of sequential shockwaves (pulses)
+    pulses: 5
+    # Delay between each shockwave in ticks (20 ticks = 1 second)
+    pulse-delay: 10
+    # Speed of the wave expansion (blocks per tick)
+    pulse-speed: 2.0
+

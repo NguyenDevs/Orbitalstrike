@@ -91,3 +91,6 @@ cannons:
       settings:
         - radius: 15.0
         - duration: 300
+        - pulses: 8
+        - pulse-delay: 20
+        - pulse-speed: 2.5
