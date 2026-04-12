@@ -28,10 +28,9 @@ public final class OrbitalStrike extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        if (getServer().getPluginManager().getPlugin("WorldGuard") != null) {
-            WorldGuardManager.registerFlag();
-        }
+        WorldGuardManager.safeRegisterFlag();
     }
+
 
     @Override
     public void onEnable() {
