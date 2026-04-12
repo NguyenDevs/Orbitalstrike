@@ -49,20 +49,6 @@ cannons:
         - level: 3
         - amount: 4
 
-  plasma_example:
-    name: "PlasmaExample"
-    item:
-      - material: END_ROD
-      - durability: true
-      - max-durability: 10
-    cooldown: 45
-    payload:
-      type: PLASMA
-      settings:
-        - duration: 120
-        - damage: 5.0
-        - radius: 4.0
-
   singularity_example:
     name: "SingularityExample"
     item:

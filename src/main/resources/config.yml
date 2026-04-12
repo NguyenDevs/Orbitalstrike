@@ -136,20 +136,6 @@ payloads:
     last-fuse-ticks: 60
 
   # ========================================
-  # PLASMA Payload
-  # ========================================
-  # Focused energy beam from orbit causing DoT and melting terrain
-  plasma:
-    # How long the beam stays active in ticks (100 = 5 seconds)
-    duration: 100
-    # Damage dealt to entities every 5 ticks (2.0 = 1 heart)
-    damage: 4.0
-    # Radius of the beam's effect on ground
-    radius: 3.0
-    # Whether the beam melts common blocks into lava/glass
-    melting: true
-
-  # ========================================
   # SINGULARITY Payload
   # ========================================
   # Creates a gravitational pull that sucks in everything before imploding

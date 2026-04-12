@@ -47,10 +47,6 @@ public class ConfigManager {
         config.addDefault("payloads.recursion.split-fuse-ticks", 20);
         config.addDefault("payloads.recursion.last-fuse-ticks", 60);
 
-        config.addDefault("payloads.plasma.duration", 100);
-        config.addDefault("payloads.plasma.damage", 4.0);
-        config.addDefault("payloads.plasma.radius", 3.0);
-        config.addDefault("payloads.plasma.melting", true);
 
         config.addDefault("payloads.singularity.duration", 60);
         config.addDefault("payloads.singularity.pull-force", 0.5);
@@ -177,21 +173,6 @@ public class ConfigManager {
         return plugin.getConfig().getInt("payloads.recursion.last-fuse-ticks");
     }
 
-    public int getPlasmaDuration() {
-        return plugin.getConfig().getInt("payloads.plasma.duration");
-    }
-
-    public double getPlasmaDamage() {
-        return plugin.getConfig().getDouble("payloads.plasma.damage");
-    }
-
-    public double getPlasmaRadius() {
-        return plugin.getConfig().getDouble("payloads.plasma.radius");
-    }
-
-    public boolean isPlasmaMeltingEnabled() {
-        return plugin.getConfig().getBoolean("payloads.plasma.melting");
-    }
 
     public int getSingularityDuration() {
         return plugin.getConfig().getInt("payloads.singularity.duration");

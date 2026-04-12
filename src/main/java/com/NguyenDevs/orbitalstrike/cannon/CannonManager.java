@@ -56,10 +56,6 @@ public class CannonManager {
             cannon.setParameter("velocity", plugin.getConfigManager().getRecursionVelocity());
             cannon.setParameter("split-fuse-ticks", plugin.getConfigManager().getRecursionSplitFuseTicks());
             cannon.setParameter("last-fuse-ticks", plugin.getConfigManager().getRecursionLastFuseTicks());
-        } else if (payloadType == PayloadType.PLASMA) {
-            cannon.setParameter("duration", plugin.getConfigManager().getPlasmaDuration());
-            cannon.setParameter("damage", plugin.getConfigManager().getPlasmaDamage());
-            cannon.setParameter("radius", plugin.getConfigManager().getPlasmaRadius());
         } else if (payloadType == PayloadType.SINGULARITY) {
             cannon.setParameter("duration", plugin.getConfigManager().getSingularityDuration());
             cannon.setParameter("pull-force", plugin.getConfigManager().getSingularityPullForce());
