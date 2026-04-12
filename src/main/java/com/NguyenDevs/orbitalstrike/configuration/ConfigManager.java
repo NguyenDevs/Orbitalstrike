@@ -62,8 +62,9 @@ public class ConfigManager {
         config.addDefault("payloads.emp.radius", 12.0);
         config.addDefault("payloads.emp.duration", 200);
         config.addDefault("payloads.emp.pulses", 5);
-        config.addDefault("payloads.emp.pulse-delay", 10);
+        config.addDefault("payloads.emp.pulse-delay", 20);
         config.addDefault("payloads.emp.pulse-speed", 2.0);
+
 
 
         

@@ -210,34 +210,30 @@ public class PayloadManager {
         new BukkitRunnable() {
             int currentPulse = 0;
             double currentRadius = 0;
+            final double step = 5.0; // Fast waves
             int waitTicks = 0;
+            boolean waveActive = true;
 
             @Override
             public void run() {
-                // Handle waiting between pulses
-                if (waitTicks > 0) {
-                    waitTicks--;
-                    return;
-                }
-
-                // If a pulse finishes, reset radius and increment pulse count
-                if (currentRadius >= maxRadius) {
-                    currentRadius = 0;
-                    currentPulse++;
-                    
-                    if (currentPulse >= totalPulses) {
-                        this.cancel();
+                // Handle the sequence
+                if (!waveActive) {
+                    if (waitTicks > 0) {
+                        waitTicks--;
                         return;
-                    }
-                    
-                    // Trigger wait period
-                    if (pulseDelay > 0) {
-                        waitTicks = pulseDelay;
-                        return;
+                    } else {
+                        // Start the next wave
+                        currentPulse++;
+                        if (currentPulse >= totalPulses) {
+                            this.cancel();
+                            return;
+                        }
+                        currentRadius = 0;
+                        waveActive = true;
                     }
                 }
 
-                if (currentRadius == 0) {
+                if (currentRadius == 0 && waveActive) {
                     // Start of a pulse sounds
                     world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2.0f, 0.5f + (currentPulse * 0.2f));
                     world.playSound(center, Sound.ITEM_TRIDENT_RIPTIDE_1, 1.5f, 1.2f);
@@ -245,61 +241,68 @@ public class PayloadManager {
 
                 currentRadius += step;
 
-
-                // Single expanding ring of particles
-                for (double angle = 0; angle < 360; angle += 8.0 / currentRadius) {
-                    double rad = Math.toRadians(angle);
-                    double x = currentRadius * Math.cos(rad);
-                    double z = currentRadius * Math.sin(rad);
-                    world.spawnParticle(Particle.END_ROD, center.clone().add(x, 0.2, z), 1, 0, 0, 0, 0);
-                    // Add secondary particle for "bloom" effect
-                    if (currentRadius > 5 && angle % 30 == 0) {
-                        world.spawnParticle(Particle.ELECTRIC_SPARK, center.clone().add(x, 0.5, z), 1, 0.1, 0.1, 0.1, 0.02);
+                // Only spawn particles if wave is active
+                if (waveActive) {
+                    // Single expanding ring of particles
+                    for (double angle = 0; angle < 360; angle += 6.0 / currentRadius) {
+                        double rad = Math.toRadians(angle);
+                        double x = currentRadius * Math.cos(rad);
+                        double z = currentRadius * Math.sin(rad);
+                        world.spawnParticle(Particle.END_ROD, center.clone().add(x, 0.2, z), 2, 0, 0, 0, 0);
+                        
+                        if (currentRadius > 5 && angle % 45 == 0) {
+                            world.spawnParticle(Particle.ELECTRIC_SPARK, center.clone().add(x, 0.5, z), 2, 0.1, 0.1, 0.1, 0.1);
+                        }
                     }
-                }
 
-                // Block processing at the current wave front
-                int boxRadius = (int) Math.ceil(currentRadius);
-                for (int x = -boxRadius; x <= boxRadius; x++) {
-                    for (int y = -3; y <= 3; y++) {
-                        for (int z = -boxRadius; z <= boxRadius; z++) {
-                            Location loc = center.clone().add(x, y, z);
-                            double dist = loc.distance(center);
-                            
-                            if (dist >= currentRadius - step && dist <= currentRadius) {
-                                org.bukkit.block.Block block = loc.getBlock();
-                                Material type = block.getType();
+                    // Block and Entity processing only on the wave front
+                    int boxRadius = (int) Math.ceil(currentRadius);
+                    for (int x = -boxRadius; x <= boxRadius; x++) {
+                        for (int y = -3; y <= 3; y++) {
+                            for (int z = -boxRadius; z <= boxRadius; z++) {
+                                Location loc = center.clone().add(x, y, z);
+                                double dist = loc.distance(center);
                                 
-                                if (type.name().contains("REDSTONE") || type.name().contains("TORCH")) {
-                                    block.breakNaturally();
-                                }
-                                
-                                if (type.name().contains("GLASS")) {
-                                    block.setType(Material.AIR);
-                                    world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.0f, 1.0f);
+                                if (dist >= currentRadius - step && dist <= currentRadius) {
+                                    org.bukkit.block.Block block = loc.getBlock();
+                                    Material type = block.getType();
+                                    
+                                    if (type.name().contains("REDSTONE") || type.name().contains("TORCH")) {
+                                        block.breakNaturally();
+                                    }
+                                    
+                                    if (type.name().contains("GLASS")) {
+                                        block.setType(Material.AIR);
+                                        world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.0f, 1.0f);
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                // Entity processing
-                world.getNearbyEntities(center, currentRadius, 10, currentRadius).forEach(entity -> {
-                    double dist = entity.getLocation().distance(center);
-                    if (dist >= currentRadius - step && dist <= currentRadius) {
-                        if (entity instanceof org.bukkit.entity.LivingEntity) {
-                            org.bukkit.entity.LivingEntity living = (org.bukkit.entity.LivingEntity) entity;
-                            living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.BLINDNESS, duration, 0));
-                            living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SLOW, duration, 2));
+                    world.getNearbyEntities(center, currentRadius, 10, currentRadius).forEach(entity -> {
+                        double dist = entity.getLocation().distance(center);
+                        if (dist >= currentRadius - step && dist <= currentRadius) {
+                            if (entity instanceof org.bukkit.entity.LivingEntity) {
+                                org.bukkit.entity.LivingEntity living = (org.bukkit.entity.LivingEntity) entity;
+                                living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.BLINDNESS, 60, 0));
+                                living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.WEAKNESS, 400, 1));
+                            }
+                            Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize();
+                            direction.setY(0.15);
+                            entity.setVelocity(direction.multiply(1.2));
                         }
-                        
-                        // Stronger knockback per pulse to simulate "waves" pushing
-                        Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize();
-                        direction.setY(0.25);
-                        entity.setVelocity(direction.multiply(0.8));
+                    });
+
+                    // Check if wave reached max distance
+                    if (currentRadius >= maxRadius) {
+                        waveActive = false;
+                        waitTicks = pulseDelay;
                     }
-                });
+                }
             }
+
+
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
