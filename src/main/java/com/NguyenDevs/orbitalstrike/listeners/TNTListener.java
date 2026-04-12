@@ -50,8 +50,14 @@ public class TNTListener implements Listener {
                     plugin.getPayloadManager().getEmpBlindnessDurationKey(), PersistentDataType.INTEGER, 60);
             int weakness = tnt.getPersistentDataContainer().getOrDefault(
                     plugin.getPayloadManager().getEmpWeaknessDurationKey(), PersistentDataType.INTEGER, 400);
+            int nausea = tnt.getPersistentDataContainer().getOrDefault(
+                    plugin.getPayloadManager().getEmpNauseaDurationKey(), PersistentDataType.INTEGER, 100);
+            int slowness = tnt.getPersistentDataContainer().getOrDefault(
+                    plugin.getPayloadManager().getEmpSlownessDurationKey(), PersistentDataType.INTEGER, 100);
+            int slownessAmp = tnt.getPersistentDataContainer().getOrDefault(
+                    plugin.getPayloadManager().getEmpSlownessAmplifierKey(), PersistentDataType.INTEGER, 1);
 
-            plugin.getPayloadManager().triggerEmpShockwave(event.getLocation(), radius, pulses, delay, speed, blindness, weakness);
+            plugin.getPayloadManager().triggerEmpShockwave(event.getLocation(), radius, pulses, delay, speed, blindness, weakness, nausea, slowness, slownessAmp);
 
         }
 

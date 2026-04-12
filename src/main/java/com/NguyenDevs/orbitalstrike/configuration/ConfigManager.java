@@ -58,6 +58,9 @@ public class ConfigManager {
         config.addDefault("payloads.emp.pulse-speed", 2.0);
         config.addDefault("payloads.emp.blindness-duration", 60);
         config.addDefault("payloads.emp.weakness-duration", 400);
+        config.addDefault("payloads.emp.nausea-duration", 100);
+        config.addDefault("payloads.emp.slowness-duration", 100);
+        config.addDefault("payloads.emp.slowness-amplifier", 1);
 
 
 
@@ -198,6 +201,18 @@ public class ConfigManager {
 
     public int getEmpWeaknessDuration() {
         return plugin.getConfig().getInt("payloads.emp.weakness-duration", 400);
+    }
+
+    public int getEmpNauseaDuration() {
+        return plugin.getConfig().getInt("payloads.emp.nausea-duration", 100);
+    }
+
+    public int getEmpSlownessDuration() {
+        return plugin.getConfig().getInt("payloads.emp.slowness-duration", 100);
+    }
+
+    public int getEmpSlownessAmplifier() {
+        return plugin.getConfig().getInt("payloads.emp.slowness-amplifier", 1);
     }
 
 }

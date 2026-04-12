@@ -141,3 +141,9 @@ payloads:
     blindness-duration: 20
     # Duration of the Weakness effect in ticks
     weakness-duration: 400
+    # Duration of the Nausea effect in ticks (20 ticks = 1 second)
+    nausea-duration: 100
+    # Duration of the Slowness effect in ticks
+    slowness-duration: 100
+    # Level of the Slowness effect (0 = Level 1, 1 = Level 2, etc.)
+    slowness-amplifier: 1

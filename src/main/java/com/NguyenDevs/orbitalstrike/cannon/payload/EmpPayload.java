@@ -27,6 +27,9 @@ public class EmpPayload implements IPayload {
             double speed = PayloadUtils.getDoubleParameter(cannon, "pulse-speed", plugin.getConfigManager().getEmpPulseSpeed());
             int blindness = PayloadUtils.getIntParameter(cannon, "blindness-duration", plugin.getConfigManager().getEmpBlindnessDuration());
             int weakness = PayloadUtils.getIntParameter(cannon, "weakness-duration", plugin.getConfigManager().getEmpWeaknessDuration());
+            int nausea = PayloadUtils.getIntParameter(cannon, "nausea-duration", plugin.getConfigManager().getEmpNauseaDuration());
+            int slowness = PayloadUtils.getIntParameter(cannon, "slowness-duration", plugin.getConfigManager().getEmpSlownessDuration());
+            int slownessAmp = PayloadUtils.getIntParameter(cannon, "slowness-amplifier", plugin.getConfigManager().getEmpSlownessAmplifier());
 
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpTntKey(), PersistentDataType.BYTE, (byte) 1);
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpRadiusKey(), PersistentDataType.DOUBLE, radius);
@@ -35,6 +38,9 @@ public class EmpPayload implements IPayload {
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpPulseSpeedKey(), PersistentDataType.DOUBLE, speed);
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpBlindnessDurationKey(), PersistentDataType.INTEGER, blindness);
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpWeaknessDurationKey(), PersistentDataType.INTEGER, weakness);
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpNauseaDurationKey(), PersistentDataType.INTEGER, nausea);
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpSlownessDurationKey(), PersistentDataType.INTEGER, slowness);
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpSlownessAmplifierKey(), PersistentDataType.INTEGER, slownessAmp);
 
 
         }

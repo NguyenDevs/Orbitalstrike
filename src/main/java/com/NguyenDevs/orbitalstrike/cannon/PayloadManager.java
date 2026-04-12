@@ -38,6 +38,9 @@ public class PayloadManager {
     private final NamespacedKey empPulseSpeedKey;
     private final NamespacedKey empBlindnessDurationKey;
     private final NamespacedKey empWeaknessDurationKey;
+    private final NamespacedKey empNauseaDurationKey;
+    private final NamespacedKey empSlownessDurationKey;
+    private final NamespacedKey empSlownessAmplifierKey;
 
     public PayloadManager(OrbitalStrike plugin) {
         this.plugin = plugin;
@@ -58,6 +61,9 @@ public class PayloadManager {
         this.empPulseSpeedKey = new NamespacedKey(plugin, "emp_pulse_speed");
         this.empBlindnessDurationKey = new NamespacedKey(plugin, "emp_blindness_duration");
         this.empWeaknessDurationKey = new NamespacedKey(plugin, "emp_weakness_duration");
+        this.empNauseaDurationKey = new NamespacedKey(plugin, "emp_nausea_duration");
+        this.empSlownessDurationKey = new NamespacedKey(plugin, "emp_slowness_duration");
+        this.empSlownessAmplifierKey = new NamespacedKey(plugin, "emp_slowness_amplifier");
 
         registerPayloads();
     }
@@ -83,6 +89,9 @@ public class PayloadManager {
     public NamespacedKey getEmpPulseSpeedKey() { return empPulseSpeedKey; }
     public NamespacedKey getEmpBlindnessDurationKey() { return empBlindnessDurationKey; }
     public NamespacedKey getEmpWeaknessDurationKey() { return empWeaknessDurationKey; }
+    public NamespacedKey getEmpNauseaDurationKey() { return empNauseaDurationKey; }
+    public NamespacedKey getEmpSlownessDurationKey() { return empSlownessDurationKey; }
+    public NamespacedKey getEmpSlownessAmplifierKey() { return empSlownessAmplifierKey; }
 
     public void initiateStrike(Cannon cannon, StrikeData data, Location target) {
         if (plugin.getConfigManager().getDisabledWorlds().contains(target.getWorld().getName())) {
@@ -157,7 +166,8 @@ public class PayloadManager {
         }
     }
 
-    public void triggerEmpShockwave(Location center, double maxRadius, int pulses, int pulseDelay, double pulseSpeed, int blindnessDuration, int weaknessDuration) {
+    public void triggerEmpShockwave(Location center, double maxRadius, int pulses, int pulseDelay, double pulseSpeed, 
+                                   int blindnessDuration, int weaknessDuration, int nauseaDuration, int slownessDuration, int slownessAmplifier) {
         World world = center.getWorld();
         if (world == null) return;
 
@@ -172,7 +182,7 @@ public class PayloadManager {
                     return;
                 }
                 if (ticksSinceLastPulse >= pulseDelay) {
-                    launchSingleWave(center, maxRadius, pulseSpeed, blindnessDuration, weaknessDuration);
+                    launchSingleWave(center, maxRadius, pulseSpeed, blindnessDuration, weaknessDuration, nauseaDuration, slownessDuration, slownessAmplifier);
                     pulsesLaunched++;
                     ticksSinceLastPulse = 0;
                 }
@@ -181,7 +191,8 @@ public class PayloadManager {
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
-    private void launchSingleWave(Location center, double maxRadius, double step, int blindnessDuration, int weaknessDuration) {
+    private void launchSingleWave(Location center, double maxRadius, double step, 
+                                  int blindnessDuration, int weaknessDuration, int nauseaDuration, int slownessDuration, int slownessAmplifier) {
         World world = center.getWorld();
         if (world == null) return;
 
@@ -214,7 +225,7 @@ public class PayloadManager {
                                 return;
                             }
                             spawnSphereShell(world, center, currentRadius);
-                            processWaveEffects(center, currentRadius, step, blindnessDuration, weaknessDuration);
+                            processWaveEffects(center, currentRadius, step, blindnessDuration, weaknessDuration, nauseaDuration, slownessDuration, slownessAmplifier);
                         }
                     }.runTaskTimer(plugin, 0L, 1L);
 
@@ -275,7 +286,8 @@ public class PayloadManager {
         }
     }
 
-    private void processWaveEffects(Location center, double currentRadius, double step, int blindnessDuration, int weaknessDuration) {
+    private void processWaveEffects(Location center, double currentRadius, double step, 
+                                    int blindnessDuration, int weaknessDuration, int nauseaDuration, int slownessDuration, int slownessAmplifier) {
         World world = center.getWorld();
         if (world == null) return;
 
@@ -347,10 +359,25 @@ public class PayloadManager {
                     if (weaknessDuration > 0) {
                         living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.WEAKNESS, weaknessDuration, 1));
                     }
+                    if (nauseaDuration > 0) {
+                        living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.CONFUSION, nauseaDuration, 4));
+                    }
+                    if (slownessDuration > 0) {
+                        living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SLOW, slownessDuration, slownessAmplifier));
+                    }
                 }
+
                 Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize();
-                direction.setY(0.2);
-                entity.setVelocity(direction.multiply(0.8));
+                direction.setY(0.1); // Reduced vertical lift
+
+                double multiplier = 0.15; // Light knockback for living entities
+                if (entity instanceof org.bukkit.entity.Item || entity instanceof org.bukkit.entity.ExperienceOrb) {
+                    multiplier = 0.02; // Minimal movement for items
+                } else if (!(entity instanceof LivingEntity)) {
+                    multiplier = 0.08; // Small knockback for other non-living entities
+                }
+
+                entity.setVelocity(direction.multiply(multiplier));
             }
         });
     }
