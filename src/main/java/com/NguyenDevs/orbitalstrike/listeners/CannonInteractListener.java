@@ -4,6 +4,7 @@ import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import com.NguyenDevs.orbitalstrike.cannon.Cannon;
 import com.NguyenDevs.orbitalstrike.cannon.CannonRecipeManager;
 import com.NguyenDevs.orbitalstrike.utils.ColorUtils;
+
 import com.NguyenDevs.orbitalstrike.utils.StrikeData;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -115,8 +116,31 @@ public class CannonInteractListener implements Listener {
             return;
         }
         
-        item.setAmount(item.getAmount() - 1);
-        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
+        boolean shouldConsume = true;
+        if (cannon.isDurabilityEnabled()) {
+            int currentUses = meta.getPersistentDataContainer().getOrDefault(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER, 0);
+            currentUses++;
+
+            if (currentUses < cannon.getMaxDurability()) {
+                meta.getPersistentDataContainer().set(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER, currentUses);
+
+                if (meta instanceof Damageable) {
+                    Damageable damageable = (Damageable) meta;
+                    int maxVanilla = item.getType().getMaxDurability();
+                    if (maxVanilla > 0) {
+                        int initialDamage = Math.max(0, maxVanilla - cannon.getMaxDurability());
+                        damageable.setDamage(initialDamage + currentUses);
+                    }
+                }
+                item.setItemMeta(meta);
+                shouldConsume = false;
+            }
+        }
+
+        if (shouldConsume) {
+            item.setAmount(item.getAmount() - 1);
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
+        }
 
 
         StrikeData strikeData = new StrikeData(cannon.getPayloadType());

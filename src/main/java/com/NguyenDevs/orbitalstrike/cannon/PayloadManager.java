@@ -6,6 +6,9 @@ import com.NguyenDevs.orbitalstrike.utils.PayloadType;
 import com.NguyenDevs.orbitalstrike.utils.StrikeData;
 import org.bukkit.*;
 import org.bukkit.Color;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Lightable;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -289,13 +292,33 @@ public class PayloadManager {
                     if (distSq >= innerBound * innerBound && distSq <= outerBound * outerBound) {
                         org.bukkit.block.Block block = loc.getBlock();
                         Material type = block.getType();
+                        String name = type.name();
 
-                        if (type.name().contains("REDSTONE") || type.name().contains("TORCH")
-                                || type.name().contains("REPEATER") || type.name().contains("COMPARATOR")) {
+                        // 1. Redstone & Logical Components (Shredding)
+                        boolean isRedstone = name.contains("REDSTONE") || name.contains("REPEATER") || name.contains("COMPARATOR")
+                                || name.contains("PISTON") || name.contains("DROPPER") || name.contains("DISPENSER")
+                                || name.contains("CRAFTER") || name.contains("OBSERVER") || name.contains("RAIL")
+                                || name.contains("DAYLIGHT_DETECTOR") || name.contains("LEVER");
+
+                        // Exclude regular torches, include redstone torches
+                        if (isRedstone && !name.equals("TORCH") && !name.equals("SOUL_TORCH")) {
                             block.breakNaturally();
                         }
 
-                        if (type.name().contains("GLASS") && !type.name().contains("PANE")) {
+                        // 2. Copper Bulb Deactivation
+                        if (name.contains("COPPER_BULB")) {
+                            BlockData data = block.getBlockData();
+                            if (data instanceof Lightable) {
+                                Lightable lightable = (Lightable) data;
+                                if (lightable.isLit()) {
+                                    lightable.setLit(false);
+                                    block.setBlockData(lightable);
+                                }
+                            }
+                        }
+
+                        // 3. Glass Shattering
+                        if (name.contains("GLASS")) {
                             block.setType(Material.AIR);
                             world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.2f);
                             world.spawnParticle(Particle.ELECTRIC_SPARK, loc.clone().add(0.5, 0.5, 0.5), 5, 0.2, 0.2, 0.2, 0.1);
@@ -308,8 +331,16 @@ public class PayloadManager {
         world.getNearbyEntities(center, currentRadius + 0.5, currentRadius + 0.5, currentRadius + 0.5).forEach(entity -> {
             double dist = entity.getLocation().distance(center);
             if (dist >= innerBound && dist <= outerBound) {
-                if (entity instanceof org.bukkit.entity.LivingEntity) {
-                    org.bukkit.entity.LivingEntity living = (org.bukkit.entity.LivingEntity) entity;
+                // 4. TNT Conversion (Force back to block)
+                if (entity instanceof TNTPrimed) {
+                    Location loc = entity.getLocation();
+                    loc.getBlock().setType(Material.TNT);
+                    entity.remove();
+                    return;
+                }
+
+                if (entity instanceof LivingEntity) {
+                    LivingEntity living = (LivingEntity) entity;
                     if (blindnessDuration > 0) {
                         living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.BLINDNESS, blindnessDuration, 0));
                     }
