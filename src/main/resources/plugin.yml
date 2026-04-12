@@ -1,5 +1,5 @@
 name: OrbitalStrike
-version: 1.0.3
+version: ${version}
 main: com.NguyenDevs.orbitalstrike.OrbitalStrike
 api-version: '1.21'
 author: NguyenDevs
