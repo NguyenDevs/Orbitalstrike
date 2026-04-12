@@ -133,3 +133,55 @@ payloads:
     # This applies ONLY to the final level before explosion
     # Longer fuse gives time for TNTs to spread before detonating
     last-fuse-ticks: 60
+
+  # ========================================
+  # PLASMA Payload
+  # ========================================
+  # Focused energy beam from orbit causing DoT and melting terrain
+  plasma:
+    # How long the beam stays active in ticks (100 = 5 seconds)
+    duration: 100
+    # Damage dealt to entities every 5 ticks (2.0 = 1 heart)
+    damage: 4.0
+    # Radius of the beam's effect on ground
+    radius: 3.0
+    # Whether the beam melts common blocks into lava/glass
+    melting: true
+
+  # ========================================
+  # SINGULARITY Payload
+  # ========================================
+  # Creates a gravitational pull that sucks in everything before imploding
+  singularity:
+    # Duration of the pull effect in ticks
+    duration: 60
+    # Strength of the gravitational pull
+    pull-force: 0.5
+    # Effective radius of the pull effect
+    radius: 10.0
+    # Explosion yield of the final implosion
+    yield: 12.0
+
+  # ========================================
+  # CLUSTER Payload
+  # ========================================
+  # Splits into multiple sub-munitions in mid-air
+  cluster:
+    # Height above target where the shell splits
+    split-height: 40.0
+    # Number of sub-munitions to spawn
+    amount: 15
+    # Explosion yield of each sub-munition
+    yield: 6.0
+    # Horizontal scatter intensity
+    scatter: 1.2
+
+  # ========================================
+  # EMP Payload
+  # ========================================
+  # Disables electronic-like blocks and cripples players
+  emp:
+    # Radius of the EMP wave
+    radius: 12.0
+    # Duration of the debuff effects in ticks
+    duration: 200

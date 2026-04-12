@@ -46,6 +46,25 @@ public class ConfigManager {
         config.addDefault("payloads.recursion.velocity", 0.8);
         config.addDefault("payloads.recursion.split-fuse-ticks", 20);
         config.addDefault("payloads.recursion.last-fuse-ticks", 60);
+
+        config.addDefault("payloads.plasma.duration", 100);
+        config.addDefault("payloads.plasma.damage", 4.0);
+        config.addDefault("payloads.plasma.radius", 3.0);
+        config.addDefault("payloads.plasma.melting", true);
+
+        config.addDefault("payloads.singularity.duration", 60);
+        config.addDefault("payloads.singularity.pull-force", 0.5);
+        config.addDefault("payloads.singularity.radius", 10.0);
+        config.addDefault("payloads.singularity.yield", 12.0);
+
+        config.addDefault("payloads.cluster.split-height", 40.0);
+        config.addDefault("payloads.cluster.amount", 15);
+        config.addDefault("payloads.cluster.yield", 6.0);
+        config.addDefault("payloads.cluster.scatter", 1.2);
+
+        config.addDefault("payloads.emp.radius", 12.0);
+        config.addDefault("payloads.emp.duration", 200);
+
         
         config.options().copyDefaults(true);
         plugin.saveConfig();
@@ -155,4 +174,61 @@ public class ConfigManager {
     public int getRecursionLastFuseTicks(){
         return plugin.getConfig().getInt("payloads.recursion.last-fuse-ticks");
     }
+
+    public int getPlasmaDuration() {
+        return plugin.getConfig().getInt("payloads.plasma.duration");
+    }
+
+    public double getPlasmaDamage() {
+        return plugin.getConfig().getDouble("payloads.plasma.damage");
+    }
+
+    public double getPlasmaRadius() {
+        return plugin.getConfig().getDouble("payloads.plasma.radius");
+    }
+
+    public boolean isPlasmaMeltingEnabled() {
+        return plugin.getConfig().getBoolean("payloads.plasma.melting");
+    }
+
+    public int getSingularityDuration() {
+        return plugin.getConfig().getInt("payloads.singularity.duration");
+    }
+
+    public double getSingularityPullForce() {
+        return plugin.getConfig().getDouble("payloads.singularity.pull-force");
+    }
+
+    public double getSingularityRadius() {
+        return plugin.getConfig().getDouble("payloads.singularity.radius");
+    }
+
+    public double getSingularityYield() {
+        return plugin.getConfig().getDouble("payloads.singularity.yield");
+    }
+
+    public double getClusterSplitHeight() {
+        return plugin.getConfig().getDouble("payloads.cluster.split-height");
+    }
+
+    public int getClusterAmount() {
+        return plugin.getConfig().getInt("payloads.cluster.amount");
+    }
+
+    public double getClusterYield() {
+        return plugin.getConfig().getDouble("payloads.cluster.yield");
+    }
+
+    public double getClusterScatter() {
+        return plugin.getConfig().getDouble("payloads.cluster.scatter");
+    }
+
+    public double getEmpRadius() {
+        return plugin.getConfig().getDouble("payloads.emp.radius");
+    }
+
+    public int getEmpDuration() {
+        return plugin.getConfig().getInt("payloads.emp.duration");
+    }
 }
+
