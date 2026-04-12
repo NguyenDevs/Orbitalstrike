@@ -5,7 +5,6 @@
 # For individual cannon customization, edit "cannons.yml" instead.
 
 settings:
-  # Enable update notifications for server administrators
   update-notify: true
 
   # Automatically load the target chunk before firing to ensure strike success
@@ -17,9 +16,7 @@ settings:
     - example_nether
     - example_the_end
 
-
-  # Enable cannon trigger console log
-  logs: true
+  logs: false
 
 # ==========================================
 # Default Item Settings
@@ -28,8 +25,6 @@ settings:
 # To customize individual cannons, edit "cannons.yml"
 
 items:
-  # Material type for the cannon item
-  # Can be any valid Minecraft material (e.g., FISHING_ROD, STICK, BLAZE_ROD)
   material: FISHING_ROD
 
   # Enable item durability system
@@ -53,7 +48,6 @@ payloads:
   # ========================================
   # STAB Payload
   # ========================================
-  # Creates a vertical pattern drilling down to bedrock
   stab:
     # Explosion power of each TNT (default Minecraft TNT is 4.0)
     yield: 8.0
@@ -68,7 +62,6 @@ payloads:
   # ========================================
   # NUKE Payload
   # ========================================
-  # Spawns a massive array of TNT in concentric rings above the target
   nuke:
     # Explosion power of each TNT
     yield: 8.0
@@ -99,7 +92,6 @@ payloads:
   # ========================================
   # RECURSION Payload
   # ========================================
-  # Creates a chain reaction where each TNT splits into multiple TNTs
   recursion:
     # Explosion power of each TNT
     # Lower values recommended to prevent server lag
@@ -136,18 +128,16 @@ payloads:
   # ========================================
   # EMP Payload
   # ========================================
-  # Emits high-tech electromagnetic pulses that disable electronics
-  # and cripple enemies in a 3D spherical volume.
   emp:
     # Radius of the EMP wave expansion
-    radius: 12.0
+    radius: 20.0
     # Number of sequential shockwaves (pulses) per explosion
-    pulses: 5
+    pulses: 3
     # Delay between each shockwave in ticks (20 ticks = 1 second)
-    pulse-delay: 10
+    pulse-delay: 40
     # Speed of the wave expansion (blocks per tick)
     pulse-speed: 2.0
     # Duration of the Blindness effect in ticks
-    blindness-duration: 60
+    blindness-duration: 20
     # Duration of the Weakness effect in ticks
     weakness-duration: 400
