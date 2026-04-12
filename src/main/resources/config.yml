@@ -134,9 +134,9 @@ payloads:
     # Number of sequential shockwaves (pulses) per explosion
     pulses: 3
     # Delay between each shockwave in ticks (20 ticks = 1 second)
-    pulse-delay: 40
+    pulse-delay: 60
     # Speed of the wave expansion (blocks per tick)
-    pulse-speed: 2.0
+    pulse-speed: 2.5
     # Duration of the Blindness effect in ticks
     blindness-duration: 20
     # Duration of the Weakness effect in ticks
