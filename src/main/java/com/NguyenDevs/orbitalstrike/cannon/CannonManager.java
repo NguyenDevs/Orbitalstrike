@@ -56,15 +56,13 @@ public class CannonManager {
             cannon.setParameter("velocity", plugin.getConfigManager().getRecursionVelocity());
             cannon.setParameter("split-fuse-ticks", plugin.getConfigManager().getRecursionSplitFuseTicks());
             cannon.setParameter("last-fuse-ticks", plugin.getConfigManager().getRecursionLastFuseTicks());
-        } else if (payloadType == PayloadType.SINGULARITY) {
-            cannon.setParameter("duration", plugin.getConfigManager().getSingularityDuration());
-            cannon.setParameter("pull-force", plugin.getConfigManager().getSingularityPullForce());
-            cannon.setParameter("radius", plugin.getConfigManager().getSingularityRadius());
-            cannon.setParameter("yield", plugin.getConfigManager().getSingularityYield());
-
         } else if (payloadType == PayloadType.EMP) {
             cannon.setParameter("radius", plugin.getConfigManager().getEmpRadius());
-            cannon.setParameter("duration", plugin.getConfigManager().getEmpDuration());
+            cannon.setParameter("pulses", plugin.getConfigManager().getEmpPulses());
+            cannon.setParameter("pulse-delay", plugin.getConfigManager().getEmpPulseDelay());
+            cannon.setParameter("pulse-speed", plugin.getConfigManager().getEmpPulseSpeed());
+            cannon.setParameter("blindness-duration", plugin.getConfigManager().getEmpBlindnessDuration());
+            cannon.setParameter("weakness-duration", plugin.getConfigManager().getEmpWeaknessDuration());
         }
 
 

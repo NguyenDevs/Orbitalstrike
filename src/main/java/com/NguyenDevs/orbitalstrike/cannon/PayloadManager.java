@@ -19,7 +19,7 @@ public class PayloadManager {
     private final OrbitalStrike plugin;
     private final List<ActiveStrike> activeStrikes;
     private final Map<PayloadType, IPayload> payloads;
-    
+
     private final NamespacedKey orbitalStrikeKey;
     private final NamespacedKey recursionLevelKey;
     private final NamespacedKey recursionAmountKey;
@@ -29,19 +29,17 @@ public class PayloadManager {
     private final NamespacedKey recursionLastFuseKey;
     private final NamespacedKey empTntKey;
     private final NamespacedKey empRadiusKey;
-    private final NamespacedKey empDurationKey;
     private final NamespacedKey empPulsesKey;
     private final NamespacedKey empPulseDelayKey;
     private final NamespacedKey empPulseSpeedKey;
-
-
-
+    private final NamespacedKey empBlindnessDurationKey;
+    private final NamespacedKey empWeaknessDurationKey;
 
     public PayloadManager(OrbitalStrike plugin) {
         this.plugin = plugin;
         this.activeStrikes = new ArrayList<>();
         this.payloads = new EnumMap<>(PayloadType.class);
-        
+
         this.orbitalStrikeKey = new NamespacedKey(plugin, "orbital_strike_tnt");
         this.recursionLevelKey = new NamespacedKey(plugin, "recursion_level");
         this.recursionAmountKey = new NamespacedKey(plugin, "recursion_amount");
@@ -51,13 +49,11 @@ public class PayloadManager {
         this.recursionLastFuseKey = new NamespacedKey(plugin, "recursion_last_fuse");
         this.empTntKey = new NamespacedKey(plugin, "emp_tnt");
         this.empRadiusKey = new NamespacedKey(plugin, "emp_radius");
-        this.empDurationKey = new NamespacedKey(plugin, "emp_duration");
         this.empPulsesKey = new NamespacedKey(plugin, "emp_pulses");
         this.empPulseDelayKey = new NamespacedKey(plugin, "emp_pulse_delay");
         this.empPulseSpeedKey = new NamespacedKey(plugin, "emp_pulse_speed");
-
-
-
+        this.empBlindnessDurationKey = new NamespacedKey(plugin, "emp_blindness_duration");
+        this.empWeaknessDurationKey = new NamespacedKey(plugin, "emp_weakness_duration");
 
         registerPayloads();
     }
@@ -66,77 +62,32 @@ public class PayloadManager {
         payloads.put(PayloadType.STAB, new StabPayload(plugin));
         payloads.put(PayloadType.NUKE, new NukePayload(plugin));
         payloads.put(PayloadType.RECURSION, new RecursionPayload(plugin));
-        payloads.put(PayloadType.SINGULARITY, new SingularityPayload(plugin));
         payloads.put(PayloadType.EMP, new EmpPayload(plugin));
-
     }
 
-    public NamespacedKey getOrbitalStrikeKey() {
-        return orbitalStrikeKey;
-    }
-
-    public NamespacedKey getRecursionLevelKey() {
-        return recursionLevelKey;
-    }
-
-    public NamespacedKey getRecursionAmountKey() {
-        return recursionAmountKey;
-    }
-
-    public NamespacedKey getRecursionYieldKey() {
-        return recursionYieldKey;
-    }
-
-    public NamespacedKey getRecursionVelocityKey() {
-        return recursionVelocityKey;
-    }
-
-    public NamespacedKey getRecursionSplitFuseKey() {
-        return recursionSplitFuseKey;
-    }
-
-    public NamespacedKey getRecursionLastFuseKey() {
-        return recursionLastFuseKey;
-    }
-
-    public NamespacedKey getEmpTntKey() {
-        return empTntKey;
-    }
-
-    public NamespacedKey getEmpRadiusKey() {
-        return empRadiusKey;
-    }
-
-    public NamespacedKey getEmpDurationKey() {
-        return empDurationKey;
-    }
-
-    public NamespacedKey getEmpPulsesKey() {
-        return empPulsesKey;
-    }
-
-    public NamespacedKey getEmpPulseDelayKey() {
-        return empPulseDelayKey;
-    }
-
-    public NamespacedKey getEmpPulseSpeedKey() {
-        return empPulseSpeedKey;
-    }
-
-
-
+    public NamespacedKey getOrbitalStrikeKey() { return orbitalStrikeKey; }
+    public NamespacedKey getRecursionLevelKey() { return recursionLevelKey; }
+    public NamespacedKey getRecursionAmountKey() { return recursionAmountKey; }
+    public NamespacedKey getRecursionYieldKey() { return recursionYieldKey; }
+    public NamespacedKey getRecursionVelocityKey() { return recursionVelocityKey; }
+    public NamespacedKey getRecursionSplitFuseKey() { return recursionSplitFuseKey; }
+    public NamespacedKey getRecursionLastFuseKey() { return recursionLastFuseKey; }
+    public NamespacedKey getEmpTntKey() { return empTntKey; }
+    public NamespacedKey getEmpRadiusKey() { return empRadiusKey; }
+    public NamespacedKey getEmpPulsesKey() { return empPulsesKey; }
+    public NamespacedKey getEmpPulseDelayKey() { return empPulseDelayKey; }
+    public NamespacedKey getEmpPulseSpeedKey() { return empPulseSpeedKey; }
+    public NamespacedKey getEmpBlindnessDurationKey() { return empBlindnessDurationKey; }
+    public NamespacedKey getEmpWeaknessDurationKey() { return empWeaknessDurationKey; }
 
     public void initiateStrike(Cannon cannon, StrikeData data, Location target) {
         if (plugin.getConfigManager().getDisabledWorlds().contains(target.getWorld().getName())) {
             return;
         }
 
-
         if (plugin.getConfigManager().isLogsEnabled()) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&bOrbital&3Strike&9Cannon&8]")
-                    + " " + plugin.getMessageManager().getMessage("log",
-                    "%target%",  target.toString()
-            ));
+                    + " " + plugin.getMessageManager().getMessage("log", "%target%", target.toString()));
         }
 
         ActiveStrike strike = new ActiveStrike(cannon, data, target);
@@ -202,39 +153,38 @@ public class PayloadManager {
         }
     }
 
-    public void triggerEmpShockwave(Location center, double maxRadius, int duration, int totalPulses, int pulseDelay, double stepSpeed) {
+    public void triggerEmpShockwave(Location center, double maxRadius, int pulses, int pulseDelay, double pulseSpeed, int blindnessDuration, int weaknessDuration) {
         World world = center.getWorld();
         if (world == null) return;
 
         new BukkitRunnable() {
             int pulsesLaunched = 0;
-            int ticksSinceLastPulse = pulseDelay; // Start first pulse immediately
+            int ticksSinceLastPulse = pulseDelay;
 
             @Override
             public void run() {
-                if (pulsesLaunched >= totalPulses) {
+                if (pulsesLaunched >= pulses) {
                     this.cancel();
                     return;
                 }
-
                 if (ticksSinceLastPulse >= pulseDelay) {
-                    launchSingleWave(center, maxRadius, stepSpeed);
+                    launchSingleWave(center, maxRadius, pulseSpeed, blindnessDuration, weaknessDuration);
                     pulsesLaunched++;
                     ticksSinceLastPulse = 0;
                 }
-
                 ticksSinceLastPulse++;
             }
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
-    private void launchSingleWave(Location center, double maxRadius, double step) {
+    private void launchSingleWave(Location center, double maxRadius, double step, int blindnessDuration, int weaknessDuration) {
         World world = center.getWorld();
         if (world == null) return;
 
-        // Sound effect at launch
         world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2.0f, 0.6f);
         world.playSound(center, Sound.ITEM_TRIDENT_RIPTIDE_1, 1.2f, 1.5f);
+        world.playSound(center, Sound.BLOCK_BEACON_DEACTIVATE, 1.0f, 1.5f);
+        world.playSound(center, Sound.BLOCK_PORTAL_TRIGGER, 1.0f, 2.0f);
 
         new BukkitRunnable() {
             double currentRadius = 0;
@@ -242,91 +192,90 @@ public class PayloadManager {
             @Override
             public void run() {
                 currentRadius += step;
-
                 if (currentRadius > maxRadius) {
                     this.cancel();
                     return;
                 }
 
-                // Smooth particle ring
-                // Particle density increases with radius to maintain a solid look
-                double density = 8.0; 
-                double count = density * currentRadius;
-                for (int i = 0; i < count; i++) {
-                    double angle = (2 * Math.PI * i) / count;
-                    double x = Math.cos(angle) * currentRadius;
-                    double z = Math.sin(angle) * currentRadius;
-                    
-                    Location particleLoc = center.clone().add(x, 0.2, z);
-                    world.spawnParticle(Particle.END_ROD, particleLoc, 1, 0, 0, 0, 0);
-                    
-                    // Add electric sparks occasionally
-                    if (currentRadius > 2 && i % 10 == 0) {
-                        world.spawnParticle(Particle.ELECTRIC_SPARK, particleLoc.add(0, 0.3, 0), 1, 0.05, 0.05, 0.05, 0.02);
-                    }
-                }
+                spawnSphereWave(world, center, currentRadius);
 
-                // Block and Entity effects - precisely at the wavefront
-                processWaveEffects(center, currentRadius, step);
+                processWaveEffects(center, currentRadius, step, blindnessDuration, weaknessDuration);
             }
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
-    private void processWaveEffects(Location center, double currentRadius, double step) {
+    private void spawnSphereWave(World world, Location center, double radius) {
+        if (radius <= 0) return;
+        int layers = Math.max(6, (int) (radius * 2));
+        for (int layer = 0; layer < layers; layer++) {
+            double phi = Math.PI * layer / (layers - 1);
+            double y = radius * Math.cos(phi);
+            double radiusAtLayer = radius * Math.sin(phi);
+            int points = Math.max(2, (int) (radiusAtLayer * 8));
+            for (int p = 0; p < points; p++) {
+                double theta = 2 * Math.PI * p / points;
+                Location loc = center.clone().add(radiusAtLayer * Math.cos(theta), y, radiusAtLayer * Math.sin(theta));
+                world.spawnParticle(Particle.END_ROD, loc, 1, 0.02, 0.02, 0.02, 0);
+                if (p % 8 == 0) {
+                    world.spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0.05, 0.05, 0.05, 0.02);
+                }
+            }
+        }
+    }
+
+    private void processWaveEffects(Location center, double currentRadius, double step, int blindnessDuration, int weaknessDuration) {
         World world = center.getWorld();
         if (world == null) return;
 
         double innerBound = currentRadius - step;
         double outerBound = currentRadius;
-
-        // Process entities in a slightly larger box for safety
         int scanRadius = (int) Math.ceil(currentRadius) + 1;
-        
-        // Block processing
+
         for (int x = -scanRadius; x <= scanRadius; x++) {
             for (int y = -3; y <= 3; y++) {
                 for (int z = -scanRadius; z <= scanRadius; z++) {
                     Location loc = center.clone().add(x, y, z);
                     double distSq = loc.distanceSquared(center);
-                    
+
                     if (distSq >= innerBound * innerBound && distSq <= outerBound * outerBound) {
                         org.bukkit.block.Block block = loc.getBlock();
                         Material type = block.getType();
-                        
-                        if (type.name().contains("REDSTONE") || type.name().contains("TORCH") || type.name().contains("REPEATER") || type.name().contains("COMPARATOR")) {
+
+                        if (type.name().contains("REDSTONE") || type.name().contains("TORCH")
+                                || type.name().contains("REPEATER") || type.name().contains("COMPARATOR")) {
                             block.breakNaturally();
                         }
-                        
+
                         if (type.name().contains("GLASS") && !type.name().contains("PANE")) {
                             block.setType(Material.AIR);
                             world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.2f);
-                            world.spawnParticle(Particle.ELECTRIC_SPARK, loc.add(0.5, 0.5, 0.5), 5, 0.2, 0.2, 0.2, 0.1);
+                            world.spawnParticle(Particle.ELECTRIC_SPARK, loc.clone().add(0.5, 0.5, 0.5), 5, 0.2, 0.2, 0.2, 0.1);
                         }
                     }
                 }
             }
         }
 
-        // Entity processing
-        world.getNearbyEntities(center, currentRadius + 0.5, 10, currentRadius + 0.5).forEach(entity -> {
+        world.getNearbyEntities(center, currentRadius + 0.5, currentRadius + 0.5, currentRadius + 0.5).forEach(entity -> {
             double dist = entity.getLocation().distance(center);
             if (dist >= innerBound && dist <= outerBound) {
                 if (entity instanceof org.bukkit.entity.LivingEntity) {
                     org.bukkit.entity.LivingEntity living = (org.bukkit.entity.LivingEntity) entity;
-                    living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.BLINDNESS, 60, 0));
-                    living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.WEAKNESS, 400, 1));
+                    if (blindnessDuration > 0) {
+                        living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.BLINDNESS, blindnessDuration, 0));
+                    }
+                    if (weaknessDuration > 0) {
+                        living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.WEAKNESS, weaknessDuration, 1));
+                    }
                 }
-                
-                // Push effect
                 Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize();
-                direction.setY(0.2); // Add a little lift
+                direction.setY(0.2);
                 entity.setVelocity(direction.multiply(0.8));
             }
         });
     }
 
     public void clearAll() {
-
         activeStrikes.clear();
     }
 }

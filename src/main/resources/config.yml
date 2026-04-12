@@ -12,8 +12,6 @@ settings:
   # Recommended: true (prevents strikes from failing in unloaded chunks)
   force-load-target: true
 
-  # List of worlds where cannons can be activated
-  # Add or remove world names to control where strikes are allowed
   disabled-worlds:
     - example
     - example_nether
@@ -136,33 +134,20 @@ payloads:
     last-fuse-ticks: 60
 
   # ========================================
-  # SINGULARITY Payload
-  # ========================================
-  # Creates a gravitational pull that sucks in everything before imploding
-  singularity:
-    # Duration of the pull effect in ticks
-    duration: 60
-    # Strength of the gravitational pull
-    pull-force: 0.5
-    # Effective radius of the pull effect
-    radius: 10.0
-    # Explosion yield of the final implosion
-    yield: 12.0
-
-
-  # ========================================
   # EMP Payload
   # ========================================
-  # Disables electronic-like blocks and cripples players
+  # Emits high-tech electromagnetic pulses that disable electronics
+  # and cripple enemies in a 3D spherical volume.
   emp:
-    # Radius of the EMP wave
+    # Radius of the EMP wave expansion
     radius: 12.0
-    # Duration of the debuff effects in ticks
-    duration: 200
-    # Number of sequential shockwaves (pulses)
+    # Number of sequential shockwaves (pulses) per explosion
     pulses: 5
     # Delay between each shockwave in ticks (20 ticks = 1 second)
     pulse-delay: 10
     # Speed of the wave expansion (blocks per tick)
     pulse-speed: 2.0
-
+    # Duration of the Blindness effect in ticks
+    blindness-duration: 60
+    # Duration of the Weakness effect in ticks
+    weakness-duration: 400

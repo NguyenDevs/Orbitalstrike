@@ -22,17 +22,19 @@ public class EmpPayload implements IPayload {
         TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnLoc, 0, 80, true, plugin.getPayloadManager().getEmpTntKey());
         if (tnt != null) {
             double radius = PayloadUtils.getDoubleParameter(cannon, "radius", plugin.getConfigManager().getEmpRadius());
-            int duration = PayloadUtils.getIntParameter(cannon, "duration", plugin.getConfigManager().getEmpDuration());
             int pulses = PayloadUtils.getIntParameter(cannon, "pulses", plugin.getConfigManager().getEmpPulses());
             int delay = PayloadUtils.getIntParameter(cannon, "pulse-delay", plugin.getConfigManager().getEmpPulseDelay());
             double speed = PayloadUtils.getDoubleParameter(cannon, "pulse-speed", plugin.getConfigManager().getEmpPulseSpeed());
+            int blindness = PayloadUtils.getIntParameter(cannon, "blindness-duration", plugin.getConfigManager().getEmpBlindnessDuration());
+            int weakness = PayloadUtils.getIntParameter(cannon, "weakness-duration", plugin.getConfigManager().getEmpWeaknessDuration());
 
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpTntKey(), PersistentDataType.BYTE, (byte) 1);
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpRadiusKey(), PersistentDataType.DOUBLE, radius);
-            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpDurationKey(), PersistentDataType.INTEGER, duration);
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpPulsesKey(), PersistentDataType.INTEGER, pulses);
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpPulseDelayKey(), PersistentDataType.INTEGER, delay);
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpPulseSpeedKey(), PersistentDataType.DOUBLE, speed);
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpBlindnessDurationKey(), PersistentDataType.INTEGER, blindness);
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpWeaknessDurationKey(), PersistentDataType.INTEGER, weakness);
 
 
         }

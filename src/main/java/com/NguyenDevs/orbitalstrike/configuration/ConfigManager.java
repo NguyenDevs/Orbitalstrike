@@ -48,18 +48,16 @@ public class ConfigManager {
         config.addDefault("payloads.recursion.last-fuse-ticks", 60);
 
 
-        config.addDefault("payloads.singularity.duration", 60);
-        config.addDefault("payloads.singularity.pull-force", 0.5);
-        config.addDefault("payloads.singularity.radius", 10.0);
-        config.addDefault("payloads.singularity.yield", 12.0);
+
 
 
 
         config.addDefault("payloads.emp.radius", 12.0);
-        config.addDefault("payloads.emp.duration", 200);
         config.addDefault("payloads.emp.pulses", 5);
         config.addDefault("payloads.emp.pulse-delay", 20);
         config.addDefault("payloads.emp.pulse-speed", 2.0);
+        config.addDefault("payloads.emp.blindness-duration", 60);
+        config.addDefault("payloads.emp.weakness-duration", 400);
 
 
 
@@ -174,30 +172,12 @@ public class ConfigManager {
     }
 
 
-    public int getSingularityDuration() {
-        return plugin.getConfig().getInt("payloads.singularity.duration");
-    }
 
-    public double getSingularityPullForce() {
-        return plugin.getConfig().getDouble("payloads.singularity.pull-force");
-    }
-
-    public double getSingularityRadius() {
-        return plugin.getConfig().getDouble("payloads.singularity.radius");
-    }
-
-    public double getSingularityYield() {
-        return plugin.getConfig().getDouble("payloads.singularity.yield");
-    }
 
 
 
     public double getEmpRadius() {
         return plugin.getConfig().getDouble("payloads.emp.radius");
-    }
-
-    public int getEmpDuration() {
-        return plugin.getConfig().getInt("payloads.emp.duration");
     }
 
     public int getEmpPulses() {
@@ -210,6 +190,14 @@ public class ConfigManager {
 
     public double getEmpPulseSpeed() {
         return plugin.getConfig().getDouble("payloads.emp.pulse-speed", 2.0);
+    }
+
+    public int getEmpBlindnessDuration() {
+        return plugin.getConfig().getInt("payloads.emp.blindness-duration", 60);
+    }
+
+    public int getEmpWeaknessDuration() {
+        return plugin.getConfig().getInt("payloads.emp.weakness-duration", 400);
     }
 
 }

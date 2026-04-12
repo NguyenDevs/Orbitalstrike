@@ -4,7 +4,6 @@ public enum PayloadType {
     STAB,
     NUKE,
     RECURSION,
-    SINGULARITY,
     EMP
 
 

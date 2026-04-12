@@ -6,7 +6,7 @@
 
 cannons:
   stab_example:
-    name: "StabExample"
+    name: "Stab Example"
     item:
       - material: FISHING_ROD
       - durability: true
@@ -20,7 +20,7 @@ cannons:
         - vertical-step: 2
 
   nuke_example:
-    name: "NukeExample"
+    name: "Nuke Example"
     item:
       - material: BLAZE_ROD
       - durability: true
@@ -49,22 +49,6 @@ cannons:
         - level: 3
         - amount: 4
 
-  singularity_example:
-    name: "SingularityExample"
-    item:
-      - material: HEART_OF_THE_SEA
-      - durability: true
-      - max-durability: 1
-    cooldown: 300
-    payload:
-      type: SINGULARITY
-      settings:
-        - duration: 80
-        - pull-force: 0.6
-        - radius: 12.0
-        - yield: 15.0
-
-
   emp_example:
     name: "EmpExample"
     item:
@@ -76,7 +60,8 @@ cannons:
       type: EMP
       settings:
         - radius: 15.0
-        - duration: 300
         - pulses: 8
         - pulse-delay: 20
         - pulse-speed: 2.5
+        - blindness-duration: 100
+        - weakness-duration: 600

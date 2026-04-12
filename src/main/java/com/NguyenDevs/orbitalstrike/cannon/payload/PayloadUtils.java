@@ -38,6 +38,14 @@ public class PayloadUtils {
         return defaultValue;
     }
 
+    public static String getStringParameter(Cannon cannon, String key, String defaultValue) {
+        Object val = cannon.getParameter(key);
+        if (val instanceof String) {
+            return (String) val;
+        }
+        return defaultValue;
+    }
+
     public static TNTPrimed spawnTNTAt(OrbitalStrike plugin, World world, Location loc, float yield, int fuse, boolean invulnerable, NamespacedKey key) {
         try {
             if (fuse == 0 && loc.getBlock().isLiquid()) return null;

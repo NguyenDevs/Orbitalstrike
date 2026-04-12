@@ -13,7 +13,7 @@
 
 ## 💣 Attack Payloads
 
-The cannon system supports 5 advanced weapon types, each with its own mechanics and purpose:
+The cannon system supports 4 advanced weapon types, each with its own mechanics and purpose:
 
 ### 🔴 STAB — Precision Strike
 A focused, high-speed attack that drops a continuous column of TNT onto a single point, drilling deep into the ground. Perfect for destroying the most fortified underground bunkers.
@@ -24,8 +24,7 @@ Launches a massive nuclear warhead from orbit, creating concentric explosion rin
 ### 🟣 RECURSION — Chain Reaction
 Creates a cascading series of explosions. Each detonation spawns more explosives, causing extreme chaos across the target zone.
 
-### 🌀 SINGULARITY — Implosion
-Creates a spatial distortion that pulls all nearby entities and items toward its center before collapsing in a powerful, high-yield implosion.
+
 
 ### ⚡ EMP — Shockwave
 Emits a sequence of expanding electromagnetic pulses that disable Redstone devices, shatter glass, and cripple enemies with Blindness and Weakness.
