@@ -1,74 +1,72 @@
 # 🛰️ OrbitalStrike
 
-Minecraft plugin — Orbital cannon system
-
----
-![image](https://github.com/user-attachments/assets/9b628bd9-f92e-4d21-bf58-3f8039309d89)
-## Cannon System
-
-Players can establish virtual **cannons** in orbit. Each cannon is assigned a unique name and loaded with a specific type of ammunition (payload). Cannons can be fired by command or via a special Fishing Rod targeting tool.
+**Minecraft Plugin — Experience devastating power from orbit.**
 
 ---
 
-## Attack Payloads
+![Banner](https://github.com/user-attachments/assets/9b628bd9-f92e-4d21-bf58-3f8039309d89)
+
+## 🌌 Overview
+**OrbitalStrike** allows players to establish orbital satellite cannon systems to perform precision strikes or massive bombardments. The plugin brings a modern warfare experience with stunning visual effects and overwhelming power.
+
+---
+
+## 💣 Attack Payloads
+
+The cannon system supports 7 advanced weapon types, each with its own mechanics and purpose:
 
 ### 🔴 STAB — Precision Strike
-A focused attack that drops a continuous column of TNT onto a single point, drilling deep into the ground. Ideal for breaching bunkers or reinforced bases.
+A focused, high-speed attack that drops a continuous column of TNT onto a single point, drilling deep into the ground. Perfect for destroying the most fortified underground bunkers.
 
 ### 🟡 NUKE — Area Bombardment
-A massive area-of-effect strike. Drops a main warhead from high altitude with expanding rings of TNT to carpet-bomb a large area. Ideal for surface annihilation.
+Launches a massive nuclear warhead from orbit, creating concentric explosion rings that flatten everything on the surface.
 
 ### 🟣 RECURSION — Chain Reaction
-Creates devastating chain-detonation effects across the target zone for cascading destruction.
+Creates a cascading series of explosions. Each detonation spawns more explosives, causing extreme chaos across the target zone.
+
+### 🔵 PLASMA — Focused Beam (NEW)
+Focuses an ultra-hot plasma energy beam from orbit. The beam melts stone into lava and sand into glass while dealing continuous burn damage to all entities caught inside.
+
+### 🌀 SINGULARITY — Implosion (NEW)
+Creates a spatial distortion that pulls all nearby entities and items toward its center before collapsing in a powerful, high-yield implosion.
+
+### 🌨️ CLUSTER — Air Burst (NEW)
+The warhead splits into dozens of smaller sub-munitions in mid-air, creating a rain of bombs that covers large areas simultaneously.
+
+### ⚡ EMP — Shockwave (NEW)
+Emits an electromagnetic pulse that disables all Redstone devices, extinguishes light sources, and cripples enemies with Blindness and extreme Slowness.
 
 ---
 
-## Firing Mechanisms
+## 🛠️ How It Works
 
-### 🔵 By Command
-Fire immediately at the crosshair location or at specific X, Y, Z coordinates using `/cannon fire` or `/cannon target`.
+### 🎮 Firing by Command
+You can signal the cannon to fire immediately at your crosshair or at specific X, Y, Z coordinates:
+- `/cannon fire <name>`
+- `/cannon target <name> <x> <y> <z>`
 
-### 🟢 By Fishing Rod
-A special Fishing Rod linked to a specific cannon. Clicking with the rod fires at the location the player is looking at. Can be crafted in survival mode if recipes are configured.
+### 🎣 Remote Controller
+Use a special Remote Controller (crafted or given) linked to a specific cannon. Simply click with the rod to fire exactly where you are looking. These can be crafted in Survival mode.
 
 ---
-![image](https://github.com/user-attachments/assets/31b13b0c-d8e2-4634-813e-280ae6d081d7)
-## Commands
+
+## 📜 Commands
 
 | Command | Description |
 |---|---|
-| `/cannon create <name> [payload]` | Create a cannon at your location |
-| `/cannon remove <name>` | Remove a cannon |
-| `/cannon list` | List all cannons |
-| `/cannon fire <cannon>` | Fire payload at crosshair |
-| `/cannon info <cannon>` | Show info for a cannon |
-| `/cannon target <cannon> <x> <y> <z>` | Fire at specific coordinates |
-| `/cannon give <player> <cannon>` | Give targeting tool to a player |
-| `/cannon set <cannon> <param> <value>` | Set a parameter for a cannon |
-| `/cannon reload` | Reload configuration |
+| `/cannon create <name> [payload]` | Establish a new cannon at your current location |
+| `/cannon remove <name>` | Decommission and remove a cannon from orbit |
+| `/cannon list` | List all available cannons under your control |
+| `/cannon info <name>` | View detailed stats (Payload type, location, etc.) |
+| `/cannon set <name> <param> <value>` | Customize power, radius, or speed parameters |
+| `/cannon reload` | Refresh the plugin configuration |
 
 ---
 
-## Permissions
-
-| Node | Description |
-|---|---|
-| `orbitalstrike.use.<cannon>` | Use a specific orbital strike cannon |
-| `orbitalstrike.admin` | Create and manage cannons |
+## 🛡️ Region Protection
+The plugin is fully compatible with **WorldGuard**. Administrators can control cannon usage via:
+- **Flag:** `osc-enable`
+- **Default:** `deny` (Protected regions block all orbital strikes by default).
 
 ---
-
-## WorldGuard Integration
-
-### Flag: `osc-enable`
-
-Controls whether OrbitalStrike cannons are allowed to fire within a WorldGuard region.
-
-> **Default: `deny`** — Regions that have **not** explicitly set this flag will block all orbital strikes by default.
-
-| Value | Effect |
-|---|---|
-| `allow` | Orbital strikes are permitted in this region |
-| `deny` | Orbital strikes are blocked (default for all regions) |
-
-Set to `allow` to enable strikes in a specific region — useful for designated PvP or war zones.
+© 2026 Developed by **NguyenDevs**
