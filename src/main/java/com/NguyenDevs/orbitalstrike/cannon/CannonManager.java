@@ -24,8 +24,12 @@ public class CannonManager {
         this.cannons = new HashMap<>();
         this.selectedCannons = new HashMap<>();
         this.cannonsFile = new File(plugin.getDataFolder(), "cannons.yml");
+        if (!cannonsFile.exists()) {
+            plugin.saveResource("cannons.yml", false);
+        }
         loadCannons();
     }
+
 
     public void createCannon(String name, PayloadType payloadType) {
         Cannon cannon = new Cannon(name, payloadType);
@@ -52,7 +56,25 @@ public class CannonManager {
             cannon.setParameter("velocity", plugin.getConfigManager().getRecursionVelocity());
             cannon.setParameter("split-fuse-ticks", plugin.getConfigManager().getRecursionSplitFuseTicks());
             cannon.setParameter("last-fuse-ticks", plugin.getConfigManager().getRecursionLastFuseTicks());
+        } else if (payloadType == PayloadType.PLASMA) {
+            cannon.setParameter("duration", plugin.getConfigManager().getPlasmaDuration());
+            cannon.setParameter("damage", plugin.getConfigManager().getPlasmaDamage());
+            cannon.setParameter("radius", plugin.getConfigManager().getPlasmaRadius());
+        } else if (payloadType == PayloadType.SINGULARITY) {
+            cannon.setParameter("duration", plugin.getConfigManager().getSingularityDuration());
+            cannon.setParameter("pull-force", plugin.getConfigManager().getSingularityPullForce());
+            cannon.setParameter("radius", plugin.getConfigManager().getSingularityRadius());
+            cannon.setParameter("yield", plugin.getConfigManager().getSingularityYield());
+        } else if (payloadType == PayloadType.CLUSTER) {
+            cannon.setParameter("split-height", plugin.getConfigManager().getClusterSplitHeight());
+            cannon.setParameter("amount", plugin.getConfigManager().getClusterAmount());
+            cannon.setParameter("yield", plugin.getConfigManager().getClusterYield());
+            cannon.setParameter("scatter", plugin.getConfigManager().getClusterScatter());
+        } else if (payloadType == PayloadType.EMP) {
+            cannon.setParameter("radius", plugin.getConfigManager().getEmpRadius());
+            cannon.setParameter("duration", plugin.getConfigManager().getEmpDuration());
         }
+
 
         cannon.setItemMaterial(plugin.getConfigManager().getDefaultItemMaterial());
         cannon.setDurabilityEnabled(plugin.getConfigManager().isDefaultItemDurabilityEnabled());

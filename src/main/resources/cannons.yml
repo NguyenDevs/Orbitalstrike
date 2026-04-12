@@ -1,0 +1,107 @@
+# ==========================================
+# Orbital Strike Cannon Examples
+# ==========================================
+# This file contains example cannons for each payload type.
+# Use these as a reference to create your own devastating weaponry!
+
+cannons:
+  stab_example:
+    name: "StabExample"
+    item:
+      - material: FISHING_ROD
+      - durability: true
+      - max-durability: 5
+    cooldown: 30
+    payload:
+      type: STAB
+      settings:
+        - yield: 8.0
+        - offset: 0.3
+        - vertical-step: 2
+
+  nuke_example:
+    name: "NukeExample"
+    item:
+      - material: BLAZE_ROD
+      - durability: true
+      - max-durability: 3
+    cooldown: 120
+    payload:
+      type: NUKE
+      settings:
+        - yield: 10.0
+        - height: 60.0
+        - rings: 8
+        - base-tnt: 15
+        - tnt-increase: 2
+
+  recursion_example:
+    name: "RecursionExample"
+    item:
+      - material: NETHER_STAR
+      - durability: false
+    cooldown: 60
+    payload:
+      type: RECURSION
+      settings:
+        - yield: 10.0
+        - height: 100.0
+        - level: 3
+        - amount: 4
+
+  plasma_example:
+    name: "PlasmaExample"
+    item:
+      - material: END_ROD
+      - durability: true
+      - max-durability: 10
+    cooldown: 45
+    payload:
+      type: PLASMA
+      settings:
+        - duration: 120
+        - damage: 5.0
+        - radius: 4.0
+
+  singularity_example:
+    name: "SingularityExample"
+    item:
+      - material: HEART_OF_THE_SEA
+      - durability: true
+      - max-durability: 1
+    cooldown: 300
+    payload:
+      type: SINGULARITY
+      settings:
+        - duration: 80
+        - pull-force: 0.6
+        - radius: 12.0
+        - yield: 15.0
+
+  cluster_example:
+    name: "ClusterExample"
+    item:
+      - material: FIREWORK_STAR
+      - durability: true
+      - max-durability: 5
+    cooldown: 45
+    payload:
+      type: CLUSTER
+      settings:
+        - split-height: 50.0
+        - amount: 20
+        - yield: 5.0
+        - scatter: 1.5
+
+  emp_example:
+    name: "EmpExample"
+    item:
+      - material: PRISMARINE_CRYSTALS
+      - durability: true
+      - max-durability: 8
+    cooldown: 60
+    payload:
+      type: EMP
+      settings:
+        - radius: 15.0
+        - duration: 300
