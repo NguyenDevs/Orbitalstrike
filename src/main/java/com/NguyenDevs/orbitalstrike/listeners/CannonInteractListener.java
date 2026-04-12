@@ -116,6 +116,8 @@ public class CannonInteractListener implements Listener {
             return;
         }
         
+        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
+
         boolean shouldConsume = true;
         if (cannon.isDurabilityEnabled()) {
             int currentUses = meta.getPersistentDataContainer().getOrDefault(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER, 0);
@@ -139,7 +141,6 @@ public class CannonInteractListener implements Listener {
 
         if (shouldConsume) {
             item.setAmount(item.getAmount() - 1);
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
         }
 
 
