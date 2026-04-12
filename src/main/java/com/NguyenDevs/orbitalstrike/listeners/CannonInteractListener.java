@@ -114,57 +114,9 @@ public class CannonInteractListener implements Listener {
             return;
         }
         
-        // Check cooldown
-        if (cannon.getCooldown() > 0) {
-            long currentTime = System.currentTimeMillis();
-            cooldowns.putIfAbsent(player.getUniqueId(), new HashMap<>());
-            Map<String, Long> playerCooldowns = cooldowns.get(player.getUniqueId());
-            
-            if (playerCooldowns.containsKey(cannon.getName())) {
-                long lastUse = playerCooldowns.get(cannon.getName());
-                long cooldownTime = cannon.getCooldown() * 1000L;
-                if (currentTime - lastUse < cooldownTime) {
-                    long remaining = (cooldownTime - (currentTime - lastUse)) / 1000;
-                    player.sendMessage(plugin.getMessageManager().getMessage("cannon.cooldown", "%time%", String.valueOf(remaining)));
-                    return;
-                }
-            }
-            playerCooldowns.put(cannon.getName(), currentTime);
-            player.setCooldown(item.getType(), cannon.getCooldown() * 20);
-        }
+        item.setAmount(item.getAmount() - 1);
+        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
 
-        if (cannon.isDurabilityEnabled()) {
-            int uses = 0;
-            if (meta.getPersistentDataContainer().has(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER)) {
-                uses = meta.getPersistentDataContainer().get(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER);
-            }
-            
-            uses++;
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
-            
-            if (uses >= cannon.getMaxDurability()) {
-                item.setAmount(0);
-            } else {
-                meta.getPersistentDataContainer().set(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER, uses);
-                
-                if (meta instanceof Damageable) {
-                    Damageable damageable = (Damageable) meta;
-                    int maxVanilla = item.getType().getMaxDurability();
-                    
-                    if (maxVanilla > 0) {
-                        int currentDamage = damageable.getDamage();
-                        damageable.setDamage(currentDamage + 1);
-
-                        if (damageable.getDamage() >= maxVanilla) {
-                            item.setAmount(0);
-                            return;
-                        }
-                    }
-                }
-                
-                item.setItemMeta(meta);
-            }
-        }
 
         StrikeData strikeData = new StrikeData(cannon.getPayloadType());
 

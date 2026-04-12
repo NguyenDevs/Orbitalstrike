@@ -27,6 +27,11 @@ public class PayloadManager {
     private final NamespacedKey recursionVelocityKey;
     private final NamespacedKey recursionSplitFuseKey;
     private final NamespacedKey recursionLastFuseKey;
+    private final NamespacedKey empTntKey;
+    private final NamespacedKey empRadiusKey;
+    private final NamespacedKey empDurationKey;
+
+
 
     public PayloadManager(OrbitalStrike plugin) {
         this.plugin = plugin;
@@ -40,6 +45,11 @@ public class PayloadManager {
         this.recursionVelocityKey = new NamespacedKey(plugin, "recursion_velocity");
         this.recursionSplitFuseKey = new NamespacedKey(plugin, "recursion_split_fuse");
         this.recursionLastFuseKey = new NamespacedKey(plugin, "recursion_last_fuse");
+        this.empTntKey = new NamespacedKey(plugin, "emp_tnt");
+        this.empRadiusKey = new NamespacedKey(plugin, "emp_radius");
+        this.empDurationKey = new NamespacedKey(plugin, "emp_duration");
+
+
 
         registerPayloads();
     }
@@ -50,8 +60,8 @@ public class PayloadManager {
         payloads.put(PayloadType.RECURSION, new RecursionPayload(plugin));
         payloads.put(PayloadType.PLASMA, new PlasmaPayload(plugin));
         payloads.put(PayloadType.SINGULARITY, new SingularityPayload(plugin));
-        payloads.put(PayloadType.CLUSTER, new ClusterPayload(plugin));
         payloads.put(PayloadType.EMP, new EmpPayload(plugin));
+
     }
 
     public NamespacedKey getOrbitalStrikeKey() {
@@ -81,6 +91,20 @@ public class PayloadManager {
     public NamespacedKey getRecursionLastFuseKey() {
         return recursionLastFuseKey;
     }
+
+    public NamespacedKey getEmpTntKey() {
+        return empTntKey;
+    }
+
+    public NamespacedKey getEmpRadiusKey() {
+        return empRadiusKey;
+    }
+
+    public NamespacedKey getEmpDurationKey() {
+        return empDurationKey;
+    }
+
+
 
     public void initiateStrike(Cannon cannon, StrikeData data, Location target) {
         if (!plugin.getConfigManager().getEnabledWorlds().contains(target.getWorld().getName())) {
@@ -157,7 +181,85 @@ public class PayloadManager {
         }
     }
 
+    public void triggerEmpShockwave(Location center, double maxRadius, int duration) {
+        World world = center.getWorld();
+        if (world == null) return;
+
+        new BukkitRunnable() {
+            double currentRadius = 0;
+            final double step = 1.5;
+
+            @Override
+            public void run() {
+                if (currentRadius >= maxRadius) {
+                    this.cancel();
+                    return;
+                }
+
+                currentRadius += step;
+
+                // 3 rings of particles
+                for (int ring = 0; ring < 3; ring++) {
+                    double r = currentRadius - (ring * 1.5);
+                    if (r <= 0) continue;
+
+                    for (double angle = 0; angle < 360; angle += 10.0 / r) {
+                        double rad = Math.toRadians(angle);
+                        double x = r * Math.cos(rad);
+                        double z = r * Math.sin(rad);
+                        world.spawnParticle(Particle.END_ROD, center.clone().add(x, 0.2, z), 1, 0, 0, 0, 0);
+                    }
+                }
+
+                // Block processing at exactly currentRadius shell
+                int boxRadius = (int) Math.ceil(currentRadius);
+                for (int x = -boxRadius; x <= boxRadius; x++) {
+                    for (int y = -3; y <= 3; y++) {
+                        for (int z = -boxRadius; z <= boxRadius; z++) {
+                            Location loc = center.clone().add(x, y, z);
+                            double dist = loc.distance(center);
+                            
+                            if (dist >= currentRadius - step && dist <= currentRadius) {
+                                org.bukkit.block.Block block = loc.getBlock();
+                                Material type = block.getType();
+                                
+                                // Redstone and Torches
+                                if (type.name().contains("REDSTONE") || type.name().contains("TORCH")) {
+                                    block.breakNaturally();
+                                }
+                                
+                                // Glass shattering
+                                if (type.name().contains("GLASS")) {
+                                    block.setType(Material.AIR);
+                                    world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.0f, 1.0f);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Entity processing
+                world.getNearbyEntities(center, currentRadius, 10, currentRadius).forEach(entity -> {
+                    double dist = entity.getLocation().distance(center);
+                    if (dist >= currentRadius - step && dist <= currentRadius) {
+                        if (entity instanceof org.bukkit.entity.LivingEntity) {
+                            org.bukkit.entity.LivingEntity living = (org.bukkit.entity.LivingEntity) entity;
+                            living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.BLINDNESS, duration, 0));
+                            living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SLOW, duration, 2));
+                        }
+                        
+                        // Knockback
+                        Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize();
+                        direction.setY(0.3); // Slight upward lift
+                        entity.setVelocity(direction.multiply(1.2));
+                    }
+                });
+            }
+        }.runTaskTimer(plugin, 0L, 1L);
+    }
+
     public void clearAll() {
+
         activeStrikes.clear();
     }
 }

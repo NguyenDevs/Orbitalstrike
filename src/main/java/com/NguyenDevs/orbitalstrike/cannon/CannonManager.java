@@ -65,11 +65,7 @@ public class CannonManager {
             cannon.setParameter("pull-force", plugin.getConfigManager().getSingularityPullForce());
             cannon.setParameter("radius", plugin.getConfigManager().getSingularityRadius());
             cannon.setParameter("yield", plugin.getConfigManager().getSingularityYield());
-        } else if (payloadType == PayloadType.CLUSTER) {
-            cannon.setParameter("split-height", plugin.getConfigManager().getClusterSplitHeight());
-            cannon.setParameter("amount", plugin.getConfigManager().getClusterAmount());
-            cannon.setParameter("yield", plugin.getConfigManager().getClusterYield());
-            cannon.setParameter("scatter", plugin.getConfigManager().getClusterScatter());
+
         } else if (payloadType == PayloadType.EMP) {
             cannon.setParameter("radius", plugin.getConfigManager().getEmpRadius());
             cannon.setParameter("duration", plugin.getConfigManager().getEmpDuration());

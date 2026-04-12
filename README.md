@@ -30,9 +30,6 @@ Focuses an ultra-hot plasma energy beam from orbit. The beam melts stone into la
 ### 🌀 SINGULARITY — Implosion (NEW)
 Creates a spatial distortion that pulls all nearby entities and items toward its center before collapsing in a powerful, high-yield implosion.
 
-### 🌨️ CLUSTER — Air Burst (NEW)
-The warhead splits into dozens of smaller sub-munitions in mid-air, creating a rain of bombs that covers large areas simultaneously.
-
 ### ⚡ EMP — Shockwave (NEW)
 Emits an electromagnetic pulse that disables all Redstone devices, extinguishes light sources, and cripples enemies with Blindness and extreme Slowness.
 

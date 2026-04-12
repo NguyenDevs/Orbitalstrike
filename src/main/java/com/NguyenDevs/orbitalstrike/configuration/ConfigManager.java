@@ -57,10 +57,7 @@ public class ConfigManager {
         config.addDefault("payloads.singularity.radius", 10.0);
         config.addDefault("payloads.singularity.yield", 12.0);
 
-        config.addDefault("payloads.cluster.split-height", 40.0);
-        config.addDefault("payloads.cluster.amount", 15);
-        config.addDefault("payloads.cluster.yield", 6.0);
-        config.addDefault("payloads.cluster.scatter", 1.2);
+
 
         config.addDefault("payloads.emp.radius", 12.0);
         config.addDefault("payloads.emp.duration", 200);
@@ -207,21 +204,7 @@ public class ConfigManager {
         return plugin.getConfig().getDouble("payloads.singularity.yield");
     }
 
-    public double getClusterSplitHeight() {
-        return plugin.getConfig().getDouble("payloads.cluster.split-height");
-    }
 
-    public int getClusterAmount() {
-        return plugin.getConfig().getInt("payloads.cluster.amount");
-    }
-
-    public double getClusterYield() {
-        return plugin.getConfig().getDouble("payloads.cluster.yield");
-    }
-
-    public double getClusterScatter() {
-        return plugin.getConfig().getDouble("payloads.cluster.scatter");
-    }
 
     public double getEmpRadius() {
         return plugin.getConfig().getDouble("payloads.emp.radius");

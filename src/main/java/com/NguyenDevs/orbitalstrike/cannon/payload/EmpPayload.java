@@ -3,12 +3,9 @@ package com.NguyenDevs.orbitalstrike.cannon.payload;
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import com.NguyenDevs.orbitalstrike.cannon.Cannon;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.persistence.PersistentDataType;
 
 public class EmpPayload implements IPayload {
     private final OrbitalStrike plugin;
@@ -19,32 +16,18 @@ public class EmpPayload implements IPayload {
 
     @Override
     public void execute(World world, Location target, Cannon cannon) {
-        double radius = PayloadUtils.getDoubleParameter(cannon, "radius", plugin.getConfigManager().getEmpRadius());
-        int duration = PayloadUtils.getIntParameter(cannon, "duration", plugin.getConfigManager().getEmpDuration());
+        double height = 60.0;
+        Location spawnLoc = target.clone().add(0, height, 0);
 
-        world.spawnParticle(Particle.FLASH, target, 5, 2, 2, 2, 0.1);
-        world.spawnParticle(Particle.ELECTRIC_SPARK, target, 50, radius / 2, radius / 2, radius / 2, 0.5);
+        TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnLoc, 0, 80, true, plugin.getPayloadManager().getEmpTntKey());
+        if (tnt != null) {
+            double radius = PayloadUtils.getDoubleParameter(cannon, "radius", plugin.getConfigManager().getEmpRadius());
+            int duration = PayloadUtils.getIntParameter(cannon, "duration", plugin.getConfigManager().getEmpDuration());
+            
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpTntKey(), PersistentDataType.BYTE, (byte) 1);
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpRadiusKey(), PersistentDataType.DOUBLE, radius);
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpDurationKey(), PersistentDataType.INTEGER, duration);
 
-        for (int x = (int) -radius; x <= radius; x++) {
-            for (int y = (int) -radius; y <= radius; y++) {
-                for (int z = (int) -radius; z <= radius; z++) {
-                    Location loc = target.clone().add(x, y, z);
-                    if (loc.distance(target) <= radius) {
-                        Material type = loc.getBlock().getType();
-                        if (type.name().contains("TORCH") || type.name().contains("REDSTONE")) {
-                            loc.getBlock().setType(Material.AIR);
-                        }
-                    }
-                }
-            }
         }
-
-        world.getNearbyEntities(target, radius, radius, radius).forEach(entity -> {
-            if (entity instanceof LivingEntity) {
-                LivingEntity living = (LivingEntity) entity;
-                living.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, duration, 0));
-                living.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, 2));
-            }
-        });
     }
 }

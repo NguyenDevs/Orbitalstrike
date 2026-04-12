@@ -6,7 +6,7 @@ public enum PayloadType {
     RECURSION,
     PLASMA,
     SINGULARITY,
-    CLUSTER,
     EMP
+
 
 }

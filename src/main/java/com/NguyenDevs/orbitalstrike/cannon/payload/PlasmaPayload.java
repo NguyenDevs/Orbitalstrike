@@ -23,6 +23,8 @@ public class PlasmaPayload implements IPayload {
         double radius = PayloadUtils.getDoubleParameter(cannon, "radius", plugin.getConfigManager().getPlasmaRadius());
         boolean melting = plugin.getConfigManager().isPlasmaMeltingEnabled();
 
+        world.playSound(target, org.bukkit.Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.0f);
+
         new BukkitRunnable() {
             int ticks = 0;
 
@@ -33,9 +35,17 @@ public class PlasmaPayload implements IPayload {
                     return;
                 }
 
+                if (ticks % 10 == 0) {
+                    world.playSound(target, org.bukkit.Sound.BLOCK_FIRE_AMBIENT, 1.0f, 1.0f);
+                }
+
                 for (double y = 0; y < 100; y += 2) {
                     world.spawnParticle(Particle.END_ROD, target.clone().add(0, y, 0), 1, 0.1, 0.1, 0.1, 0.05);
+                    if (ticks % 4 == 0) {
+                        world.spawnParticle(Particle.FLAME, target.clone().add(0, y, 0), 1, 0.2, 0.2, 0.2, 0.02);
+                    }
                 }
+
 
                 if (ticks % 5 == 0) {
                     world.getNearbyEntities(target, radius, 100, radius).forEach(entity -> {

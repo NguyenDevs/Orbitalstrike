@@ -78,20 +78,6 @@ cannons:
         - radius: 12.0
         - yield: 15.0
 
-  cluster_example:
-    name: "ClusterExample"
-    item:
-      - material: FIREWORK_STAR
-      - durability: true
-      - max-durability: 5
-    cooldown: 45
-    payload:
-      type: CLUSTER
-      settings:
-        - split-height: 50.0
-        - amount: 20
-        - yield: 5.0
-        - scatter: 1.5
 
   emp_example:
     name: "EmpExample"

@@ -27,8 +27,23 @@ public class TNTListener implements Listener {
                 PersistentDataType.BYTE)) {
 
             plugin.getPayloadManager().handleRecursionExplosion(tnt);
-
             return;
         }
+
+        if (tnt.getPersistentDataContainer().has(
+                plugin.getPayloadManager().getEmpTntKey(),
+                PersistentDataType.BYTE)) {
+            
+            event.setYield(0); // Extra safety
+            event.blockList().clear(); // No block damage
+            
+            double radius = tnt.getPersistentDataContainer().getOrDefault(
+                    plugin.getPayloadManager().getEmpRadiusKey(), PersistentDataType.DOUBLE, 12.0);
+            int duration = tnt.getPersistentDataContainer().getOrDefault(
+                    plugin.getPayloadManager().getEmpDurationKey(), PersistentDataType.INTEGER, 200);
+            
+            plugin.getPayloadManager().triggerEmpShockwave(event.getLocation(), radius, duration);
+        }
+
     }
 }

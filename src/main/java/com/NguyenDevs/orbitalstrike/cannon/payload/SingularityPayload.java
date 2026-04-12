@@ -29,12 +29,19 @@ public class SingularityPayload implements IPayload {
             public void run() {
                 if (ticks >= duration) {
                     this.cancel();
+                    world.playSound(target, org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 1.5f, 1.0f);
                     PayloadUtils.spawnTNTAt(plugin, world, target, yield, 0, false, plugin.getPayloadManager().getOrbitalStrikeKey());
                     return;
                 }
 
+                if (ticks % 20 == 0) {
+                    world.playSound(target, org.bukkit.Sound.BLOCK_PORTAL_TRAVEL, 1.0f, 1.5f);
+                }
+
                 world.spawnParticle(Particle.PORTAL, target, 20, 1, 1, 1, 0.1);
-                world.spawnParticle(Particle.REVERSE_PORTAL, target, 10, 0.5, 0.5, 0.5, 0.05);
+                world.spawnParticle(Particle.REVERSE_PORTAL, target, 15, 0.5, 0.5, 0.5, 0.05);
+                world.spawnParticle(Particle.DRAGON_BREATH, target, 5, 0.2, 0.2, 0.2, 0.02);
+
 
                 world.getNearbyEntities(target, radius, radius, radius).forEach(entity -> {
                     Vector direction = target.toVector().subtract(entity.getLocation().toVector());

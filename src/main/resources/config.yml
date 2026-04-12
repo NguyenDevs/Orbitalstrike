@@ -162,19 +162,6 @@ payloads:
     # Explosion yield of the final implosion
     yield: 12.0
 
-  # ========================================
-  # CLUSTER Payload
-  # ========================================
-  # Splits into multiple sub-munitions in mid-air
-  cluster:
-    # Height above target where the shell splits
-    split-height: 40.0
-    # Number of sub-munitions to spawn
-    amount: 15
-    # Explosion yield of each sub-munition
-    yield: 6.0
-    # Horizontal scatter intensity
-    scatter: 1.2
 
   # ========================================
   # EMP Payload
