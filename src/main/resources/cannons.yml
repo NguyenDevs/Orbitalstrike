@@ -36,7 +36,7 @@ cannons:
         - tnt-increase: 2
 
   recursion_example:
-    name: "RecursionExample"
+    name: "Recursion Example"
     item:
       - material: NETHER_STAR
       - durability: false
@@ -50,7 +50,7 @@ cannons:
         - amount: 4
 
   emp_example:
-    name: "EmpExample"
+    name: "EMP Example"
     item:
       - material: PRISMARINE_CRYSTALS
       - durability: true
