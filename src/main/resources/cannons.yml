@@ -6,7 +6,7 @@
 
 cannons:
   stab_example:
-    name: "Stab Example"
+    name: "Stab_Example"
     item:
       - material: FISHING_ROD
       - durability: true
@@ -20,7 +20,7 @@ cannons:
         - vertical-step: 2
 
   nuke_example:
-    name: "Nuke Example"
+    name: "Nuke_Example"
     item:
       - material: BLAZE_ROD
       - durability: true
@@ -36,7 +36,7 @@ cannons:
         - tnt-increase: 2
 
   recursion_example:
-    name: "Recursion Example"
+    name: "Recursion_Example"
     item:
       - material: NETHER_STAR
       - durability: false
@@ -50,7 +50,7 @@ cannons:
         - amount: 4
 
   emp_example:
-    name: "EMP Example"
+    name: "EMP_Example"
     item:
       - material: PRISMARINE_CRYSTALS
       - durability: true
