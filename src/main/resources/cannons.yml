@@ -61,7 +61,10 @@ cannons:
       settings:
         - radius: 15.0
         - pulses: 8
-        - pulse-delay: 20
+        - pulse-delay: 40
         - pulse-speed: 2.5
-        - blindness-duration: 100
+        - blindness-duration: 20
         - weakness-duration: 600
+        - nausea-duration: 100
+        - slowness-duration: 100
+        - slowness-amplifier: 1
