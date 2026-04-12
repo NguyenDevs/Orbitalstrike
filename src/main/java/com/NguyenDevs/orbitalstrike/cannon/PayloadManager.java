@@ -5,6 +5,7 @@ import com.NguyenDevs.orbitalstrike.cannon.payload.*;
 import com.NguyenDevs.orbitalstrike.utils.PayloadType;
 import com.NguyenDevs.orbitalstrike.utils.StrikeData;
 import org.bukkit.*;
+import org.bukkit.Color;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -181,44 +182,97 @@ public class PayloadManager {
         World world = center.getWorld();
         if (world == null) return;
 
-        world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2.0f, 0.6f);
-        world.playSound(center, Sound.ITEM_TRIDENT_RIPTIDE_1, 1.2f, 1.5f);
-        world.playSound(center, Sound.BLOCK_BEACON_DEACTIVATE, 1.0f, 1.5f);
-        world.playSound(center, Sound.BLOCK_PORTAL_TRIGGER, 1.0f, 2.0f);
-
+        // Phase 1: Gather — particles converge toward center (charge-up effect)
+        int gatherTicks = 15;
         new BukkitRunnable() {
-            double currentRadius = 0;
+            int tick = 0;
 
             @Override
             public void run() {
-                currentRadius += step;
-                if (currentRadius > maxRadius) {
+                if (tick >= gatherTicks) {
                     this.cancel();
+
+                    // Flash at moment of release
+                    world.spawnParticle(Particle.FLASH, center, 1, 0, 0, 0, 0);
+                    world.spawnParticle(Particle.ELECTRIC_SPARK, center, 60, 0.3, 0.3, 0.3, 0.3);
+                    world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2.0f, 0.6f);
+                    world.playSound(center, Sound.ITEM_TRIDENT_RIPTIDE_1, 1.2f, 1.5f);
+                    world.playSound(center, Sound.BLOCK_BEACON_DEACTIVATE, 1.0f, 1.5f);
+
+                    // Phase 2: Expand — single shell shockwave
+                    new BukkitRunnable() {
+                        double currentRadius = 0;
+
+                        @Override
+                        public void run() {
+                            currentRadius += step;
+                            if (currentRadius > maxRadius) {
+                                this.cancel();
+                                return;
+                            }
+                            spawnSphereShell(world, center, currentRadius);
+                            processWaveEffects(center, currentRadius, step, blindnessDuration, weaknessDuration);
+                        }
+                    }.runTaskTimer(plugin, 0L, 1L);
+
                     return;
                 }
 
-                spawnSphereWave(world, center, currentRadius);
+                // Particles appear around center and shrink inward each tick
+                double gatherRadius = maxRadius * 0.35 * (1.0 - (double) tick / gatherTicks);
+                int particleCount = 10 + tick * 4;
+                Particle.DustOptions gatherDust = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.0f);
+                for (int i = 0; i < particleCount; i++) {
+                    double phi = Math.acos(1 - 2.0 * Math.random());
+                    double theta = 2 * Math.PI * Math.random();
+                    double r = gatherRadius * (0.6 + Math.random() * 0.4);
+                    double px = center.getX() + r * Math.sin(phi) * Math.cos(theta);
+                    double py = center.getY() + r * Math.cos(phi);
+                    double pz = center.getZ() + r * Math.sin(phi) * Math.sin(theta);
+                    world.spawnParticle(Particle.DUST, px, py, pz, 1, 0, 0, 0, 0, gatherDust);
+                }
 
-                processWaveEffects(center, currentRadius, step, blindnessDuration, weaknessDuration);
+                // Rising hum sound during charge-up
+                if (tick % 5 == 0) {
+                    float pitch = 0.5f + (tick / (float) gatherTicks);
+                    world.playSound(center, Sound.BLOCK_BEACON_ACTIVATE, 0.5f, pitch);
+                }
+
+                tick++;
             }
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
-    private void spawnSphereWave(World world, Location center, double radius) {
+    /**
+     * Spawns a single thin spherical shell at the given radius using
+     * Fibonacci sphere distribution — perfectly uniform, no visible "layers".
+     *
+     * Dùng DUST (không có trail/velocity) thay END_ROD để tránh hiệu ứng đuôi
+     * làm trông như nhiều tầng lồng nhau.
+     */
+    private void spawnSphereShell(World world, Location center, double radius) {
         if (radius <= 0) return;
-        int layers = Math.max(6, (int) (radius * 2));
-        for (int layer = 0; layer < layers; layer++) {
-            double phi = Math.PI * layer / (layers - 1);
-            double y = radius * Math.cos(phi);
-            double radiusAtLayer = radius * Math.sin(phi);
-            int points = Math.max(2, (int) (radiusAtLayer * 8));
-            for (int p = 0; p < points; p++) {
-                double theta = 2 * Math.PI * p / points;
-                Location loc = center.clone().add(radiusAtLayer * Math.cos(theta), y, radiusAtLayer * Math.sin(theta));
-                world.spawnParticle(Particle.END_ROD, loc, 1, 0.02, 0.02, 0.02, 0);
-                if (p % 8 == 0) {
-                    world.spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0.05, 0.05, 0.05, 0.02);
-                }
+
+        // Scale point count với surface area, capped tránh lag
+        int totalPoints = (int) Math.min(500, Math.max(40, Math.PI * radius * radius * 2.5));
+
+        // Dust trắng sáng — không có trailing effect
+        Particle.DustOptions whiteDust  = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.2f);
+        Particle.DustOptions cyanDust   = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.0f);
+
+        double goldenRatio = (1.0 + Math.sqrt(5)) / 2.0;
+        for (int i = 0; i < totalPoints; i++) {
+            double theta = 2 * Math.PI * i / goldenRatio;
+            double phi   = Math.acos(1.0 - 2.0 * (i + 0.5) / totalPoints);
+
+            double px = center.getX() + radius * Math.sin(phi) * Math.cos(theta);
+            double py = center.getY() + radius * Math.cos(phi);
+            double pz = center.getZ() + radius * Math.sin(phi) * Math.sin(theta);
+
+            // count=1, offsetX/Y/Z=0 — không spread, đúng vị trí shell
+            world.spawnParticle(Particle.DUST, px, py, pz, 1, 0, 0, 0, 0, whiteDust);
+            if (i % 10 == 0) {
+                world.spawnParticle(Particle.DUST, px, py, pz, 1, 0, 0, 0, 0, cyanDust);
             }
         }
     }
@@ -232,7 +286,7 @@ public class PayloadManager {
         int scanRadius = (int) Math.ceil(currentRadius) + 1;
 
         for (int x = -scanRadius; x <= scanRadius; x++) {
-            for (int y = -3; y <= 3; y++) {
+            for (int y = -scanRadius; y <= scanRadius; y++) {
                 for (int z = -scanRadius; z <= scanRadius; z++) {
                     Location loc = center.clone().add(x, y, z);
                     double distSq = loc.distanceSquared(center);
