@@ -1,0 +1,43 @@
+stab_example:
+  particle:
+    - FLAME
+    - LAVA
+  position:
+    - CENTER
+    - DOWN
+  type:
+    - LINE
+    - SPREAD
+
+nuke_example:
+  particle:
+    - CAMPFIRE_COSY_SMOKE
+    - SMOKE_LARGE
+  position:
+    - UP
+    - DOWN
+    - SIDE
+  type:
+    - ROTATE
+    - SPREAD
+
+recursion_example:
+  particle:
+    - SOUL_FIRE_FLAME
+  position:
+    - CENTER
+    - SIDE
+  type:
+    - SPIRAL
+    - SPREAD
+
+emp_example:
+  particle:
+    - ELECTRIC_SPARK
+    - FIREWORKS_SPARK
+  position:
+    - SIDE
+    - UP
+  type:
+    - DOT
+    - CIRCLE
