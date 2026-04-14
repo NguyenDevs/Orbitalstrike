@@ -38,7 +38,7 @@ cannons:
   recursion_example:
     name: "Recursion_Example"
     item:
-      - material: NETHER_STAR
+      - material: FIRE_CHARGE
       - durability: false
     cooldown: 60
     payload:
