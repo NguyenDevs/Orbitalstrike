@@ -130,13 +130,13 @@ payloads:
   # ========================================
   emp:
     # Radius of EMP wave expansion
-    radius: 12.0
+    radius: 15.0
     # Number of sequential shockwaves per explosion
-    pulses: 5
+    pulses: 3
     # Delay between shockwaves (ticks)
-    pulse-delay: 20
+    pulse-delay: 40
     # Speed of wave expansion
-    pulse-speed: 2.0
+    pulse-speed: 2.5
     # List of potion effects applied (FORMAT: <EFFECT_NAME>:<AMPLIFIER>:<DURATION_TICKS>)
     effects:
       - "BLINDNESS:0:60"
