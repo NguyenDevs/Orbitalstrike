@@ -63,7 +63,7 @@ public class PayloadUtils {
         return defaultValue;
     }
 
-    public static TNTPrimed spawnTNTAt(OrbitalStrike plugin, World world, Location loc, float yield, int fuse, boolean invulnerable, NamespacedKey key) {
+    public static TNTPrimed spawnTNTAt(OrbitalStrike plugin, World world, Location loc, float yield, int fuse, boolean invulnerable, NamespacedKey key, String cannonName) {
         try {
             if (fuse == 0 && loc.getBlock().isLiquid()) return null;
 
@@ -76,6 +76,12 @@ public class PayloadUtils {
             }
 
             tnt.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
+            if (cannonName != null) {
+                tnt.getPersistentDataContainer().set(new NamespacedKey(plugin, "source_cannon"), PersistentDataType.STRING, cannonName);
+                if (plugin.getTrailManager() != null) {
+                    plugin.getTrailManager().startTrailTask(tnt, cannonName);
+                }
+            }
 
             return tnt;
         } catch (Exception e) {

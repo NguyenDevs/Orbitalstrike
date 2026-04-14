@@ -35,7 +35,7 @@ public class NukePayload implements IPayload {
 
         List<TntLaunchData> launchDataList = new ArrayList<>();
 
-        TNTPrimed centerTnt = PayloadUtils.spawnTNTAt(plugin, world, spawnCenter.clone(), yield, initialFuse, false, plugin.getPayloadManager().getOrbitalStrikeKey());
+        TNTPrimed centerTnt = PayloadUtils.spawnTNTAt(plugin, world, spawnCenter.clone(), yield, initialFuse, false, plugin.getPayloadManager().getOrbitalStrikeKey(), cannon.getName());
         if (centerTnt != null) {
             centerTnt.setGravity(false);
             centerTnt.setVelocity(new Vector(0, 0, 0));
@@ -52,7 +52,7 @@ public class NukePayload implements IPayload {
                 double targetX = target.getX() + radius * Math.cos(Math.toRadians(angle));
                 double targetZ = target.getZ() + radius * Math.sin(Math.toRadians(angle));
 
-                TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnCenter.clone(), yield, initialFuse, false, plugin.getPayloadManager().getOrbitalStrikeKey());
+                TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnCenter.clone(), yield, initialFuse, false, plugin.getPayloadManager().getOrbitalStrikeKey(), cannon.getName());
                 if (tnt != null) {
                     tnt.setGravity(false);
                     tnt.setVelocity(new Vector(0, 0, 0));

@@ -35,8 +35,8 @@ public class StabPayload implements IPayload {
                 }
 
                 Location loc = new Location(world, ground.getX(), currentY, ground.getZ());
-                PayloadUtils.spawnTNTAt(plugin, world, loc.clone().add(offset, 0, offset), yield, 0, false, plugin.getPayloadManager().getOrbitalStrikeKey());
-                PayloadUtils.spawnTNTAt(plugin, world, loc.clone().subtract(offset, 0, offset), yield, 0, false, plugin.getPayloadManager().getOrbitalStrikeKey());
+                PayloadUtils.spawnTNTAt(plugin, world, loc.clone().add(offset, 0, offset), yield, 0, false, plugin.getPayloadManager().getOrbitalStrikeKey(), cannon.getName());
+                PayloadUtils.spawnTNTAt(plugin, world, loc.clone().subtract(offset, 0, offset), yield, 0, false, plugin.getPayloadManager().getOrbitalStrikeKey(), cannon.getName());
                 currentY -= verticalStep;
             }
         }.runTaskTimer(plugin, 0L, 1L);

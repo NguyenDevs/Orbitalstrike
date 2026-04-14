@@ -1,0 +1,12 @@
+stab_example:
+  particle:
+    - REDSTONE
+  position:
+    - UP 
+    - DOWN
+    - SIDE
+    - CENTER
+  type: 
+    - SPIRAL
+    - LINE
+    - CIRCLE

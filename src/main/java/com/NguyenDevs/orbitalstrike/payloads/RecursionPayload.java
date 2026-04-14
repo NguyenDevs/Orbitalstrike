@@ -27,7 +27,7 @@ public class RecursionPayload implements IPayload {
 
         Location spawnLocation = target.clone().add(0, height, 0);
 
-        TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnLocation, yield, 80, false, plugin.getPayloadManager().getOrbitalStrikeKey());
+        TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnLocation, yield, 80, false, plugin.getPayloadManager().getOrbitalStrikeKey(), cannon.getName());
         if (tnt != null) {
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getRecursionLevelKey(), PersistentDataType.INTEGER, level);
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getRecursionAmountKey(), PersistentDataType.INTEGER, amount);

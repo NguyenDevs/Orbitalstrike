@@ -12,6 +12,7 @@ import com.NguyenDevs.orbitalstrike.listeners.TNTListener;
 import com.NguyenDevs.orbitalstrike.utils.ConfigMigrationUtils;
 import com.NguyenDevs.orbitalstrike.utils.SpigotPlugin;
 import com.NguyenDevs.orbitalstrike.managers.WorldGuardManager;
+import com.NguyenDevs.orbitalstrike.managers.TrailManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,6 +26,7 @@ public final class OrbitalStrike extends JavaPlugin {
     private PayloadManager payloadManager;
     private CannonRecipeManager cannonRecipeManager;
     private WorldGuardManager worldGuardManager;
+    private TrailManager trailManager;
 
     @Override
     public void onLoad() {
@@ -48,6 +50,8 @@ public final class OrbitalStrike extends JavaPlugin {
         this.messageManager.loadMessages();
 
         this.cannonManager = new CannonManager(this);
+        this.trailManager = new TrailManager(this);
+        this.trailManager.init();
         this.payloadManager = new PayloadManager(this);
         
         this.cannonRecipeManager = new CannonRecipeManager(this);
@@ -102,6 +106,10 @@ public final class OrbitalStrike extends JavaPlugin {
 
     public WorldGuardManager getWorldGuardManager() {
         return worldGuardManager;
+    }
+
+    public TrailManager getTrailManager() {
+        return trailManager;
     }
 
     public void printLogo() {

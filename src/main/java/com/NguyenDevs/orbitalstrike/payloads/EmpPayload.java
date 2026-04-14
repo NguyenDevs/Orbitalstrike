@@ -19,7 +19,7 @@ public class EmpPayload implements IPayload {
         double height = 60.0;
         Location spawnLoc = target.clone().add(0, height, 0);
 
-        TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnLoc, 0, 80, true, plugin.getPayloadManager().getEmpTntKey());
+        TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnLoc, 0, 80, true, plugin.getPayloadManager().getEmpTntKey(), cannon.getName());
         if (tnt != null) {
             double radius = PayloadUtils.getDoubleParameter(cannon, "radius", 15.0);
             int pulses = PayloadUtils.getIntParameter(cannon, "pulses", 3);

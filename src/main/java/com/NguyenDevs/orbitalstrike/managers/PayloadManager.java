@@ -143,13 +143,19 @@ public class PayloadManager {
 
         double angleStep = 360.0 / amount;
         int fuseToUse = (level - 1 == 0) ? lastFuseTicks : splitFuseTicks;
+        
+        String sourceCannon = null;
+        NamespacedKey cannonNameKey = new NamespacedKey(plugin, "source_cannon");
+        if (explodedTnt.getPersistentDataContainer().has(cannonNameKey, PersistentDataType.STRING)) {
+            sourceCannon = explodedTnt.getPersistentDataContainer().get(cannonNameKey, PersistentDataType.STRING);
+        }
 
         for (int i = 0; i < amount; i++) {
             double angle = i * angleStep;
             double radians = Math.toRadians(angle);
             Vector velocity = new Vector(Math.cos(radians), 0.5, Math.sin(radians)).normalize().multiply(velocityMult);
 
-            TNTPrimed newTnt = PayloadUtils.spawnTNTAt(plugin, world, center.clone().add(0, 0.5, 0), yield, fuseToUse, false, orbitalStrikeKey);
+            TNTPrimed newTnt = PayloadUtils.spawnTNTAt(plugin, world, center.clone().add(0, 0.5, 0), yield, fuseToUse, false, orbitalStrikeKey, sourceCannon);
             if (newTnt != null) {
                 newTnt.setVelocity(velocity);
                 newTnt.getPersistentDataContainer().set(recursionLevelKey, PersistentDataType.INTEGER, level - 1);

@@ -81,6 +81,10 @@ public class CannonManager {
 
         cannons.put(name.toLowerCase(), cannon);
         saveCannons();
+        
+        if (plugin.getTrailManager() != null) {
+            plugin.getTrailManager().checkAndGenerateDefaults();
+        }
     }
 
     public void createCannon(String name) {
