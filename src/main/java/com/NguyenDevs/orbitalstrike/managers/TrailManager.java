@@ -69,6 +69,21 @@ public class TrailManager {
         }
 
         if (changed) {
+            config.options().header("=========================================================\n" +
+                    "ORBITAL STRIKE - TRAILS CONFIGURATION\n" +
+                    "=========================================================\n" +
+                    "System supports creating multiple particle layers per cannon.\n" +
+                    "- particle: The name of the particle (E.g.: FLAME, LAVA, ELECTRIC_SPARK).\n" +
+                    "  * Supports REDSTONE coloring: REDSTONE:<R>,<G>,<B>:<Size> (E.g.: REDSTONE:255,0,0:1.5)\n" +
+                    "- formula-x, formula-y, formula-z: Spawn coordinates evaluated via Math expressions.\n" +
+                    "  * 't' is the variable representing Time (Ticks). Each tick 't' increments by 1.\n" +
+                    "  * Supported functions: sin(t), cos(t), tan(t), sqrt(t), abs(t), +, -, *, /, %\n" +
+                    "  * 0.5 is the exact center of the TNT block.\n" +
+                    "- spread: The spread potential of the particle in XYZ format. E.g.: \"0.2, 0.2, 0.2\"\n" +
+                    "- speed: The movement speed of the particle.\n" +
+                    "- count: The amount of particles spawned per tick.\n" +
+                    "=========================================================");
+            config.options().copyHeader(true);
             try {
                 config.save(file);
             } catch (IOException e) {

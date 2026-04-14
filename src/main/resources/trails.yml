@@ -1,8 +1,24 @@
+# =========================================================
+# ORBITAL STRIKE - TRAILS CONFIGURATION
+# =========================================================
+# System supports creating multiple particle layers per cannon.
+# - particle: The name of the particle (E.g.: FLAME, LAVA, ELECTRIC_SPARK). 
+#   * Supports REDSTONE coloring: REDSTONE:<R>,<G>,<B>:<Size> (E.g.: REDSTONE:255,0,0:1.5)
+# - formula-x, formula-y, formula-z: Spawn coordinates evaluated via Math expressions.
+#   * 't' is the variable representing Time (Ticks). Each tick 't' increments by 1.
+#   * Supported functions: sin(t), cos(t), tan(t), sqrt(t), abs(t), +, -, *, /, %
+#   * 0.5 is the exact center of the TNT block.
+# - spread: The spread potential of the particle in XYZ format. E.g.: "0.2, 0.2, 0.2"
+# - speed: The movement speed of the particle.
+# - count: The amount of particles spawned per tick.
+# =========================================================
+
 stab_example:
   layers:
+    # Static cloud of sparks directly underneath the TNT
     - particle: "FLAME"
       formula-x: "0"
-      formula-y: "0.5"
+      formula-y: "0.5" # Centered on the TNT body
       formula-z: "0"
       spread: "0.2, 0.2, 0.2"
       speed: 0.1
@@ -10,6 +26,7 @@ stab_example:
 
 nuke_example:
   layers:
+    # Huge cloud of smoke spreading heavily around the TNT
     - particle: "CAMPFIRE_COSY_SMOKE"
       formula-x: "0"
       formula-y: "0.5"
@@ -17,15 +34,17 @@ nuke_example:
       spread: "0.6, 0.6, 0.6"
       speed: 0.05
       count: 10
+    # Yellow dust rotating around the Y-axis using Trigonometry
     - particle: "REDSTONE:255,255,0:2.0"
-      formula-x: "1.5 * cos(t * 0.4)"
+      formula-x: "1.5 * cos(t * 0.4)" # Radius 1.5, rotational speed 0.4 via Cosine
       formula-y: "0.5"
       formula-z: "1.5 * sin(t * 0.4)"
       spread: "0, 0, 0"
       speed: 0
       count: 1
+    # Orange dust rotating symmetrically opposite to the Yellow dust
     - particle: "REDSTONE:255,100,0:1.5"
-      formula-x: "1.0 * cos((t * 0.4) + 3.14)"
+      formula-x: "1.0 * cos((t * 0.4) + 3.14)" # PI (3.14) phase shift to create a double helix
       formula-y: "0.5"
       formula-z: "1.0 * sin((t * 0.4) + 3.14)"
       spread: "0, 0, 0"
@@ -43,7 +62,7 @@ recursion_example:
       count: 2
     - particle: "SOUL"
       formula-x: "0"
-      formula-y: "t * 0.05"
+      formula-y: "t * 0.05" # As it falls, the particle slowly ascends upward
       formula-z: "0"
       spread: "0.2, 0.2, 0.2"
       speed: 0.02
@@ -51,6 +70,7 @@ recursion_example:
 
 emp_example:
   layers:
+    # Static electric sparks bursting all around
     - particle: "ELECTRIC_SPARK"
       formula-x: "0"
       formula-y: "0.5"
@@ -58,9 +78,10 @@ emp_example:
       spread: "0.4, 0.4, 0.4"
       speed: 0.2
       count: 15
+    # Oscillating spark waves, acting like an electromagnetic wave
     - particle: "FIREWORKS_SPARK"
       formula-x: "1.2 * sin(t * 0.3)"
-      formula-y: "0.5 + sin(t * 0.2)"
+      formula-y: "0.5 + sin(t * 0.2)" # Bobs up and down via the Y-axis
       formula-z: "1.2 * cos(t * 0.3)"
       spread: "0, 0, 0"
       speed: 0
