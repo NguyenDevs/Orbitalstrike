@@ -338,6 +338,7 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         plugin.getMessageManager().loadMessages();
         plugin.getCannonManager().loadCannons();
         plugin.getCannonRecipeManager().registerRecipes();
+        plugin.getTrailManager().init();
         sender.sendMessage(plugin.getMessageManager().getMessage("reload.success"));
         playSound(sender);
     }
