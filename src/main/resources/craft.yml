@@ -5,12 +5,13 @@ recipes:
     require-permission: false
     permission: "orbitalstrike.craft.stab_example"
     shape:
-      - "  D"
-      - " S "
-      - "S  "
+      - "  W"
+      - " SW"
+      - "S T"
     ingredients:
-      D: DIAMOND
+      W: STRING
       S: STICK
+      T: TNT
 
   nuke_recipe:
     enabled: true
@@ -31,12 +32,13 @@ recipes:
     require-permission: false
     permission: "orbitalstrike.craft.recursion_example"
     shape:
-      - " N "
-      - "NBN"
-      - " N "
+      - "STS "
+      - "TFT"
+      - "STS"
     ingredients:
-      N: NETHER_STAR
-      B: BEACON
+      T: TNT
+      S: SAND
+      F: FISHING_ROD
 
   emp_recipe:
     enabled: true
