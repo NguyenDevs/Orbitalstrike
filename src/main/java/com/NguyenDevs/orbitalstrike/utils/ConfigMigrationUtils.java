@@ -52,12 +52,12 @@ public class ConfigMigrationUtils {
                 newCannon.set("name", name);
 
                 List<Map<String, Object>> itemList = new ArrayList<>();
-                itemList.add(Map.of("material", plugin.getConfigManager().getDefaultItemMaterial().name()));
-                itemList.add(Map.of("durability", plugin.getConfigManager().isDefaultItemDurabilityEnabled()));
-                itemList.add(Map.of("max-durability", plugin.getConfigManager().getDefaultItemMaxDurability()));
+                itemList.add(Map.of("material", "FISHING_ROD"));
+                itemList.add(Map.of("durability", true));
+                itemList.add(Map.of("max-durability", 1));
                 newCannon.set("item", itemList);
                 
-                newCannon.set("cooldown", plugin.getConfigManager().getDefaultItemCooldown());
+                newCannon.set("cooldown", -1);
 
                 List<Map<String, Object>> payloadSettings = new ArrayList<>();
                 for (String paramKey : oldCannon.getKeys(false)) {

@@ -36,41 +36,48 @@ public class CannonManager {
         Cannon cannon = new Cannon(name, payloadType);
 
         if (payloadType == PayloadType.STAB) {
-            cannon.setParameter("yield", plugin.getConfigManager().getStabYield());
-            cannon.setParameter("offset", plugin.getConfigManager().getStabOffset());
-            cannon.setParameter("vertical-step", plugin.getConfigManager().getStabVerticalStep());
+            cannon.setParameter("yield", 8.0);
+            cannon.setParameter("offset", 0.3);
+            cannon.setParameter("vertical-step", 2);
 
         } else if (payloadType == PayloadType.NUKE) {
-            cannon.setParameter("yield", plugin.getConfigManager().getNukeYield());
-            cannon.setParameter("height", plugin.getConfigManager().getNukeHeight());
-            cannon.setParameter("rings", plugin.getConfigManager().getNukeRings());
-            cannon.setParameter("base-tnt", plugin.getConfigManager().getNukeBaseTnt());
-            cannon.setParameter("tnt-increase", plugin.getConfigManager().getNukeTntIncrease());
-            cannon.setParameter("fuse-ticks", plugin.getConfigManager().getNukeFuseTicks());
-            cannon.setParameter("launch-delay", plugin.getConfigManager().getNukeLaunchDelay());
+            cannon.setParameter("yield", 8.0);
+            cannon.setParameter("height", 60.0);
+            cannon.setParameter("rings", 10);
+            cannon.setParameter("base-tnt", 20);
+            cannon.setParameter("tnt-increase", 3);
+            cannon.setParameter("fuse-ticks", 80);
+            cannon.setParameter("launch-delay", 10);
 
         } else if (payloadType == PayloadType.RECURSION) {
-            cannon.setParameter("yield", plugin.getConfigManager().getRecursionYield());
-            cannon.setParameter("height", plugin.getConfigManager().getRecursionHeight());
-            cannon.setParameter("level", plugin.getConfigManager().getRecursionLevel());
-            cannon.setParameter("amount", plugin.getConfigManager().getRecursionAmount());
-            cannon.setParameter("velocity", plugin.getConfigManager().getRecursionVelocity());
-            cannon.setParameter("split-fuse-ticks", plugin.getConfigManager().getRecursionSplitFuseTicks());
-            cannon.setParameter("last-fuse-ticks", plugin.getConfigManager().getRecursionLastFuseTicks());
+            cannon.setParameter("yield", 10.0);
+            cannon.setParameter("height", 111.0);
+            cannon.setParameter("level", 3);
+            cannon.setParameter("amount", 5);
+            cannon.setParameter("velocity", 0.8);
+            cannon.setParameter("split-fuse-ticks", 20);
+            cannon.setParameter("last-fuse-ticks", 60);
         } else if (payloadType == PayloadType.EMP) {
-            cannon.setParameter("radius", plugin.getConfigManager().getEmpRadius());
-            cannon.setParameter("pulses", plugin.getConfigManager().getEmpPulses());
-            cannon.setParameter("pulse-delay", plugin.getConfigManager().getEmpPulseDelay());
-            cannon.setParameter("pulse-speed", plugin.getConfigManager().getEmpPulseSpeed());
-            cannon.setParameter("effects", plugin.getConfigManager().getEmpEffects());
-            cannon.setParameter("destroyed-blocks", plugin.getConfigManager().getEmpDestroyedBlocks());
+            cannon.setParameter("radius", 15.0);
+            cannon.setParameter("pulses", 3);
+            cannon.setParameter("pulse-delay", 60);
+            cannon.setParameter("pulse-speed", 2.5);
+            cannon.setParameter("destroy-drop-items", false);
+            cannon.setParameter("effects", Arrays.asList(
+                    "BLINDNESS:0:60", "WEAKNESS:1:400", "CONFUSION:4:100", "SLOW:1:100"
+            ));
+            cannon.setParameter("destroyed-blocks", Arrays.asList(
+                    "REDSTONE", "REDSTONE_BLOCK", "PISTON", "STICKY_PISTON", "REPEATER", 
+                    "COMPARATOR", "DROPPER", "DISPENSER", "CRAFTER", "OBSERVER", 
+                    "RAIL", "ACTIVATOR_RAIL", "DETECTOR_RAIL", "POWERED_RAIL", 
+                    "DAYLIGHT_DETECTOR", "LEVER"
+            ));
         }
 
-
-        cannon.setItemMaterial(plugin.getConfigManager().getDefaultItemMaterial());
-        cannon.setDurabilityEnabled(plugin.getConfigManager().isDefaultItemDurabilityEnabled());
-        cannon.setMaxDurability(plugin.getConfigManager().getDefaultItemMaxDurability());
-        cannon.setCooldown(plugin.getConfigManager().getDefaultItemCooldown());
+        cannon.setItemMaterial(Material.FISHING_ROD);
+        cannon.setDurabilityEnabled(true);
+        cannon.setMaxDurability(1);
+        cannon.setCooldown(-1);
 
         cannons.put(name.toLowerCase(), cannon);
         saveCannons();

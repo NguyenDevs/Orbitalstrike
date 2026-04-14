@@ -63,6 +63,7 @@ cannons:
         - pulses: 3
         - pulse-delay: 60
         - pulse-speed: 2.5
+        - destroy-drop-items: false
         - effects:
           - "BLINDNESS:0:20"
           - "WEAKNESS:1:600"

@@ -17,9 +17,9 @@ public class StabPayload implements IPayload {
     public void execute(World world, Location target, Cannon cannon) {
         Location ground = PayloadUtils.findGroundLevel(world, target);
 
-        float yield = PayloadUtils.getFloatParameter(cannon, "yield", (float) plugin.getConfigManager().getStabYield());
-        double offset = PayloadUtils.getDoubleParameter(cannon, "offset", plugin.getConfigManager().getStabOffset());
-        int verticalStep = PayloadUtils.getIntParameter(cannon, "vertical-step", plugin.getConfigManager().getStabVerticalStep());
+        float yield = PayloadUtils.getFloatParameter(cannon, "yield", 8.0f);
+        double offset = PayloadUtils.getDoubleParameter(cannon, "offset", 0.3);
+        int verticalStep = PayloadUtils.getIntParameter(cannon, "vertical-step", 2);
 
         int y = (int) ground.getY();
         int minY = world.getMinHeight();

@@ -40,6 +40,7 @@ public class PayloadManager {
     private final NamespacedKey empPulseSpeedKey;
     private final NamespacedKey empEffectsKey;
     private final NamespacedKey empDestroyedBlocksKey;
+    private final NamespacedKey empDropItemsKey;
 
     public PayloadManager(OrbitalStrike plugin) {
         this.plugin = plugin;
@@ -60,6 +61,7 @@ public class PayloadManager {
         this.empPulseSpeedKey = new NamespacedKey(plugin, "emp_pulse_speed");
         this.empEffectsKey = new NamespacedKey(plugin, "emp_effects");
         this.empDestroyedBlocksKey = new NamespacedKey(plugin, "emp_destroyed_blocks");
+        this.empDropItemsKey = new NamespacedKey(plugin, "emp_drop_items");
 
         registerPayloads();
     }
@@ -85,6 +87,7 @@ public class PayloadManager {
     public NamespacedKey getEmpPulseSpeedKey() { return empPulseSpeedKey; }
     public NamespacedKey getEmpEffectsKey() { return empEffectsKey; }
     public NamespacedKey getEmpDestroyedBlocksKey() { return empDestroyedBlocksKey; }
+    public NamespacedKey getEmpDropItemsKey() { return empDropItemsKey; }
 
     public void initiateStrike(Cannon cannon, StrikeData data, Location target) {
         if (plugin.getConfigManager().getDisabledWorlds().contains(target.getWorld().getName())) {
@@ -160,7 +163,7 @@ public class PayloadManager {
     }
 
     public void triggerEmpShockwave(Location center, double maxRadius, int pulses, int pulseDelay, double pulseSpeed, 
-                                   List<String> effects, List<String> destroyedBlocks) {
+                                   List<String> effects, List<String> destroyedBlocks, boolean dropItems) {
         World world = center.getWorld();
         if (world == null) return;
 
@@ -175,7 +178,7 @@ public class PayloadManager {
                     return;
                 }
                 if (ticksSinceLastPulse >= pulseDelay) {
-                    launchSingleWave(center, maxRadius, pulseSpeed, effects, destroyedBlocks);
+                    launchSingleWave(center, maxRadius, pulseSpeed, effects, destroyedBlocks, dropItems);
                     pulsesLaunched++;
                     ticksSinceLastPulse = 0;
                 }
@@ -185,7 +188,7 @@ public class PayloadManager {
     }
 
     private void launchSingleWave(Location center, double maxRadius, double step, 
-                                  List<String> effects, List<String> destroyedBlocks) {
+                                  List<String> effects, List<String> destroyedBlocks, boolean dropItems) {
         World world = center.getWorld();
         if (world == null) return;
 
@@ -215,7 +218,7 @@ public class PayloadManager {
                                 return;
                             }
                             spawnSphereShell(world, center, currentRadius);
-                            processWaveEffects(center, currentRadius, step, effects, destroyedBlocks);
+                            processWaveEffects(center, currentRadius, step, effects, destroyedBlocks, dropItems);
                         }
                     }.runTaskTimer(plugin, 0L, 1L);
 
@@ -268,7 +271,7 @@ public class PayloadManager {
     }
 
     private void processWaveEffects(Location center, double currentRadius, double step, 
-                                    List<String> effects, List<String> destroyedBlocks) {
+                                    List<String> effects, List<String> destroyedBlocks, boolean dropItems) {
         World world = center.getWorld();
         if (world == null) return;
 
@@ -288,7 +291,11 @@ public class PayloadManager {
                         String name = type.name();
 
                         if (destroyedBlocks.contains(name)) {
-                            block.breakNaturally();
+                            if (dropItems) {
+                                block.breakNaturally();
+                            } else {
+                                block.setType(Material.AIR);
+                            }
                         }
 
                         if (name.contains("COPPER_BULB")) {

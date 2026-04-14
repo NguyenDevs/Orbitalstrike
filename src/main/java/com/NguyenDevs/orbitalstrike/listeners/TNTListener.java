@@ -50,11 +50,13 @@ public class TNTListener implements Listener {
                     plugin.getPayloadManager().getEmpEffectsKey(), PersistentDataType.STRING, "");
             String blocksStr = tnt.getPersistentDataContainer().getOrDefault(
                     plugin.getPayloadManager().getEmpDestroyedBlocksKey(), PersistentDataType.STRING, "");
+            byte dropItemsByte = tnt.getPersistentDataContainer().getOrDefault(
+                    plugin.getPayloadManager().getEmpDropItemsKey(), PersistentDataType.BYTE, (byte) 0);
 
             java.util.List<String> effects = effectsStr.isEmpty() ? new java.util.ArrayList<>() : java.util.Arrays.asList(effectsStr.split(","));
             java.util.List<String> destroyedBlocks = blocksStr.isEmpty() ? new java.util.ArrayList<>() : java.util.Arrays.asList(blocksStr.split(","));
 
-            plugin.getPayloadManager().triggerEmpShockwave(event.getLocation(), radius, pulses, delay, speed, effects, destroyedBlocks);
+            plugin.getPayloadManager().triggerEmpShockwave(event.getLocation(), radius, pulses, delay, speed, effects, destroyedBlocks, dropItemsByte != (byte) 0);
 
         }
 

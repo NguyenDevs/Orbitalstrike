@@ -20,13 +20,13 @@ public class NukePayload implements IPayload {
 
     @Override
     public void execute(World world, Location target, Cannon cannon) {
-        int rings = PayloadUtils.getIntParameter(cannon, "rings", plugin.getConfigManager().getNukeRings());
-        double height = PayloadUtils.getDoubleParameter(cannon, "height", plugin.getConfigManager().getNukeHeight());
-        float yield = PayloadUtils.getFloatParameter(cannon, "yield", (float) plugin.getConfigManager().getNukeYield());
-        int baseTnt = PayloadUtils.getIntParameter(cannon, "base-tnt", plugin.getConfigManager().getNukeBaseTnt());
-        int increase = PayloadUtils.getIntParameter(cannon, "tnt-increase", plugin.getConfigManager().getNukeTntIncrease());
-        int initialFuse = PayloadUtils.getIntParameter(cannon, "fuse-ticks", plugin.getConfigManager().getNukeFuseTicks());
-        int launchDelay = PayloadUtils.getIntParameter(cannon, "launch-delay", plugin.getConfigManager().getNukeLaunchDelay());
+        int rings = PayloadUtils.getIntParameter(cannon, "rings", 10);
+        double height = PayloadUtils.getDoubleParameter(cannon, "height", 60.0);
+        float yield = PayloadUtils.getFloatParameter(cannon, "yield", 8.0f);
+        int baseTnt = PayloadUtils.getIntParameter(cannon, "base-tnt", 20);
+        int increase = PayloadUtils.getIntParameter(cannon, "tnt-increase", 3);
+        int initialFuse = PayloadUtils.getIntParameter(cannon, "fuse-ticks", 80);
+        int launchDelay = PayloadUtils.getIntParameter(cannon, "launch-delay", 10);
 
         Location spawnCenter = target.clone().add(0, height, 0);
         if (spawnCenter.getY() > world.getMaxHeight()) {

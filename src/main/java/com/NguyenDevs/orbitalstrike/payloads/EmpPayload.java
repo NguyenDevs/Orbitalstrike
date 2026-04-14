@@ -21,13 +21,21 @@ public class EmpPayload implements IPayload {
 
         TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnLoc, 0, 80, true, plugin.getPayloadManager().getEmpTntKey());
         if (tnt != null) {
-            double radius = PayloadUtils.getDoubleParameter(cannon, "radius", plugin.getConfigManager().getEmpRadius());
-            int pulses = PayloadUtils.getIntParameter(cannon, "pulses", plugin.getConfigManager().getEmpPulses());
-            int delay = PayloadUtils.getIntParameter(cannon, "pulse-delay", plugin.getConfigManager().getEmpPulseDelay());
-            double speed = PayloadUtils.getDoubleParameter(cannon, "pulse-speed", plugin.getConfigManager().getEmpPulseSpeed());
+            double radius = PayloadUtils.getDoubleParameter(cannon, "radius", 15.0);
+            int pulses = PayloadUtils.getIntParameter(cannon, "pulses", 3);
+            int delay = PayloadUtils.getIntParameter(cannon, "pulse-delay", 60);
+            double speed = PayloadUtils.getDoubleParameter(cannon, "pulse-speed", 2.5);
+            boolean dropItems = PayloadUtils.getBooleanParameter(cannon, "destroy-drop-items", false);
             
-            java.util.List<String> effects = PayloadUtils.getStringListParameter(cannon, "effects", plugin.getConfigManager().getEmpEffects());
-            java.util.List<String> destroyedBlocks = PayloadUtils.getStringListParameter(cannon, "destroyed-blocks", plugin.getConfigManager().getEmpDestroyedBlocks());
+            java.util.List<String> effects = PayloadUtils.getStringListParameter(cannon, "effects", java.util.Arrays.asList(
+                    "BLINDNESS:0:60", "WEAKNESS:1:400", "CONFUSION:4:100", "SLOW:1:100"
+            ));
+            java.util.List<String> destroyedBlocks = PayloadUtils.getStringListParameter(cannon, "destroyed-blocks", java.util.Arrays.asList(
+                    "REDSTONE", "REDSTONE_BLOCK", "PISTON", "STICKY_PISTON", "REPEATER", 
+                    "COMPARATOR", "DROPPER", "DISPENSER", "CRAFTER", "OBSERVER", 
+                    "RAIL", "ACTIVATOR_RAIL", "DETECTOR_RAIL", "POWERED_RAIL", 
+                    "DAYLIGHT_DETECTOR", "LEVER"
+            ));
 
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpTntKey(), PersistentDataType.BYTE, (byte) 1);
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpRadiusKey(), PersistentDataType.DOUBLE, radius);
@@ -37,6 +45,7 @@ public class EmpPayload implements IPayload {
             
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpEffectsKey(), PersistentDataType.STRING, String.join(",", effects));
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpDestroyedBlocksKey(), PersistentDataType.STRING, String.join(",", destroyedBlocks));
+            tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpDropItemsKey(), PersistentDataType.BYTE, dropItems ? (byte) 1 : (byte) 0);
         }
     }
 }

@@ -55,6 +55,14 @@ public class PayloadUtils {
         return defaultValue;
     }
 
+    public static boolean getBooleanParameter(Cannon cannon, String key, boolean defaultValue) {
+        Object val = cannon.getParameter(key);
+        if (val instanceof Boolean) {
+            return (Boolean) val;
+        }
+        return defaultValue;
+    }
+
     public static TNTPrimed spawnTNTAt(OrbitalStrike plugin, World world, Location loc, float yield, int fuse, boolean invulnerable, NamespacedKey key) {
         try {
             if (fuse == 0 && loc.getBlock().isLiquid()) return null;

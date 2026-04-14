@@ -17,13 +17,13 @@ public class RecursionPayload implements IPayload {
 
     @Override
     public void execute(World world, Location target, Cannon cannon) {
-        float yield = PayloadUtils.getFloatParameter(cannon, "yield", (float) plugin.getConfigManager().getRecursionYield());
-        double height = PayloadUtils.getDoubleParameter(cannon, "height", plugin.getConfigManager().getRecursionHeight());
-        int level = PayloadUtils.getIntParameter(cannon, "level", plugin.getConfigManager().getRecursionLevel());
-        int amount = PayloadUtils.getIntParameter(cannon, "amount", plugin.getConfigManager().getRecursionAmount());
-        double velocity = PayloadUtils.getDoubleParameter(cannon, "velocity", plugin.getConfigManager().getRecursionVelocity());
-        int splitFuseTicks = PayloadUtils.getIntParameter(cannon, "split-fuse-ticks", plugin.getConfigManager().getRecursionSplitFuseTicks());
-        int lastFuseTicks = PayloadUtils.getIntParameter(cannon, "last-fuse-ticks", plugin.getConfigManager().getRecursionLastFuseTicks());
+        float yield = PayloadUtils.getFloatParameter(cannon, "yield", 10.0f);
+        double height = PayloadUtils.getDoubleParameter(cannon, "height", 111.0);
+        int level = PayloadUtils.getIntParameter(cannon, "level", 3);
+        int amount = PayloadUtils.getIntParameter(cannon, "amount", 5);
+        double velocity = PayloadUtils.getDoubleParameter(cannon, "velocity", 0.8);
+        int splitFuseTicks = PayloadUtils.getIntParameter(cannon, "split-fuse-ticks", 20);
+        int lastFuseTicks = PayloadUtils.getIntParameter(cannon, "last-fuse-ticks", 60);
 
         Location spawnLocation = target.clone().add(0, height, 0);
 
