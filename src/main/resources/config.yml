@@ -134,7 +134,7 @@ payloads:
     # Number of sequential shockwaves per explosion
     pulses: 3
     # Delay between shockwaves (ticks)
-    pulse-delay: 40
+    pulse-delay: 60
     # Speed of wave expansion
     pulse-speed: 2.5
     # List of potion effects applied (FORMAT: <EFFECT_NAME>:<AMPLIFIER>:<DURATION_TICKS>)
