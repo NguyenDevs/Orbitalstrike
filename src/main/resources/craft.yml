@@ -32,7 +32,7 @@ recipes:
     require-permission: false
     permission: "orbitalstrike.craft.recursion_example"
     shape:
-      - "STS "
+      - "STS"
       - "TFT"
       - "STS"
     ingredients:
