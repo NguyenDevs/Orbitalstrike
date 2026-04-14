@@ -63,8 +63,25 @@ cannons:
         - pulses: 3
         - pulse-delay: 60
         - pulse-speed: 2.5
-        - blindness-duration: 20
-        - weakness-duration: 600
-        - nausea-duration: 100
-        - slowness-duration: 100
-        - slowness-amplifier: 1
+        - effects:
+          - "BLINDNESS:0:20"
+          - "WEAKNESS:1:600"
+          - "CONFUSION:4:100"
+          - "SLOW:1:100"
+        - destroyed-blocks:
+          - "REDSTONE"
+          - "REDSTONE_BLOCK"
+          - "PISTON"
+          - "STICKY_PISTON"
+          - "REPEATER"
+          - "COMPARATOR"
+          - "DROPPER"
+          - "DISPENSER"
+          - "CRAFTER"
+          - "OBSERVER"
+          - "RAIL"
+          - "ACTIVATOR_RAIL"
+          - "DETECTOR_RAIL"
+          - "POWERED_RAIL"
+          - "DAYLIGHT_DETECTOR"
+          - "LEVER"

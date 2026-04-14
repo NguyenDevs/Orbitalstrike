@@ -129,21 +129,35 @@ payloads:
   # EMP Payload
   # ========================================
   emp:
-    # Radius of the EMP wave expansion
-    radius: 20.0
-    # Number of sequential shockwaves (pulses) per explosion
-    pulses: 3
-    # Delay between each shockwave in ticks (20 ticks = 1 second)
-    pulse-delay: 60
-    # Speed of the wave expansion (blocks per tick)
-    pulse-speed: 2.5
-    # Duration of the Blindness effect in ticks
-    blindness-duration: 20
-    # Duration of the Weakness effect in ticks
-    weakness-duration: 400
-    # Duration of the Nausea effect in ticks (20 ticks = 1 second)
-    nausea-duration: 100
-    # Duration of the Slowness effect in ticks
-    slowness-duration: 100
-    # Level of the Slowness effect (0 = Level 1, 1 = Level 2, etc.)
-    slowness-amplifier: 1
+    # Radius of EMP wave expansion
+    radius: 12.0
+    # Number of sequential shockwaves per explosion
+    pulses: 5
+    # Delay between shockwaves (ticks)
+    pulse-delay: 20
+    # Speed of wave expansion
+    pulse-speed: 2.0
+    # List of potion effects applied (FORMAT: <EFFECT_NAME>:<AMPLIFIER>:<DURATION_TICKS>)
+    effects:
+      - "BLINDNESS:0:60"
+      - "WEAKNESS:1:400"
+      - "CONFUSION:4:100"
+      - "SLOW:1:100"
+    # List of block materials destroyed by EMP
+    destroyed-blocks:
+      - "REDSTONE"
+      - "REDSTONE_BLOCK"
+      - "PISTON"
+      - "STICKY_PISTON"
+      - "REPEATER"
+      - "COMPARATOR"
+      - "DROPPER"
+      - "DISPENSER"
+      - "CRAFTER"
+      - "OBSERVER"
+      - "RAIL"
+      - "ACTIVATOR_RAIL"
+      - "DETECTOR_RAIL"
+      - "POWERED_RAIL"
+      - "DAYLIGHT_DETECTOR"
+      - "LEVER"
