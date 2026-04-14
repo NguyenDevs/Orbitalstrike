@@ -1,9 +1,9 @@
 recipes:
-  example_cannon:
+  stab_recipe:
     enabled: true
-    cannon: "example"
+    cannon: "Stab_Example"
     require-permission: false
-    permission: "orbitalstrike.craft.example"
+    permission: "orbitalstrike.craft.stab_example"
     shape:
       - "  D"
       - " S "
@@ -11,3 +11,42 @@ recipes:
     ingredients:
       D: DIAMOND
       S: STICK
+
+  nuke_recipe:
+    enabled: true
+    cannon: "Nuke_Example"
+    require-permission: false
+    permission: "orbitalstrike.craft.nuke_example"
+    shape:
+      - "TTT"
+      - "TBT"
+      - "TTT"
+    ingredients:
+      T: TNT
+      B: BLAZE_ROD
+
+  recursion_recipe:
+    enabled: true
+    cannon: "Recursion_Example"
+    require-permission: false
+    permission: "orbitalstrike.craft.recursion_example"
+    shape:
+      - " N "
+      - "NBN"
+      - " N "
+    ingredients:
+      N: NETHER_STAR
+      B: BEACON
+
+  emp_recipe:
+    enabled: true
+    cannon: "EMP_Example"
+    require-permission: false
+    permission: "orbitalstrike.craft.emp_example"
+    shape:
+      - "RRR"
+      - "RPR"
+      - "RRR"
+    ingredients:
+      R: REDSTONE_BLOCK
+      P: PRISMARINE_CRYSTALS
