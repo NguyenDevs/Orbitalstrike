@@ -1,11 +1,11 @@
 package com.NguyenDevs.orbitalstrike.commands;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
-import com.NguyenDevs.orbitalstrike.cannon.Cannon;
-import com.NguyenDevs.orbitalstrike.cannon.CannonRecipeManager;
+import com.NguyenDevs.orbitalstrike.models.Cannon;
+import com.NguyenDevs.orbitalstrike.managers.CannonRecipeManager;
 import com.NguyenDevs.orbitalstrike.utils.ColorUtils;
-import com.NguyenDevs.orbitalstrike.utils.PayloadType;
-import com.NguyenDevs.orbitalstrike.utils.StrikeData;
+import com.NguyenDevs.orbitalstrike.models.PayloadType;
+import com.NguyenDevs.orbitalstrike.models.StrikeData;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -35,8 +35,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import static com.NguyenDevs.orbitalstrike.cannon.CannonRecipeManager.CANNON_KEY;
-import static com.NguyenDevs.orbitalstrike.cannon.CannonRecipeManager.DURABILITY_KEY;
+import static com.NguyenDevs.orbitalstrike.managers.CannonRecipeManager.CANNON_KEY;
+import static com.NguyenDevs.orbitalstrike.managers.CannonRecipeManager.DURABILITY_KEY;
 
 public class CannonCommand implements CommandExecutor, TabCompleter {
 

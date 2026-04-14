@@ -1,6 +1,6 @@
-package com.NguyenDevs.orbitalstrike.cannon;
+package com.NguyenDevs.orbitalstrike.models;
 
-import com.NguyenDevs.orbitalstrike.utils.PayloadType;
+import com.NguyenDevs.orbitalstrike.models.PayloadType;
 import org.bukkit.Material;
 
 import java.util.HashMap;

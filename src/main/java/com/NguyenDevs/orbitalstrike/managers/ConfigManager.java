@@ -1,4 +1,4 @@
-package com.NguyenDevs.orbitalstrike.configuration;
+package com.NguyenDevs.orbitalstrike.managers;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import org.bukkit.Material;
@@ -56,11 +56,18 @@ public class ConfigManager {
         config.addDefault("payloads.emp.pulses", 5);
         config.addDefault("payloads.emp.pulse-delay", 20);
         config.addDefault("payloads.emp.pulse-speed", 2.0);
-        config.addDefault("payloads.emp.blindness-duration", 60);
-        config.addDefault("payloads.emp.weakness-duration", 400);
-        config.addDefault("payloads.emp.nausea-duration", 100);
-        config.addDefault("payloads.emp.slowness-duration", 100);
-        config.addDefault("payloads.emp.slowness-amplifier", 1);
+        config.addDefault("payloads.emp.effects", Arrays.asList(
+                "BLINDNESS:0:60",
+                "WEAKNESS:1:400",
+                "CONFUSION:4:100",
+                "SLOW:1:100"
+        ));
+        config.addDefault("payloads.emp.destroyed-blocks", Arrays.asList(
+                "REDSTONE", "REDSTONE_BLOCK", "PISTON", "STICKY_PISTON", "REPEATER", 
+                "COMPARATOR", "DROPPER", "DISPENSER", "CRAFTER", "OBSERVER", 
+                "RAIL", "ACTIVATOR_RAIL", "DETECTOR_RAIL", "POWERED_RAIL", 
+                "DAYLIGHT_DETECTOR", "LEVER"
+        ));
 
 
 
@@ -195,24 +202,12 @@ public class ConfigManager {
         return plugin.getConfig().getDouble("payloads.emp.pulse-speed", 2.0);
     }
 
-    public int getEmpBlindnessDuration() {
-        return plugin.getConfig().getInt("payloads.emp.blindness-duration", 60);
+    public List<String> getEmpEffects() {
+        return plugin.getConfig().getStringList("payloads.emp.effects");
     }
 
-    public int getEmpWeaknessDuration() {
-        return plugin.getConfig().getInt("payloads.emp.weakness-duration", 400);
-    }
-
-    public int getEmpNauseaDuration() {
-        return plugin.getConfig().getInt("payloads.emp.nausea-duration", 100);
-    }
-
-    public int getEmpSlownessDuration() {
-        return plugin.getConfig().getInt("payloads.emp.slowness-duration", 100);
-    }
-
-    public int getEmpSlownessAmplifier() {
-        return plugin.getConfig().getInt("payloads.emp.slowness-amplifier", 1);
+    public List<String> getEmpDestroyedBlocks() {
+        return plugin.getConfig().getStringList("payloads.emp.destroyed-blocks");
     }
 
 }

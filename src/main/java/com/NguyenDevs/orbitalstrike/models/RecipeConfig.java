@@ -1,4 +1,4 @@
-package com.NguyenDevs.orbitalstrike.configuration;
+package com.NguyenDevs.orbitalstrike.models;
 
 import org.bukkit.Material;
 import java.util.List;

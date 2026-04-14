@@ -1,7 +1,7 @@
-package com.NguyenDevs.orbitalstrike.cannon.payload;
+package com.NguyenDevs.orbitalstrike.payloads;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
-import com.NguyenDevs.orbitalstrike.cannon.Cannon;
+import com.NguyenDevs.orbitalstrike.models.Cannon;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.TNTPrimed;

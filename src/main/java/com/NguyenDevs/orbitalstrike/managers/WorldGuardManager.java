@@ -1,4 +1,4 @@
-package com.NguyenDevs.orbitalstrike.utils;
+package com.NguyenDevs.orbitalstrike.managers;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import org.bukkit.Bukkit;
@@ -18,17 +18,14 @@ public class WorldGuardManager {
         this.plugin = plugin;
     }
 
-    /**
-     * Safe wrapper for registerFlag that avoids class loading errors if WG is missing.
-     */
     public static void safeRegisterFlag() {
         if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
             try {
-                // By calling a method in a separate class, we delay class loading
-                // of Sk89q classes until this line is actually executed.
+
+
                 new WorldGuardHook().registerFlag();
             } catch (Throwable t) {
-                // Capture any linkage errors
+
                 Bukkit.getLogger().log(Level.WARNING, "[OrbitalStrike] Failed to register WorldGuard flag: " + t.getMessage());
             }
         }

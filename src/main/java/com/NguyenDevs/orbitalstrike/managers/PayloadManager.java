@@ -1,9 +1,11 @@
-package com.NguyenDevs.orbitalstrike.cannon;
+package com.NguyenDevs.orbitalstrike.managers;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
-import com.NguyenDevs.orbitalstrike.cannon.payload.*;
-import com.NguyenDevs.orbitalstrike.utils.PayloadType;
-import com.NguyenDevs.orbitalstrike.utils.StrikeData;
+import com.NguyenDevs.orbitalstrike.payloads.*;
+import com.NguyenDevs.orbitalstrike.models.PayloadType;
+import com.NguyenDevs.orbitalstrike.models.StrikeData;
+import com.NguyenDevs.orbitalstrike.models.Cannon;
+import com.NguyenDevs.orbitalstrike.models.ActiveStrike;
 import org.bukkit.*;
 import org.bukkit.Color;
 import org.bukkit.block.data.BlockData;
@@ -36,11 +38,8 @@ public class PayloadManager {
     private final NamespacedKey empPulsesKey;
     private final NamespacedKey empPulseDelayKey;
     private final NamespacedKey empPulseSpeedKey;
-    private final NamespacedKey empBlindnessDurationKey;
-    private final NamespacedKey empWeaknessDurationKey;
-    private final NamespacedKey empNauseaDurationKey;
-    private final NamespacedKey empSlownessDurationKey;
-    private final NamespacedKey empSlownessAmplifierKey;
+    private final NamespacedKey empEffectsKey;
+    private final NamespacedKey empDestroyedBlocksKey;
 
     public PayloadManager(OrbitalStrike plugin) {
         this.plugin = plugin;
@@ -59,11 +58,8 @@ public class PayloadManager {
         this.empPulsesKey = new NamespacedKey(plugin, "emp_pulses");
         this.empPulseDelayKey = new NamespacedKey(plugin, "emp_pulse_delay");
         this.empPulseSpeedKey = new NamespacedKey(plugin, "emp_pulse_speed");
-        this.empBlindnessDurationKey = new NamespacedKey(plugin, "emp_blindness_duration");
-        this.empWeaknessDurationKey = new NamespacedKey(plugin, "emp_weakness_duration");
-        this.empNauseaDurationKey = new NamespacedKey(plugin, "emp_nausea_duration");
-        this.empSlownessDurationKey = new NamespacedKey(plugin, "emp_slowness_duration");
-        this.empSlownessAmplifierKey = new NamespacedKey(plugin, "emp_slowness_amplifier");
+        this.empEffectsKey = new NamespacedKey(plugin, "emp_effects");
+        this.empDestroyedBlocksKey = new NamespacedKey(plugin, "emp_destroyed_blocks");
 
         registerPayloads();
     }
@@ -87,11 +83,8 @@ public class PayloadManager {
     public NamespacedKey getEmpPulsesKey() { return empPulsesKey; }
     public NamespacedKey getEmpPulseDelayKey() { return empPulseDelayKey; }
     public NamespacedKey getEmpPulseSpeedKey() { return empPulseSpeedKey; }
-    public NamespacedKey getEmpBlindnessDurationKey() { return empBlindnessDurationKey; }
-    public NamespacedKey getEmpWeaknessDurationKey() { return empWeaknessDurationKey; }
-    public NamespacedKey getEmpNauseaDurationKey() { return empNauseaDurationKey; }
-    public NamespacedKey getEmpSlownessDurationKey() { return empSlownessDurationKey; }
-    public NamespacedKey getEmpSlownessAmplifierKey() { return empSlownessAmplifierKey; }
+    public NamespacedKey getEmpEffectsKey() { return empEffectsKey; }
+    public NamespacedKey getEmpDestroyedBlocksKey() { return empDestroyedBlocksKey; }
 
     public void initiateStrike(Cannon cannon, StrikeData data, Location target) {
         if (plugin.getConfigManager().getDisabledWorlds().contains(target.getWorld().getName())) {
@@ -167,7 +160,7 @@ public class PayloadManager {
     }
 
     public void triggerEmpShockwave(Location center, double maxRadius, int pulses, int pulseDelay, double pulseSpeed, 
-                                   int blindnessDuration, int weaknessDuration, int nauseaDuration, int slownessDuration, int slownessAmplifier) {
+                                   List<String> effects, List<String> destroyedBlocks) {
         World world = center.getWorld();
         if (world == null) return;
 
@@ -182,7 +175,7 @@ public class PayloadManager {
                     return;
                 }
                 if (ticksSinceLastPulse >= pulseDelay) {
-                    launchSingleWave(center, maxRadius, pulseSpeed, blindnessDuration, weaknessDuration, nauseaDuration, slownessDuration, slownessAmplifier);
+                    launchSingleWave(center, maxRadius, pulseSpeed, effects, destroyedBlocks);
                     pulsesLaunched++;
                     ticksSinceLastPulse = 0;
                 }
@@ -192,11 +185,10 @@ public class PayloadManager {
     }
 
     private void launchSingleWave(Location center, double maxRadius, double step, 
-                                  int blindnessDuration, int weaknessDuration, int nauseaDuration, int slownessDuration, int slownessAmplifier) {
+                                  List<String> effects, List<String> destroyedBlocks) {
         World world = center.getWorld();
         if (world == null) return;
 
-        // Phase 1: Gather — particles converge toward center (charge-up effect)
         int gatherTicks = 15;
         new BukkitRunnable() {
             int tick = 0;
@@ -206,14 +198,12 @@ public class PayloadManager {
                 if (tick >= gatherTicks) {
                     this.cancel();
 
-                    // Flash at moment of release
                     world.spawnParticle(Particle.FLASH, center, 1, 0, 0, 0, 0);
                     world.spawnParticle(Particle.ELECTRIC_SPARK, center, 60, 0.3, 0.3, 0.3, 0.3);
                     world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2.0f, 0.6f);
                     world.playSound(center, Sound.ITEM_TRIDENT_RIPTIDE_1, 1.2f, 1.5f);
                     world.playSound(center, Sound.BLOCK_BEACON_DEACTIVATE, 1.0f, 1.5f);
 
-                    // Phase 2: Expand — single shell shockwave
                     new BukkitRunnable() {
                         double currentRadius = 0;
 
@@ -225,14 +215,13 @@ public class PayloadManager {
                                 return;
                             }
                             spawnSphereShell(world, center, currentRadius);
-                            processWaveEffects(center, currentRadius, step, blindnessDuration, weaknessDuration, nauseaDuration, slownessDuration, slownessAmplifier);
+                            processWaveEffects(center, currentRadius, step, effects, destroyedBlocks);
                         }
                     }.runTaskTimer(plugin, 0L, 1L);
 
                     return;
                 }
 
-                // Particles appear around center and shrink inward each tick
                 double gatherRadius = maxRadius * 0.35 * (1.0 - (double) tick / gatherTicks);
                 int particleCount = 10 + tick * 4;
                 Particle.DustOptions gatherDust = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.2f);
@@ -246,7 +235,6 @@ public class PayloadManager {
                     world.spawnParticle(Particle.REDSTONE, px, py, pz, 1, 0, 0, 0, 0, gatherDust);
                 }
 
-                // Rising hum sound during charge-up
                 if (tick % 5 == 0) {
                     float pitch = 0.5f + (tick / (float) gatherTicks);
                     world.playSound(center, Sound.BLOCK_BEACON_ACTIVATE, 0.5f, pitch);
@@ -257,13 +245,6 @@ public class PayloadManager {
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
-    /**
-     * Spawns a single thin spherical shell at the given radius using
-     * Fibonacci sphere distribution — perfectly uniform, no visible "layers".
-     *
-     * Dùng ENTITY_EFFECT (Color DataType) — static hoàn toàn, không trail,
-     * compatible 1.20.5+ kể cả 1.21.x
-     */
     private void spawnSphereShell(World world, Location center, double radius) {
         if (radius <= 0) return;
 
@@ -287,7 +268,7 @@ public class PayloadManager {
     }
 
     private void processWaveEffects(Location center, double currentRadius, double step, 
-                                    int blindnessDuration, int weaknessDuration, int nauseaDuration, int slownessDuration, int slownessAmplifier) {
+                                    List<String> effects, List<String> destroyedBlocks) {
         World world = center.getWorld();
         if (world == null) return;
 
@@ -306,18 +287,10 @@ public class PayloadManager {
                         Material type = block.getType();
                         String name = type.name();
 
-                        // 1. Redstone & Logical Components (Shredding)
-                        boolean isRedstone = name.contains("REDSTONE") || name.contains("REPEATER") || name.contains("COMPARATOR")
-                                || name.contains("PISTON") || name.contains("DROPPER") || name.contains("DISPENSER")
-                                || name.contains("CRAFTER") || name.contains("OBSERVER") || name.contains("RAIL")
-                                || name.contains("DAYLIGHT_DETECTOR") || name.contains("LEVER");
-
-                        // Exclude regular torches, include redstone torches
-                        if (isRedstone && !name.equals("TORCH") && !name.equals("SOUL_TORCH")) {
+                        if (destroyedBlocks.contains(name)) {
                             block.breakNaturally();
                         }
 
-                        // 2. Copper Bulb Deactivation
                         if (name.contains("COPPER_BULB")) {
                             BlockData data = block.getBlockData();
                             if (data instanceof Lightable) {
@@ -329,7 +302,6 @@ public class PayloadManager {
                             }
                         }
 
-                        // 3. Glass Shattering
                         if (name.contains("GLASS")) {
                             block.setType(Material.AIR);
                             world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.2f);
@@ -343,7 +315,7 @@ public class PayloadManager {
         world.getNearbyEntities(center, currentRadius + 0.5, currentRadius + 0.5, currentRadius + 0.5).forEach(entity -> {
             double dist = entity.getLocation().distance(center);
             if (dist >= innerBound && dist <= outerBound) {
-                // 4. TNT Conversion (Force back to block)
+
                 if (entity instanceof TNTPrimed) {
                     Location loc = entity.getLocation();
                     loc.getBlock().setType(Material.TNT);
@@ -353,28 +325,31 @@ public class PayloadManager {
 
                 if (entity instanceof LivingEntity) {
                     LivingEntity living = (LivingEntity) entity;
-                    if (blindnessDuration > 0) {
-                        living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.BLINDNESS, blindnessDuration, 0));
-                    }
-                    if (weaknessDuration > 0) {
-                        living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.WEAKNESS, weaknessDuration, 1));
-                    }
-                    if (nauseaDuration > 0) {
-                        living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.CONFUSION, nauseaDuration, 4));
-                    }
-                    if (slownessDuration > 0) {
-                        living.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SLOW, slownessDuration, slownessAmplifier));
+                    if (effects != null) {
+                        for (String effectStr : effects) {
+                            String[] parts = effectStr.split(":");
+                            if (parts.length >= 3) {
+                                try {
+                                    org.bukkit.potion.PotionEffectType type = org.bukkit.potion.PotionEffectType.getByName(parts[0]);
+                                    if (type != null) {
+                                        int amp = Integer.parseInt(parts[1]);
+                                        int dur = Integer.parseInt(parts[2]);
+                                        living.addPotionEffect(new org.bukkit.potion.PotionEffect(type, dur, amp));
+                                    }
+                                } catch (Exception ignored) {}
+                            }
+                        }
                     }
                 }
 
                 Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize();
-                direction.setY(0.1); // Reduced vertical lift
+                direction.setY(0.1);
 
-                double multiplier = 0.15; // Light knockback for living entities
+                double multiplier = 0.15;
                 if (entity instanceof org.bukkit.entity.Item || entity instanceof org.bukkit.entity.ExperienceOrb) {
-                    multiplier = 0.02; // Minimal movement for items
+                    multiplier = 0.02;
                 } else if (!(entity instanceof LivingEntity)) {
-                    multiplier = 0.08; // Small knockback for other non-living entities
+                    multiplier = 0.08;
                 }
 
                 entity.setVelocity(direction.multiply(multiplier));

@@ -1,4 +1,4 @@
-package com.NguyenDevs.orbitalstrike.utils;
+package com.NguyenDevs.orbitalstrike.models;
 
 public enum PayloadType {
     STAB,

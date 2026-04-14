@@ -1,11 +1,11 @@
 package com.NguyenDevs.orbitalstrike.listeners;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
-import com.NguyenDevs.orbitalstrike.cannon.Cannon;
-import com.NguyenDevs.orbitalstrike.cannon.CannonRecipeManager;
+import com.NguyenDevs.orbitalstrike.models.Cannon;
+import com.NguyenDevs.orbitalstrike.managers.CannonRecipeManager;
 import com.NguyenDevs.orbitalstrike.utils.ColorUtils;
 
-import com.NguyenDevs.orbitalstrike.utils.StrikeData;
+import com.NguyenDevs.orbitalstrike.models.StrikeData;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -108,8 +108,6 @@ public class CannonInteractListener implements Listener {
             return;
         }
 
-
-        // WorldGuard: check osc-enable flag at the target location
         if (!plugin.getWorldGuardManager().isAllowed(player, target)) {
             player.sendMessage(plugin.getMessageManager().getMessage("prefix") + plugin.getMessageManager().getMessage("error.worldguard-denied"));
             playErrorSound(player);

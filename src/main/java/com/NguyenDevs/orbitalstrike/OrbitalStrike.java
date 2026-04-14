@@ -1,17 +1,17 @@
 package com.NguyenDevs.orbitalstrike;
 
-import com.NguyenDevs.orbitalstrike.cannon.CannonManager;
-import com.NguyenDevs.orbitalstrike.cannon.CannonRecipeManager;
-import com.NguyenDevs.orbitalstrike.cannon.PayloadManager;
+import com.NguyenDevs.orbitalstrike.managers.CannonManager;
+import com.NguyenDevs.orbitalstrike.managers.CannonRecipeManager;
+import com.NguyenDevs.orbitalstrike.managers.PayloadManager;
 import com.NguyenDevs.orbitalstrike.commands.CannonCommand;
-import com.NguyenDevs.orbitalstrike.configuration.ConfigManager;
-import com.NguyenDevs.orbitalstrike.configuration.MessageManager;
+import com.NguyenDevs.orbitalstrike.managers.ConfigManager;
+import com.NguyenDevs.orbitalstrike.managers.MessageManager;
 import com.NguyenDevs.orbitalstrike.listeners.CannonInteractListener;
 import com.NguyenDevs.orbitalstrike.listeners.CraftListener;
 import com.NguyenDevs.orbitalstrike.listeners.TNTListener;
 import com.NguyenDevs.orbitalstrike.utils.ConfigMigrationUtils;
 import com.NguyenDevs.orbitalstrike.utils.SpigotPlugin;
-import com.NguyenDevs.orbitalstrike.utils.WorldGuardManager;
+import com.NguyenDevs.orbitalstrike.managers.WorldGuardManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -41,8 +41,7 @@ public final class OrbitalStrike extends JavaPlugin {
 
         this.configManager = new ConfigManager(this);
         this.configManager.loadConfig();
-        
-        // Migrate cannons.yml if needed
+
         ConfigMigrationUtils.migrateCannonsYml(this);
         
         this.messageManager = new MessageManager(this);

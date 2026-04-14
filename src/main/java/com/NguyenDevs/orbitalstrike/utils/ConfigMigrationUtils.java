@@ -47,12 +47,10 @@ public class ConfigMigrationUtils {
                 ConfigurationSection oldCannon = section.getConfigurationSection(key);
                 String name = oldCannon.getString("name");
                 String payloadType = oldCannon.getString("payload", "STAB");
-                
-                // Create new section
+
                 ConfigurationSection newCannon = newCannonsSection.createSection(key);
                 newCannon.set("name", name);
-                
-                // Item section
+
                 List<Map<String, Object>> itemList = new ArrayList<>();
                 itemList.add(Map.of("material", plugin.getConfigManager().getDefaultItemMaterial().name()));
                 itemList.add(Map.of("durability", plugin.getConfigManager().isDefaultItemDurabilityEnabled()));
@@ -60,8 +58,7 @@ public class ConfigMigrationUtils {
                 newCannon.set("item", itemList);
                 
                 newCannon.set("cooldown", plugin.getConfigManager().getDefaultItemCooldown());
-                
-                // Payload section
+
                 List<Map<String, Object>> payloadSettings = new ArrayList<>();
                 for (String paramKey : oldCannon.getKeys(false)) {
                     if (paramKey.equals("name") || paramKey.equals("payload")) continue;

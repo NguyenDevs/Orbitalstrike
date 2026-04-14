@@ -1,7 +1,7 @@
-package com.NguyenDevs.orbitalstrike.cannon.payload;
+package com.NguyenDevs.orbitalstrike.payloads;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
-import com.NguyenDevs.orbitalstrike.cannon.Cannon;
+import com.NguyenDevs.orbitalstrike.models.Cannon;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -42,6 +42,15 @@ public class PayloadUtils {
         Object val = cannon.getParameter(key);
         if (val instanceof String) {
             return (String) val;
+        }
+        return defaultValue;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static java.util.List<String> getStringListParameter(Cannon cannon, String key, java.util.List<String> defaultValue) {
+        Object val = cannon.getParameter(key);
+        if (val instanceof java.util.List) {
+            return (java.util.List<String>) val;
         }
         return defaultValue;
     }

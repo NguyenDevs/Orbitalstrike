@@ -1,6 +1,6 @@
-package com.NguyenDevs.orbitalstrike.cannon;
+package com.NguyenDevs.orbitalstrike.models;
 
-import com.NguyenDevs.orbitalstrike.utils.StrikeData;
+import com.NguyenDevs.orbitalstrike.models.StrikeData;
 import org.bukkit.Location;
 
 public class ActiveStrike {

@@ -1,7 +1,8 @@
-package com.NguyenDevs.orbitalstrike.cannon;
+package com.NguyenDevs.orbitalstrike.managers;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
-import com.NguyenDevs.orbitalstrike.utils.PayloadType;
+import com.NguyenDevs.orbitalstrike.models.PayloadType;
+import com.NguyenDevs.orbitalstrike.models.Cannon;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -61,8 +62,8 @@ public class CannonManager {
             cannon.setParameter("pulses", plugin.getConfigManager().getEmpPulses());
             cannon.setParameter("pulse-delay", plugin.getConfigManager().getEmpPulseDelay());
             cannon.setParameter("pulse-speed", plugin.getConfigManager().getEmpPulseSpeed());
-            cannon.setParameter("blindness-duration", plugin.getConfigManager().getEmpBlindnessDuration());
-            cannon.setParameter("weakness-duration", plugin.getConfigManager().getEmpWeaknessDuration());
+            cannon.setParameter("effects", plugin.getConfigManager().getEmpEffects());
+            cannon.setParameter("destroyed-blocks", plugin.getConfigManager().getEmpDestroyedBlocks());
         }
 
 
@@ -144,8 +145,7 @@ public class CannonManager {
                 }
                 
                 cannon.setCooldown(section.getInt(key + ".cooldown", -1));
-                
-                // Load payload parameters
+
                 List<Map<?, ?>> payloadSettings = section.getMapList(key + ".payload.settings");
                 for (Map<?, ?> setting : payloadSettings) {
                     for (Map.Entry<?, ?> entry : setting.entrySet()) {

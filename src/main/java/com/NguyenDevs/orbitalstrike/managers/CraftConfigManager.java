@@ -1,10 +1,11 @@
-package com.NguyenDevs.orbitalstrike.configuration;
+package com.NguyenDevs.orbitalstrike.managers;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import com.NguyenDevs.orbitalstrike.models.RecipeConfig;
 
 import java.io.File;
 import java.util.ArrayList;

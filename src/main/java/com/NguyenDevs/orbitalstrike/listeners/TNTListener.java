@@ -1,7 +1,7 @@
 package com.NguyenDevs.orbitalstrike.listeners;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
-import com.NguyenDevs.orbitalstrike.cannon.PayloadManager;
+import com.NguyenDevs.orbitalstrike.managers.PayloadManager;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,8 +35,8 @@ public class TNTListener implements Listener {
                 plugin.getPayloadManager().getEmpTntKey(),
                 PersistentDataType.BYTE)) {
             
-            event.setYield(0); // Extra safety
-            event.blockList().clear(); // No block damage
+            event.setYield(0);
+            event.blockList().clear();
             
             double radius = tnt.getPersistentDataContainer().getOrDefault(
                     plugin.getPayloadManager().getEmpRadiusKey(), PersistentDataType.DOUBLE, 12.0);
@@ -46,18 +46,15 @@ public class TNTListener implements Listener {
                     plugin.getPayloadManager().getEmpPulseDelayKey(), PersistentDataType.INTEGER, 10);
             double speed = tnt.getPersistentDataContainer().getOrDefault(
                     plugin.getPayloadManager().getEmpPulseSpeedKey(), PersistentDataType.DOUBLE, 2.0);
-            int blindness = tnt.getPersistentDataContainer().getOrDefault(
-                    plugin.getPayloadManager().getEmpBlindnessDurationKey(), PersistentDataType.INTEGER, 60);
-            int weakness = tnt.getPersistentDataContainer().getOrDefault(
-                    plugin.getPayloadManager().getEmpWeaknessDurationKey(), PersistentDataType.INTEGER, 400);
-            int nausea = tnt.getPersistentDataContainer().getOrDefault(
-                    plugin.getPayloadManager().getEmpNauseaDurationKey(), PersistentDataType.INTEGER, 100);
-            int slowness = tnt.getPersistentDataContainer().getOrDefault(
-                    plugin.getPayloadManager().getEmpSlownessDurationKey(), PersistentDataType.INTEGER, 100);
-            int slownessAmp = tnt.getPersistentDataContainer().getOrDefault(
-                    plugin.getPayloadManager().getEmpSlownessAmplifierKey(), PersistentDataType.INTEGER, 1);
+            String effectsStr = tnt.getPersistentDataContainer().getOrDefault(
+                    plugin.getPayloadManager().getEmpEffectsKey(), PersistentDataType.STRING, "");
+            String blocksStr = tnt.getPersistentDataContainer().getOrDefault(
+                    plugin.getPayloadManager().getEmpDestroyedBlocksKey(), PersistentDataType.STRING, "");
 
-            plugin.getPayloadManager().triggerEmpShockwave(event.getLocation(), radius, pulses, delay, speed, blindness, weakness, nausea, slowness, slownessAmp);
+            java.util.List<String> effects = effectsStr.isEmpty() ? new java.util.ArrayList<>() : java.util.Arrays.asList(effectsStr.split(","));
+            java.util.List<String> destroyedBlocks = blocksStr.isEmpty() ? new java.util.ArrayList<>() : java.util.Arrays.asList(blocksStr.split(","));
+
+            plugin.getPayloadManager().triggerEmpShockwave(event.getLocation(), radius, pulses, delay, speed, effects, destroyedBlocks);
 
         }
 

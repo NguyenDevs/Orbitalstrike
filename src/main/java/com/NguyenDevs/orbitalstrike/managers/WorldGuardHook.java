@@ -1,4 +1,4 @@
-package com.NguyenDevs.orbitalstrike.utils;
+package com.NguyenDevs.orbitalstrike.managers;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
@@ -12,10 +12,6 @@ import com.sk89q.worldguard.protection.regions.RegionQuery;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-/**
- * This class handles all direct interaction with the WorldGuard API.
- * It is only loaded if WorldGuard is present on the server.
- */
 public class WorldGuardHook {
 
     public static StateFlag OSC_ENABLE_FLAG;
@@ -44,16 +40,14 @@ public class WorldGuardHook {
 
             com.sk89q.worldedit.util.Location wgLocation = BukkitAdapter.adapt(target);
 
-            // Check if there are any regions covering this location (excluding global)
             ApplicableRegionSet set = query.getApplicableRegions(wgLocation);
             if (set.size() == 0) {
-                // Wilderness: Allow by default
+
                 return true;
             }
 
             com.sk89q.worldguard.LocalPlayer wgPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
-            // Inside a region: Default to DENY unless the flag is explicitly set to ALLOW
             StateFlag.State state = query.queryState(wgLocation, wgPlayer, OSC_ENABLE_FLAG);
 
             return state == StateFlag.State.ALLOW;

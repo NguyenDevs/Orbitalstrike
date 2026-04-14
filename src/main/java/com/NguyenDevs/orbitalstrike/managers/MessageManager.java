@@ -1,4 +1,4 @@
-package com.NguyenDevs.orbitalstrike.configuration;
+package com.NguyenDevs.orbitalstrike.managers;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import com.NguyenDevs.orbitalstrike.utils.ColorUtils;

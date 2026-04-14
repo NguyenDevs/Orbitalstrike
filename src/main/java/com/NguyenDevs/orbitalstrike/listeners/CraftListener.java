@@ -1,8 +1,8 @@
 package com.NguyenDevs.orbitalstrike.listeners;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
-import com.NguyenDevs.orbitalstrike.cannon.CannonRecipeManager;
-import com.NguyenDevs.orbitalstrike.configuration.RecipeConfig;
+import com.NguyenDevs.orbitalstrike.managers.CannonRecipeManager;
+import com.NguyenDevs.orbitalstrike.models.RecipeConfig;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;

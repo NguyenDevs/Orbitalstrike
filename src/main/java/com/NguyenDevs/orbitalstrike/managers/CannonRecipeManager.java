@@ -1,8 +1,9 @@
-package com.NguyenDevs.orbitalstrike.cannon;
+package com.NguyenDevs.orbitalstrike.managers;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
-import com.NguyenDevs.orbitalstrike.configuration.CraftConfigManager;
-import com.NguyenDevs.orbitalstrike.configuration.RecipeConfig;
+import com.NguyenDevs.orbitalstrike.managers.CraftConfigManager;
+import com.NguyenDevs.orbitalstrike.models.RecipeConfig;
+import com.NguyenDevs.orbitalstrike.models.Cannon;
 import com.NguyenDevs.orbitalstrike.utils.ColorUtils;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;

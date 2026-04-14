@@ -107,6 +107,6 @@ public class SpigotPlugin {
     }
 
     public String getResourceUrl() {
-        return "https://www.spigotmc.org/resources/" + id + "/";
+        return "https://www.spigotmc.org/resources/" + id;
     }
 }
