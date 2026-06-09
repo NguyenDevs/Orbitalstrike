@@ -74,7 +74,8 @@ public class NukePayload implements IPayload {
 
                         Vector velocity;
                         if (distance > 0) {
-                            double speed = distance / 25.0;
+                            double fallTime = (-1.22 + Math.sqrt(1.4884 + 0.08 * height)) / 0.04;
+                            double speed = distance / fallTime;
                             velocity = new Vector(deltaX / distance * speed, -1.2, deltaZ / distance * speed);
                         } else {
                             velocity = new Vector(0, -1.2, 0);

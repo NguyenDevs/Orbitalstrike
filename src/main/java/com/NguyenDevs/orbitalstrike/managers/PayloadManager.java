@@ -210,7 +210,7 @@ public class PayloadManager {
                 if (tick >= gatherTicks) {
                     this.cancel();
 
-                    world.spawnParticle(Particle.FLASH, center, 1, 0, 0, 0, 0);
+                    world.spawnParticle(Particle.EXPLOSION, center, 1, 0, 0, 0, 0);
                     world.spawnParticle(Particle.ELECTRIC_SPARK, center, 60, 0.3, 0.3, 0.3, 0.3);
                     world.playSound(center, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2.0f, 0.6f);
                     world.playSound(center, Sound.ITEM_TRIDENT_RIPTIDE_1, 1.2f, 1.5f);
