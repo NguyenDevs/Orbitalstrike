@@ -77,6 +77,9 @@ public final class OrbitalStrike extends JavaPlugin {
         if (payloadManager != null) {
             payloadManager.clearAll();
         }
+        if (trailManager != null) {
+            trailManager.cancelAllTasks();
+        }
         Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&bOrbital&3Strike&9Cannon&8] &cOrbitalStrikeCannon plugin disabled!"));
     }
 

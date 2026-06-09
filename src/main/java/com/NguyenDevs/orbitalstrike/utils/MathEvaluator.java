@@ -102,7 +102,12 @@ public class MathEvaluator {
                 }
             }.parse();
         } catch (Exception e) {
-            return t -> 0; // Safe fallback
+            return t -> {
+                if (t < 0) java.util.logging.Logger.getLogger("OrbitalStrike").warning(
+                    "MathEvaluator: Parse error for expression '" + input + "': " + e.getMessage()
+                );
+                return 0;
+            };
         }
     }
 }

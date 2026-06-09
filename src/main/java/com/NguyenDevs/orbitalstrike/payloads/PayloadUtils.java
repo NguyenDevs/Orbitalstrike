@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -67,7 +68,7 @@ public class PayloadUtils {
         try {
             if (fuse == 0 && loc.getBlock().isLiquid()) return null;
 
-            TNTPrimed tnt = (TNTPrimed) world.spawnEntity(loc, EntityType.PRIMED_TNT);
+            TNTPrimed tnt = (TNTPrimed) world.spawnEntity(loc, EntityType.TNT);
             tnt.setFuseTicks(fuse);
             tnt.setYield(yield);
             tnt.setIsIncendiary(false);
@@ -77,7 +78,7 @@ public class PayloadUtils {
 
             tnt.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
             if (cannonName != null) {
-                tnt.getPersistentDataContainer().set(new NamespacedKey(plugin, "source_cannon"), PersistentDataType.STRING, cannonName);
+                tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getSourceCannonKey(), PersistentDataType.STRING, cannonName);
                 if (plugin.getTrailManager() != null) {
                     plugin.getTrailManager().startTrailTask(tnt, cannonName);
                 }

@@ -5,15 +5,18 @@
 # For individual cannon customization, edit "cannons.yml" instead.
 
 settings:
+  # Notify admins on join when a new version is available
   update-notify: true
 
   # Automatically load the target chunk before firing to ensure strike success
   # Recommended: true (prevents strikes from failing in unloaded chunks)
   force-load-target: true
 
-  disabled-worlds:
-    - example
-    - example_nether
-    - example_the_end
+  # Worlds where cannons are disabled
+  disabled-worlds: []
 
-  logs: false
+  # Log strike events to console
+  log-strikes: false
+
+  # Maximum number of TNT entities per strike (safety limit)
+  max-tnt-per-strike: 500

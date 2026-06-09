@@ -20,13 +20,14 @@ public class NukePayload implements IPayload {
 
     @Override
     public void execute(World world, Location target, Cannon cannon) {
-        int rings = PayloadUtils.getIntParameter(cannon, "rings", 10);
+        int rings = Math.min(PayloadUtils.getIntParameter(cannon, "rings", 10), 50);
         double height = PayloadUtils.getDoubleParameter(cannon, "height", 60.0);
         float yield = PayloadUtils.getFloatParameter(cannon, "yield", 8.0f);
-        int baseTnt = PayloadUtils.getIntParameter(cannon, "base-tnt", 20);
-        int increase = PayloadUtils.getIntParameter(cannon, "tnt-increase", 3);
+        int baseTnt = Math.min(PayloadUtils.getIntParameter(cannon, "base-tnt", 20), 100);
+        int increase = Math.min(PayloadUtils.getIntParameter(cannon, "tnt-increase", 3), 20);
         int initialFuse = PayloadUtils.getIntParameter(cannon, "fuse-ticks", 80);
         int launchDelay = PayloadUtils.getIntParameter(cannon, "launch-delay", 10);
+        int maxTnt = plugin.getConfigManager().getMaxTntPerStrike();
 
         Location spawnCenter = target.clone().add(0, height, 0);
         if (spawnCenter.getY() > world.getMaxHeight()) {
@@ -35,24 +36,25 @@ public class NukePayload implements IPayload {
 
         List<TntLaunchData> launchDataList = new ArrayList<>();
 
-        TNTPrimed centerTnt = PayloadUtils.spawnTNTAt(plugin, world, spawnCenter.clone(), yield, initialFuse, false, plugin.getPayloadManager().getOrbitalStrikeKey(), cannon.getName());
+        Location centerLoc = spawnCenter.clone();
+        TNTPrimed centerTnt = PayloadUtils.spawnTNTAt(plugin, world, centerLoc, yield, initialFuse, false, plugin.getPayloadManager().getOrbitalStrikeKey(), cannon.getName());
         if (centerTnt != null) {
             centerTnt.setGravity(false);
             centerTnt.setVelocity(new Vector(0, 0, 0));
             launchDataList.add(new TntLaunchData(centerTnt, target.getX(), target.getZ()));
         }
 
-        for (int ring = 1; ring <= rings; ring++) {
+        for (int ring = 1; ring <= rings && launchDataList.size() < maxTnt; ring++) {
             double radius = ring * 4.0;
-            int tntCount = baseTnt + ring * increase;
+            int tntCount = Math.min(baseTnt + ring * increase, maxTnt - launchDataList.size());
             double angleStep = 360.0 / tntCount;
 
-            for (int i = 0; i < tntCount; i++) {
+            for (int i = 0; i < tntCount && launchDataList.size() < maxTnt; i++) {
                 double angle = i * angleStep;
                 double targetX = target.getX() + radius * Math.cos(Math.toRadians(angle));
                 double targetZ = target.getZ() + radius * Math.sin(Math.toRadians(angle));
 
-                TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnCenter.clone(), yield, initialFuse, false, plugin.getPayloadManager().getOrbitalStrikeKey(), cannon.getName());
+                TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, centerLoc, yield, initialFuse, false, plugin.getPayloadManager().getOrbitalStrikeKey(), cannon.getName());
                 if (tnt != null) {
                     tnt.setGravity(false);
                     tnt.setVelocity(new Vector(0, 0, 0));

@@ -1,9 +1,9 @@
 package com.NguyenDevs.orbitalstrike.managers;
 
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import java.util.Arrays;
+
+import java.util.Collections;
 import java.util.List;
 
 public class ConfigManager {
@@ -16,18 +16,10 @@ public class ConfigManager {
     public void loadConfig() {
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
-        FileConfiguration config = plugin.getConfig();
-
-        config.addDefault("settings.force-load-target", true);
-        config.addDefault("settings.disabled-worlds", Arrays.asList("example", "example_nether", "example_the_end"));
-        config.addDefault("settings.logs", true);
-
-        config.options().copyDefaults(true);
-        plugin.saveConfig();
     }
-    
+
     public boolean isForceLoadTarget() {
-        return plugin.getConfig().getBoolean("settings.force-load-target");
+        return plugin.getConfig().getBoolean("settings.force-load-target", true);
     }
 
     public List<String> getDisabledWorlds() {
@@ -35,8 +27,11 @@ public class ConfigManager {
     }
 
     public boolean isLogsEnabled() {
-        return plugin.getConfig().getBoolean("settings.logs", true);
+        return plugin.getConfig().getBoolean("settings.log-strikes", false);
     }
-
+    
+    public int getMaxTntPerStrike() {
+        return Math.max(1, Math.min(5000, plugin.getConfig().getInt("settings.max-tnt-per-strike", 500)));
+    }
 }
 

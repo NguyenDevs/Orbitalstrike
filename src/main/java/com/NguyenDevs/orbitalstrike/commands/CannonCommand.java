@@ -4,6 +4,7 @@ import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import com.NguyenDevs.orbitalstrike.models.Cannon;
 import com.NguyenDevs.orbitalstrike.managers.CannonRecipeManager;
 import com.NguyenDevs.orbitalstrike.utils.ColorUtils;
+import com.NguyenDevs.orbitalstrike.utils.SoundUtils;
 import com.NguyenDevs.orbitalstrike.models.PayloadType;
 import com.NguyenDevs.orbitalstrike.models.StrikeData;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -13,7 +14,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,11 +32,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import static com.NguyenDevs.orbitalstrike.managers.CannonRecipeManager.CANNON_KEY;
 import static com.NguyenDevs.orbitalstrike.managers.CannonRecipeManager.DURABILITY_KEY;
+import static com.NguyenDevs.orbitalstrike.utils.SoundUtils.playSuccessSound;
 
 public class CannonCommand implements CommandExecutor, TabCompleter {
 
@@ -208,9 +208,20 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
+        if (cannon.getCooldown() > 0) {
+            long lastUsed = plugin.getCannonManager().getLastUsed(cannonName);
+            long timeLeft = (lastUsed + cannon.getCooldown() * 1000L) - System.currentTimeMillis();
+            if (timeLeft > 0) {
+                sender.sendMessage(plugin.getMessageManager().getMessage("cannon.cooldown", "%time%", String.valueOf(timeLeft / 1000 + 1)));
+                playErrorSound(sender);
+                return;
+            }
+        }
+
         StrikeData strikeData = new StrikeData(cannon.getPayloadType());
 
         plugin.getPayloadManager().initiateStrike(cannon, strikeData, target);
+        plugin.getCannonManager().setLastUsed(cannonName, System.currentTimeMillis());
         sender.sendMessage(plugin.getMessageManager().getMessage("cannon.fired",
                 "%x%", String.valueOf(target.getBlockX()),
                 "%y%", String.valueOf(target.getBlockY()),
@@ -259,9 +270,20 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
         }
 
 
+        if (cannon.getCooldown() > 0) {
+            long lastUsed = plugin.getCannonManager().getLastUsed(cannonName);
+            long timeLeft = (lastUsed + cannon.getCooldown() * 1000L) - System.currentTimeMillis();
+            if (timeLeft > 0) {
+                sender.sendMessage(plugin.getMessageManager().getMessage("cannon.cooldown", "%time%", String.valueOf(timeLeft / 1000 + 1)));
+                playErrorSound(sender);
+                return;
+            }
+        }
+
         StrikeData strikeData = new StrikeData(cannon.getPayloadType());
 
         plugin.getPayloadManager().initiateStrike(cannon, strikeData, target);
+        plugin.getCannonManager().setLastUsed(cannonName, System.currentTimeMillis());
         sender.sendMessage(plugin.getMessageManager().getMessage("cannon.fired",
                 "%x%", String.valueOf(target.getBlockX()),
                 "%y%", String.valueOf(target.getBlockY()),
@@ -299,8 +321,7 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
             if (cannon.isDurabilityEnabled()) {
                 meta.getPersistentDataContainer().set(DURABILITY_KEY, PersistentDataType.INTEGER, 0);
 
-                if (meta instanceof Damageable) {
-                    Damageable damageable = (Damageable) meta;
+                if (meta instanceof Damageable damageable) {
                     int maxVanilla = item.getType().getMaxDurability();
                     int customMax = cannon.getMaxDurability();
                     
@@ -546,24 +567,10 @@ public class CannonCommand implements CommandExecutor, TabCompleter {
     }
 
     private void playSound(CommandSender sender) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            try {
-                player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.5f);
-            } catch (Exception e) {
-                plugin.getLogger().log(Level.WARNING, "Error playing success sound for player: " + player.getName(), e);
-            }
-        }
+        playSuccessSound(sender, plugin.getLogger());
     }
 
     private void playErrorSound(CommandSender sender) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            try {
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f);
-            } catch (Exception e) {
-                plugin.getLogger().log(Level.WARNING, "Error playing error sound for player: " + player.getName(), e);
-            }
-        }
+        SoundUtils.playErrorSound(sender, plugin.getLogger());
     }
 }

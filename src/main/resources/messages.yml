@@ -48,3 +48,8 @@ error:
   player-not-found: "&cPlayer not found!"
   world-disabled: "&cCannon cannot be used in this world!"
   worldguard-denied: "&cOrbital Strike Cannon is disabled in this region!"
+  max-tnt-reached: "&cMaximum TNT limit reached for this strike!"
+  target-out-of-range: "&cTarget is out of range!"
+  cannon-in-use: "&cThis cannon is already firing!"
+  invalid-material: "&cInvalid material specified!"
+  no-console: "&cThis command cannot be used from console."

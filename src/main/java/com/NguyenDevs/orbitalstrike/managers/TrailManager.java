@@ -16,21 +16,20 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 public class TrailManager {
     private final OrbitalStrike plugin;
     private final Map<String, TrailConfig> trails;
+    private final List<BukkitRunnable> activeTrailTasks;
     private final File file;
     private FileConfiguration config;
 
     public TrailManager(OrbitalStrike plugin) {
         this.plugin = plugin;
         this.trails = new HashMap<>();
+        this.activeTrailTasks = Collections.synchronizedList(new ArrayList<>());
         this.file = new File(plugin.getDataFolder(), "trails.yml");
         if (!file.exists()) {
             plugin.saveResource("trails.yml", false);
@@ -74,7 +73,7 @@ public class TrailManager {
                     "=========================================================\n" +
                     "System supports creating multiple particle layers per cannon.\n" +
                     "- particle: The name of the particle (E.g.: FLAME, LAVA, ELECTRIC_SPARK).\n" +
-                    "  * Supports REDSTONE coloring: REDSTONE:<R>,<G>,<B>:<Size> (E.g.: REDSTONE:255,0,0:1.5)\n" +
+                    "  * Supports DUST coloring: DUST:<R>,<G>,<B>:<Size> (E.g.: DUST:255,0,0:1.5)\n" +
                     "- formula-x, formula-y, formula-z: Spawn coordinates evaluated via Math expressions.\n" +
                     "  * 't' is the variable representing Time (Ticks). Each tick 't' increments by 1.\n" +
                     "  * Supported functions: sin(t), cos(t), tan(t), sqrt(t), abs(t), +, -, *, /, %\n" +
@@ -123,7 +122,7 @@ public class TrailManager {
                     continue;
                 }
                 
-                if (parts.length >= 2 && particleType == Particle.REDSTONE) {
+                if (parts.length >= 2 && particleType == Particle.DUST) {
                     String[] rgb = parts[1].split(",");
                     if (rgb.length >= 3) {
                         try {
@@ -135,7 +134,7 @@ public class TrailManager {
                     }
                 }
                 
-                if (parts.length >= 3 && particleType == Particle.REDSTONE) {
+                if (parts.length >= 3 && particleType == Particle.DUST) {
                     try {
                         size = Float.parseFloat(parts[2]);
                     } catch (NumberFormatException ignored) {}
@@ -188,11 +187,24 @@ public class TrailManager {
         TrailConfig conf = getTrail(cannonName);
         if (conf == null) return;
 
-        new BukkitRunnable() {
+        // Pre-cache DustOptions per layer
+        Map<Integer, Object> dustCache = new HashMap<>();
+        List<TrailLayer> layers = conf.getLayers();
+        for (int i = 0; i < layers.size(); i++) {
+            TrailLayer layer = layers.get(i);
+                if (layer.getParticle() == Particle.DUST) {
+                dustCache.put(i, new Particle.DustOptions(
+                    layer.getColor() != null ? layer.getColor() : Color.RED, layer.getSize()
+                ));
+            }
+        }
+
+        BukkitRunnable task = new BukkitRunnable() {
             double tick = 0;
             @Override
             public void run() {
                 if (!tnt.isValid() || tnt.isDead()) {
+                    activeTrailTasks.remove(this);
                     this.cancel();
                     return;
                 }
@@ -201,16 +213,17 @@ public class TrailManager {
                 World w = center.getWorld();
                 if (w == null) return;
 
-                for (TrailLayer layer : conf.getLayers()) {
+                for (int i = 0; i < layers.size(); i++) {
+                    TrailLayer layer = layers.get(i);
                     double ox = layer.getOffsetX().evaluate(tick);
                     double oy = layer.getOffsetY().evaluate(tick);
                     double oz = layer.getOffsetZ().evaluate(tick);
                     
                     Location spawnLoc = center.clone().add(ox, oy, oz);
                     
-                    Object data = null;
-                    if (layer.getParticle() == Particle.REDSTONE) {
-                        data = new Particle.DustOptions(layer.getColor() != null ? layer.getColor() : Color.RED, layer.getSize());
+                    Object data = dustCache.get(i);
+                    if (data == null && layer.getParticle() == Particle.DUST) {
+                        data = new Particle.DustOptions(Color.RED, 1.0f);
                     }
 
                     w.spawnParticle(layer.getParticle(), spawnLoc, layer.getCount(), 
@@ -219,6 +232,19 @@ public class TrailManager {
                 }
                 tick++;
             }
-        }.runTaskTimer(plugin, 1L, 1L);
+        };
+        activeTrailTasks.add(task);
+        task.runTaskTimer(plugin, 1L, 1L);
+    }
+    
+    public void cancelAllTasks() {
+        synchronized (activeTrailTasks) {
+            for (BukkitRunnable task : activeTrailTasks) {
+                try {
+                    task.cancel();
+                } catch (Exception ignored) {}
+            }
+            activeTrailTasks.clear();
+        }
     }
 }

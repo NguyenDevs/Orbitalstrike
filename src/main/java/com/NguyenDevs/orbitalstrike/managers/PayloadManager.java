@@ -8,18 +8,19 @@ import com.NguyenDevs.orbitalstrike.models.Cannon;
 import com.NguyenDevs.orbitalstrike.models.ActiveStrike;
 import org.bukkit.*;
 import org.bukkit.Color;
+import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Lightable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Level;
 
 public class PayloadManager {
     private final OrbitalStrike plugin;
@@ -27,6 +28,7 @@ public class PayloadManager {
     private final Map<PayloadType, IPayload> payloads;
 
     private final NamespacedKey orbitalStrikeKey;
+    private final NamespacedKey sourceCannonKey;
     private final NamespacedKey recursionLevelKey;
     private final NamespacedKey recursionAmountKey;
     private final NamespacedKey recursionYieldKey;
@@ -48,6 +50,7 @@ public class PayloadManager {
         this.payloads = new EnumMap<>(PayloadType.class);
 
         this.orbitalStrikeKey = new NamespacedKey(plugin, "orbital_strike_tnt");
+        this.sourceCannonKey = new NamespacedKey(plugin, "source_cannon");
         this.recursionLevelKey = new NamespacedKey(plugin, "recursion_level");
         this.recursionAmountKey = new NamespacedKey(plugin, "recursion_amount");
         this.recursionYieldKey = new NamespacedKey(plugin, "recursion_yield");
@@ -74,6 +77,7 @@ public class PayloadManager {
     }
 
     public NamespacedKey getOrbitalStrikeKey() { return orbitalStrikeKey; }
+    public NamespacedKey getSourceCannonKey() { return sourceCannonKey; }
     public NamespacedKey getRecursionLevelKey() { return recursionLevelKey; }
     public NamespacedKey getRecursionAmountKey() { return recursionAmountKey; }
     public NamespacedKey getRecursionYieldKey() { return recursionYieldKey; }
@@ -145,9 +149,8 @@ public class PayloadManager {
         int fuseToUse = (level - 1 == 0) ? lastFuseTicks : splitFuseTicks;
         
         String sourceCannon = null;
-        NamespacedKey cannonNameKey = new NamespacedKey(plugin, "source_cannon");
-        if (explodedTnt.getPersistentDataContainer().has(cannonNameKey, PersistentDataType.STRING)) {
-            sourceCannon = explodedTnt.getPersistentDataContainer().get(cannonNameKey, PersistentDataType.STRING);
+        if (explodedTnt.getPersistentDataContainer().has(sourceCannonKey, PersistentDataType.STRING)) {
+            sourceCannon = explodedTnt.getPersistentDataContainer().get(sourceCannonKey, PersistentDataType.STRING);
         }
 
         for (int i = 0; i < amount; i++) {
@@ -233,7 +236,6 @@ public class PayloadManager {
 
                 double gatherRadius = maxRadius * 0.35 * (1.0 - (double) tick / gatherTicks);
                 int particleCount = 10 + tick * 4;
-                Particle.DustOptions gatherDust = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.2f);
                 for (int i = 0; i < particleCount; i++) {
                     double phi = Math.acos(1 - 2.0 * Math.random());
                     double theta = 2 * Math.PI * Math.random();
@@ -241,7 +243,7 @@ public class PayloadManager {
                     double px = center.getX() + r * Math.sin(phi) * Math.cos(theta);
                     double py = center.getY() + r * Math.cos(phi);
                     double pz = center.getZ() + r * Math.sin(phi) * Math.sin(theta);
-                    world.spawnParticle(Particle.REDSTONE, px, py, pz, 1, 0, 0, 0, 0, gatherDust);
+                    world.spawnParticle(Particle.DUST, px, py, pz, 1, 0, 0, 0, 0, GATHER_DUST);
                 }
 
                 if (tick % 5 == 0) {
@@ -254,13 +256,14 @@ public class PayloadManager {
         }.runTaskTimer(plugin, 0L, 1L);
     }
 
+    private static final Particle.DustOptions WHITE_DUST = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.5f);
+    private static final Particle.DustOptions CYAN_DUST = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.5f);
+    private static final Particle.DustOptions GATHER_DUST = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.2f);
+
     private void spawnSphereShell(World world, Location center, double radius) {
         if (radius <= 0) return;
 
         int totalPoints = (int) Math.min(500, Math.max(40, Math.PI * radius * radius * 2.5));
-
-        Particle.DustOptions whiteDust = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.5f);
-        Particle.DustOptions cyanDust  = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.5f);
 
         double goldenRatio = (1.0 + Math.sqrt(5)) / 2.0;
         for (int i = 0; i < totalPoints; i++) {
@@ -271,9 +274,30 @@ public class PayloadManager {
             double py = center.getY() + radius * Math.cos(phi);
             double pz = center.getZ() + radius * Math.sin(phi) * Math.sin(theta);
 
-            world.spawnParticle(Particle.REDSTONE, px, py, pz, 1, 0, 0, 0, 0,
-                    (i % 8 == 0) ? cyanDust : whiteDust);
+            world.spawnParticle(Particle.DUST, px, py, pz, 1, 0, 0, 0, 0,
+                    (i % 8 == 0) ? CYAN_DUST : WHITE_DUST);
         }
+    }
+
+    private List<PotionEffect> parseEffects(List<String> effects) {
+        if (effects == null || effects.isEmpty()) return Collections.emptyList();
+        List<PotionEffect> parsed = new ArrayList<>();
+        for (String effectStr : effects) {
+            String[] parts = effectStr.split(":");
+            if (parts.length >= 3) {
+                try {
+                    PotionEffectType type = PotionEffectType.getByName(parts[0]);
+                    if (type != null) {
+                        int amp = Integer.parseInt(parts[1]);
+                        int dur = Integer.parseInt(parts[2]);
+                        parsed.add(new PotionEffect(type, dur, amp));
+                    }
+                } catch (Exception e) {
+                    plugin.getLogger().log(Level.WARNING, "Invalid potion effect config: " + effectStr, e);
+                }
+            }
+        }
+        return parsed;
     }
 
     private void processWaveEffects(Location center, double currentRadius, double step, 
@@ -285,41 +309,39 @@ public class PayloadManager {
         double outerBound = currentRadius;
         int scanRadius = (int) Math.ceil(currentRadius) + 1;
 
+        int rSq = scanRadius * scanRadius;
+        List<PotionEffect> parsedEffects = parseEffects(effects);
+
         for (int x = -scanRadius; x <= scanRadius; x++) {
             for (int y = -scanRadius; y <= scanRadius; y++) {
                 for (int z = -scanRadius; z <= scanRadius; z++) {
-                    Location loc = center.clone().add(x, y, z);
-                    double distSq = loc.distanceSquared(center);
+                    double distSq = x * x + y * y + z * z;
+                    if (distSq < innerBound * innerBound || distSq > outerBound * outerBound) continue;
 
-                    if (distSq >= innerBound * innerBound && distSq <= outerBound * outerBound) {
-                        org.bukkit.block.Block block = loc.getBlock();
-                        Material type = block.getType();
-                        String name = type.name();
+                    Block block = center.getBlock().getRelative(x, y, z);
+                    Material type = block.getType();
+                    String name = type.name();
 
-                        if (destroyedBlocks.contains(name)) {
-                            if (dropItems) {
-                                block.breakNaturally();
-                            } else {
-                                block.setType(Material.AIR);
-                            }
-                        }
-
-                        if (name.contains("COPPER_BULB")) {
-                            BlockData data = block.getBlockData();
-                            if (data instanceof Lightable) {
-                                Lightable lightable = (Lightable) data;
-                                if (lightable.isLit()) {
-                                    lightable.setLit(false);
-                                    block.setBlockData(lightable);
-                                }
-                            }
-                        }
-
-                        if (name.contains("GLASS")) {
+                    if (destroyedBlocks.contains(name)) {
+                        if (dropItems) {
+                            block.breakNaturally();
+                        } else {
                             block.setType(Material.AIR);
-                            world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1.2f);
-                            world.spawnParticle(Particle.ELECTRIC_SPARK, loc.clone().add(0.5, 0.5, 0.5), 5, 0.2, 0.2, 0.2, 0.1);
                         }
+                    }
+
+                    if (name.contains("COPPER_BULB")) {
+                        BlockData data = block.getBlockData();
+                        if (data instanceof Lightable lightable && lightable.isLit()) {
+                            lightable.setLit(false);
+                            block.setBlockData(lightable);
+                        }
+                    }
+
+                    if (name.contains("GLASS")) {
+                        block.setType(Material.AIR);
+                        world.playSound(block.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.5f, 1.2f);
+                        world.spawnParticle(Particle.ELECTRIC_SPARK, block.getLocation().add(0.5, 0.5, 0.5), 5, 0.2, 0.2, 0.2, 0.1);
                     }
                 }
             }
@@ -327,46 +349,32 @@ public class PayloadManager {
 
         world.getNearbyEntities(center, currentRadius + 0.5, currentRadius + 0.5, currentRadius + 0.5).forEach(entity -> {
             double dist = entity.getLocation().distance(center);
-            if (dist >= innerBound && dist <= outerBound) {
+            if (dist < innerBound || dist > outerBound) return;
 
-                if (entity instanceof TNTPrimed) {
-                    Location loc = entity.getLocation();
-                    loc.getBlock().setType(Material.TNT);
-                    entity.remove();
-                    return;
-                }
-
-                if (entity instanceof LivingEntity) {
-                    LivingEntity living = (LivingEntity) entity;
-                    if (effects != null) {
-                        for (String effectStr : effects) {
-                            String[] parts = effectStr.split(":");
-                            if (parts.length >= 3) {
-                                try {
-                                    org.bukkit.potion.PotionEffectType type = org.bukkit.potion.PotionEffectType.getByName(parts[0]);
-                                    if (type != null) {
-                                        int amp = Integer.parseInt(parts[1]);
-                                        int dur = Integer.parseInt(parts[2]);
-                                        living.addPotionEffect(new org.bukkit.potion.PotionEffect(type, dur, amp));
-                                    }
-                                } catch (Exception ignored) {}
-                            }
-                        }
-                    }
-                }
-
-                Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize();
-                direction.setY(0.1);
-
-                double multiplier = 0.15;
-                if (entity instanceof org.bukkit.entity.Item || entity instanceof org.bukkit.entity.ExperienceOrb) {
-                    multiplier = 0.02;
-                } else if (!(entity instanceof LivingEntity)) {
-                    multiplier = 0.08;
-                }
-
-                entity.setVelocity(direction.multiply(multiplier));
+            if (entity instanceof TNTPrimed) {
+                Location loc = entity.getLocation();
+                loc.getBlock().setType(Material.TNT);
+                entity.remove();
+                return;
             }
+
+            if (entity instanceof LivingEntity living && !parsedEffects.isEmpty()) {
+                for (PotionEffect effect : parsedEffects) {
+                    living.addPotionEffect(effect);
+                }
+            }
+
+            Vector direction = entity.getLocation().toVector().subtract(center.toVector()).normalize();
+            direction.setY(0.1);
+
+            double multiplier = 0.15;
+            if (entity instanceof org.bukkit.entity.Item || entity instanceof org.bukkit.entity.ExperienceOrb) {
+                multiplier = 0.02;
+            } else if (!(entity instanceof LivingEntity)) {
+                multiplier = 0.08;
+            }
+
+            entity.setVelocity(direction.multiply(multiplier));
         });
     }
 

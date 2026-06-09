@@ -2,8 +2,8 @@ recipes:
   stab_recipe:
     enabled: true
     cannon: "Stab_Example"
-    require-permission: false
-    permission: "orbitalstrike.craft.stab_example"
+    require-permission: true
+    permission: "orbitalstrike.craft.stab_recipe"
     shape:
       - "  W"
       - " SW"
@@ -16,8 +16,8 @@ recipes:
   nuke_recipe:
     enabled: true
     cannon: "Nuke_Example"
-    require-permission: false
-    permission: "orbitalstrike.craft.nuke_example"
+    require-permission: true
+    permission: "orbitalstrike.craft.nuke_recipe"
     shape:
       - "TTT"
       - "TBT"
@@ -29,8 +29,8 @@ recipes:
   recursion_recipe:
     enabled: true
     cannon: "Recursion_Example"
-    require-permission: false
-    permission: "orbitalstrike.craft.recursion_example"
+    require-permission: true
+    permission: "orbitalstrike.craft.recursion_recipe"
     shape:
       - "STS"
       - "TFT"
@@ -43,8 +43,8 @@ recipes:
   emp_recipe:
     enabled: true
     cannon: "EMP_Example"
-    require-permission: false
-    permission: "orbitalstrike.craft.emp_example"
+    require-permission: true
+    permission: "orbitalstrike.craft.emp_recipe"
     shape:
       - "RRR"
       - "RPR"

@@ -23,14 +23,16 @@ public class CannonRecipeManager {
     private final CraftConfigManager craftConfigManager;
     private final List<NamespacedKey> registeredRecipes;
     private List<RecipeConfig> currentRecipes;
-    public static final NamespacedKey CANNON_KEY = new NamespacedKey("orbitalstrike", "linked_cannon");
-    public static final NamespacedKey DURABILITY_KEY = new NamespacedKey("orbitalstrike", "durability_uses");
+    public static NamespacedKey CANNON_KEY;
+    public static NamespacedKey DURABILITY_KEY;
 
     public CannonRecipeManager(OrbitalStrike plugin) {
         this.plugin = plugin;
         this.craftConfigManager = new CraftConfigManager(plugin);
         this.registeredRecipes = new ArrayList<>();
         this.currentRecipes = new ArrayList<>();
+        CANNON_KEY = new NamespacedKey(plugin, "linked_cannon");
+        DURABILITY_KEY = new NamespacedKey(plugin, "durability_uses");
     }
 
     public List<RecipeConfig> getCurrentRecipes() {
@@ -66,8 +68,7 @@ public class CannonRecipeManager {
                 if (cannon.isDurabilityEnabled()) {
                     meta.getPersistentDataContainer().set(DURABILITY_KEY, PersistentDataType.INTEGER, 0);
                     
-                    if (meta instanceof Damageable) {
-                        Damageable damageable = (Damageable) meta;
+                    if (meta instanceof Damageable damageable) {
                         int maxVanilla = item.getType().getMaxDurability();
                         int customMax = cannon.getMaxDurability();
                         

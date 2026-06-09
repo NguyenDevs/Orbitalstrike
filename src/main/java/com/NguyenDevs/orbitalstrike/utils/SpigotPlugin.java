@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,7 +20,7 @@ import java.util.logging.Level;
 public class SpigotPlugin {
     private final JavaPlugin plugin;
     private final int id;
-    private String latestVersion;
+    private boolean notified = false;
 
     public SpigotPlugin(int id, JavaPlugin plugin) {
         this.plugin = plugin;
@@ -30,16 +29,18 @@ public class SpigotPlugin {
 
     public void checkForUpdate() {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            String fetchedVersion;
             try {
-                HttpsURLConnection connection = (HttpsURLConnection) new URL("https://api.spigotmc.org/legacy/update.php?resource=" + id)
-                        .openConnection();
-                connection.setRequestMethod("GET");
-                latestVersion = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
+                URL url = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + id);
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                    fetchedVersion = reader.readLine();
+                }
             } catch (IOException e) {
                 plugin.getLogger().log(Level.WARNING, "Couldn't check the latest plugin version: " + e.getMessage());
                 return;
             }
 
+            final String latestVersion = fetchedVersion;
             String currentVersion = plugin.getDescription().getVersion();
             if (latestVersion == null || latestVersion.isEmpty()) {
                 plugin.getLogger().log(Level.WARNING, "Received invalid version from SpigotMC API.");
@@ -52,21 +53,34 @@ public class SpigotPlugin {
 
                 Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&bOrbital&3Strike&9Cannon&8] &a&oDownload it here: " + getResourceUrl()));
 
-                if (plugin.getConfig().getBoolean("update-notify")) {
-                    Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().registerEvents(new Listener() {
-                        @EventHandler(priority = EventPriority.MONITOR)
-                        public void onPlayerJoin(PlayerJoinEvent event) {
-                            Player player = event.getPlayer();
-                            if (player.hasPermission("orbitalstrike.admin")) {
-                                getOutOfDateMessage().forEach(msg -> player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg)));
-                            }
-                        }
-                    }, plugin));
+                if (plugin.getConfig().getBoolean("update-notify") && !notified) {
+                    notified = true;
+                    Bukkit.getScheduler().runTask(plugin, () ->
+                        Bukkit.getPluginManager().registerEvents(new VersionNotifyListener(latestVersion), plugin)
+                    );
                 }
             } else {
                 Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',"&8[&bOrbital&3Strike&9Cannon&8] &aYou are running the latest version: &2" + currentVersion));
             }
         });
+    }
+    
+    private class VersionNotifyListener implements Listener {
+        private final String latestVersion;
+        
+        VersionNotifyListener(String latestVersion) {
+            this.latestVersion = latestVersion;
+        }
+        
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void onPlayerJoin(PlayerJoinEvent event) {
+            Player player = event.getPlayer();
+            if (player.hasPermission("orbitalstrike.admin")) {
+                getOutOfDateMessage(latestVersion).forEach(msg -> 
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg))
+                );
+            }
+        }
     }
 
     private boolean isVersionNewer(String currentVersion, String latestVersion) {
@@ -96,7 +110,7 @@ public class SpigotPlugin {
         return false;
     }
 
-    private List<String> getOutOfDateMessage() {
+    private List<String> getOutOfDateMessage(String latestVersion) {
         return Arrays.asList(
                 "&8--------------------------------------------",
                 "&a" + plugin.getName() + " " + latestVersion + " is available!",

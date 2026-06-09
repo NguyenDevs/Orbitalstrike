@@ -1,3 +1,5 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.jdt.ls.java.home": "C:\\Program Files\\Java\\jdk-21.0.11",
+    "gradle.javaHome": "C:\\Program Files\\Java\\jdk-21.0.11"
 }

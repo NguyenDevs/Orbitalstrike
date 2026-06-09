@@ -3,14 +3,11 @@ package com.NguyenDevs.orbitalstrike.listeners;
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import com.NguyenDevs.orbitalstrike.models.Cannon;
 import com.NguyenDevs.orbitalstrike.managers.CannonRecipeManager;
-import com.NguyenDevs.orbitalstrike.utils.ColorUtils;
-
 import com.NguyenDevs.orbitalstrike.models.StrikeData;
-import org.bukkit.FluidCollisionMode;
+import com.NguyenDevs.orbitalstrike.utils.SoundUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,12 +18,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.util.RayTraceResult;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class CannonInteractListener implements Listener {
     private final OrbitalStrike plugin;
@@ -124,8 +119,7 @@ public class CannonInteractListener implements Listener {
             if (currentUses < cannon.getMaxDurability()) {
                 meta.getPersistentDataContainer().set(CannonRecipeManager.DURABILITY_KEY, PersistentDataType.INTEGER, currentUses);
 
-                if (meta instanceof Damageable) {
-                    Damageable damageable = (Damageable) meta;
+                if (meta instanceof Damageable damageable) {
                     int maxVanilla = item.getType().getMaxDurability();
                     if (maxVanilla > 0) {
                         int initialDamage = Math.max(0, maxVanilla - cannon.getMaxDurability());
@@ -153,12 +147,6 @@ public class CannonInteractListener implements Listener {
     }
 
     private void playErrorSound(Player player) {
-        if (player != null) {
-            try {
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f);
-            } catch (Exception e) {
-                plugin.getLogger().log(Level.WARNING, "Error playing error sound for player: " + player.getName(), e);
-            }
-        }
+        SoundUtils.playErrorSound(player, plugin.getLogger());
     }
 }

@@ -3,7 +3,7 @@
 # =========================================================
 # System supports creating multiple particle layers per cannon.
 # - particle: The name of the particle (E.g.: FLAME, LAVA, ELECTRIC_SPARK). 
-#   * Supports REDSTONE coloring: REDSTONE:<R>,<G>,<B>:<Size> (E.g.: REDSTONE:255,0,0:1.5)
+#  * Supports DUST coloring: DUST:<R>,<G>,<B>:<Size> (E.g.: DUST:255,0,0:1.5)
 # - formula-x, formula-y, formula-z: Spawn coordinates evaluated via Math expressions.
 #   * 't' is the variable representing Time (Ticks). Each tick 't' increments by 1.
 #   * Supported functions: sin(t), cos(t), tan(t), sqrt(t), abs(t), +, -, *, /, %
@@ -14,6 +14,7 @@
 # =========================================================
 
 stab_example:
+  enabled: true
   layers:
     # Static cloud of sparks directly underneath the TNT
     - particle: "FLAME"
@@ -27,7 +28,7 @@ stab_example:
 nuke_example:
   layers:
     # Yellow dust rotating around the Y-axis using Trigonometry
-    - particle: "REDSTONE:255,255,0:2.0"
+    - particle: "DUST:255,255,0:2.0"
       formula-x: "1.5 * cos(t * 0.4)" # Radius 1.5, rotational speed 0.4 via Cosine
       formula-y: "0.5"
       formula-z: "1.5 * sin(t * 0.4)"
@@ -35,7 +36,7 @@ nuke_example:
       speed: 0
       count: 1
     # Orange dust rotating symmetrically opposite to the Yellow dust
-    - particle: "REDSTONE:255,100,0:1.5"
+    - particle: "DUST:255,100,0:1.5"
       formula-x: "1.0 * cos((t * 0.4) + 3.14)" # PI (3.14) phase shift to create a double helix
       formula-y: "0.5"
       formula-z: "1.0 * sin((t * 0.4) + 3.14)"

@@ -1,6 +1,7 @@
 name: OrbitalStrike
 version: ${version}
 main: com.NguyenDevs.orbitalstrike.OrbitalStrike
+prefix: OrbitalStrike
 api-version: '1.21'
 author: NguyenDevs
 description: Advanced Orbital Strike Cannon system
@@ -21,17 +22,45 @@ commands:
       /cannon set <cannon> <parameter> <value> - Set a parameter for a cannon
       /cannon reload - Reload configuration
     aliases: [osc, os]
+    permission: orbitalstrike.use
+
 permissions:
   orbitalstrike.*:
     description: All orbital strike permissions
     children:
       orbitalstrike.use: true
       orbitalstrike.admin: true
+      orbitalstrike.craft.*: true
 
   orbitalstrike.use:
     description: Use orbital strike cannons
-    default: op
+    default: true
 
   orbitalstrike.admin:
     description: Create and manage cannons
+    default: op
+
+  orbitalstrike.craft.*:
+    description: Craft all orbital strike items
+    default: op
+    children:
+      orbitalstrike.craft.stab_recipe: true
+      orbitalstrike.craft.nuke_recipe: true
+      orbitalstrike.craft.recursion_recipe: true
+      orbitalstrike.craft.emp_recipe: true
+
+  orbitalstrike.craft.stab_recipe:
+    description: Craft stab cannon tool
+    default: op
+
+  orbitalstrike.craft.nuke_recipe:
+    description: Craft nuke cannon tool
+    default: op
+
+  orbitalstrike.craft.recursion_recipe:
+    description: Craft recursion cannon tool
+    default: op
+
+  orbitalstrike.craft.emp_recipe:
+    description: Craft emp cannon tool
     default: op

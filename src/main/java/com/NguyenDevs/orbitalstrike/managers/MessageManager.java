@@ -56,22 +56,25 @@ public class MessageManager {
 
         messageConfig = YamlConfiguration.loadConfiguration(messageFile);
 
-        InputStream defConfigStream = plugin.getResource("messages.yml");
-        if (defConfigStream != null) {
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream));
-            messageConfig.setDefaults(defConfig);
+        try (InputStream defConfigStream = plugin.getResource("messages.yml")) {
+            if (defConfigStream != null) {
+                YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream));
+                messageConfig.setDefaults(defConfig);
 
-            boolean changed = false;
-            for (String key : defConfig.getKeys(true)) {
-                if (!messageConfig.contains(key)) {
-                    messageConfig.set(key, defConfig.get(key));
-                    changed = true;
+                boolean changed = false;
+                for (String key : defConfig.getKeys(true)) {
+                    if (!messageConfig.contains(key)) {
+                        messageConfig.set(key, defConfig.get(key));
+                        changed = true;
+                    }
+                }
+
+                if (changed) {
+                    saveMessages();
                 }
             }
-
-            if (changed) {
-                saveMessages();
-            }
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.WARNING, "Could not close messages.yml resource stream", e);
         }
     }
 

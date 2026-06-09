@@ -3,9 +3,7 @@ package com.NguyenDevs.orbitalstrike.listeners;
 import com.NguyenDevs.orbitalstrike.OrbitalStrike;
 import com.NguyenDevs.orbitalstrike.managers.CannonRecipeManager;
 import com.NguyenDevs.orbitalstrike.models.RecipeConfig;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Sound;
-import org.bukkit.command.CommandSender;
+import com.NguyenDevs.orbitalstrike.utils.SoundUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,8 +12,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.util.logging.Level;
 
 public class CraftListener implements Listener {
     private final OrbitalStrike plugin;
@@ -51,14 +47,7 @@ public class CraftListener implements Listener {
         }
     }
 
-    private void playErrorSound(CommandSender sender) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            try {
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f);
-            } catch (Exception e) {
-                plugin.getLogger().log(Level.WARNING, "Error playing error sound for player: " + player.getName(), e);
-            }
-        }
+    private void playErrorSound(Player player) {
+        SoundUtils.playErrorSound(player, plugin.getLogger());
     }
 }

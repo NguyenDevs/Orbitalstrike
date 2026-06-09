@@ -7,6 +7,9 @@ import org.bukkit.World;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class EmpPayload implements IPayload {
     private final OrbitalStrike plugin;
 
@@ -16,7 +19,7 @@ public class EmpPayload implements IPayload {
 
     @Override
     public void execute(World world, Location target, Cannon cannon) {
-        double height = 60.0;
+        double height = PayloadUtils.getDoubleParameter(cannon, "height", 60.0);
         Location spawnLoc = target.clone().add(0, height, 0);
 
         TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnLoc, 0, 80, true, plugin.getPayloadManager().getEmpTntKey(), cannon.getName());
@@ -27,10 +30,10 @@ public class EmpPayload implements IPayload {
             double speed = PayloadUtils.getDoubleParameter(cannon, "pulse-speed", 2.5);
             boolean dropItems = PayloadUtils.getBooleanParameter(cannon, "destroy-drop-items", false);
             
-            java.util.List<String> effects = PayloadUtils.getStringListParameter(cannon, "effects", java.util.Arrays.asList(
+            List<String> effects = PayloadUtils.getStringListParameter(cannon, "effects", Arrays.asList(
                     "BLINDNESS:0:60", "WEAKNESS:1:400", "CONFUSION:4:100", "SLOW:1:100"
             ));
-            java.util.List<String> destroyedBlocks = PayloadUtils.getStringListParameter(cannon, "destroyed-blocks", java.util.Arrays.asList(
+            List<String> destroyedBlocks = PayloadUtils.getStringListParameter(cannon, "destroyed-blocks", Arrays.asList(
                     "REDSTONE", "REDSTONE_BLOCK", "PISTON", "STICKY_PISTON", "REPEATER", 
                     "COMPARATOR", "DROPPER", "DISPENSER", "CRAFTER", "OBSERVER", 
                     "RAIL", "ACTIVATOR_RAIL", "DETECTOR_RAIL", "POWERED_RAIL", 
