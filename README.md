@@ -24,9 +24,7 @@ Launches a massive nuclear warhead from orbit, creating concentric explosion rin
 ### 🟣 RECURSION — Chain Reaction
 Creates a cascading series of explosions. Each detonation spawns more explosives, causing extreme chaos across the target zone.
 
-
-
-### ⚡ EMP — Shockwave
+### ⚡ EMP — Electromagnetic Pulse
 Emits a sequence of expanding electromagnetic pulses that disable Redstone devices, shatter glass, and cripple enemies with Blindness and Weakness.
 
 ---
@@ -60,6 +58,3 @@ Use a special Remote Controller (crafted or given) linked to a specific cannon. 
 The plugin is fully compatible with **WorldGuard**. Administrators can control cannon usage via:
 - **Flag:** `osc-enable`
 - **Default:** `deny` (Protected regions block all orbital strikes by default).
-
----
-© 2026 Developed by **NguyenDevs**
