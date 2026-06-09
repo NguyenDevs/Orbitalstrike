@@ -18,5 +18,5 @@ settings:
   # Log strike events to console
   log-strikes: false
 
-  # Maximum number of TNT entities per strike (safety limit)
-  max-tnt-per-strike: 500
+  # Maximum number of TNT entities per strike (safety limit; -1 for unlimited)
+  max-tnt-per-strike: -1
