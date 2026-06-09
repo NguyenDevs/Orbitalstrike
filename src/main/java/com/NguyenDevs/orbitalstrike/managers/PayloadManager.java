@@ -171,23 +171,31 @@ public class PayloadManager {
         }
     }
 
-    public void triggerEmpShockwave(Location center, double maxRadius, int pulses, int pulseDelay, double pulseSpeed, 
+    public void triggerEmpShockwave(TNTPrimed tnt, double targetY, double maxRadius, int pulses, int pulseDelay, double pulseSpeed,
                                    List<String> effects, List<String> destroyedBlocks, boolean dropItems) {
-        World world = center.getWorld();
-        if (world == null) return;
+        World world = tnt.getWorld();
 
         new BukkitRunnable() {
             int pulsesLaunched = 0;
             int ticksSinceLastPulse = pulseDelay;
+            boolean reachedTarget = false;
 
             @Override
             public void run() {
-                if (pulsesLaunched >= pulses) {
+                if (tnt.isDead() || pulsesLaunched >= pulses) {
+                    if (!tnt.isDead()) tnt.remove();
                     this.cancel();
                     return;
                 }
+                if (!reachedTarget) {
+                    if (tnt.getLocation().getY() <= targetY) {
+                        reachedTarget = true;
+                        ticksSinceLastPulse = pulseDelay;
+                    }
+                    return;
+                }
                 if (ticksSinceLastPulse >= pulseDelay) {
-                    dropThroughBreakable(center, destroyedBlocks, dropItems);
+                    Location center = tnt.getLocation();
                     launchSingleWave(center, maxRadius, pulseSpeed, effects, destroyedBlocks, dropItems);
                     pulsesLaunched++;
                     ticksSinceLastPulse = 0;
@@ -195,32 +203,6 @@ public class PayloadManager {
                 ticksSinceLastPulse++;
             }
         }.runTaskTimer(plugin, 0L, 1L);
-    }
-
-    private void dropThroughBreakable(Location center, List<String> destroyedBlocks, boolean dropItems) {
-        World world = center.getWorld();
-        if (world == null || destroyedBlocks == null || destroyedBlocks.isEmpty()) return;
-
-        int minY = world.getMinHeight();
-        int currentY = center.getBlockY();
-
-        while (currentY > minY) {
-            currentY--;
-            Block block = world.getBlockAt(center.getBlockX(), currentY, center.getBlockZ());
-            Material type = block.getType();
-
-            if (type == Material.AIR) continue;
-            if (!destroyedBlocks.contains(type.name())) break;
-
-            if (dropItems) {
-                block.breakNaturally();
-            } else {
-                block.setType(Material.AIR);
-            }
-
-            center.setY(currentY + 0.5);
-            world.spawnParticle(Particle.ELECTRIC_SPARK, center.clone().add(0, 0.5, 0), 6, 0.2, 0.2, 0.2, 0.1);
-        }
     }
 
     private void launchSingleWave(Location center, double maxRadius, double step, 
@@ -253,7 +235,7 @@ public class PayloadManager {
                                 this.cancel();
                                 return;
                             }
-                            spawnSphereShell(world, center, currentRadius);
+                            spawnRings(world, center, currentRadius);
                             processWaveEffects(center, currentRadius, step, effects, destroyedBlocks, dropItems);
                         }
                     }.runTaskTimer(plugin, 0L, 1L);
@@ -287,22 +269,42 @@ public class PayloadManager {
     private static final Particle.DustOptions CYAN_DUST = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.5f);
     private static final Particle.DustOptions GATHER_DUST = new Particle.DustOptions(Color.fromRGB(100, 220, 255), 1.2f);
 
-    private void spawnSphereShell(World world, Location center, double radius) {
+    private void spawnRings(World world, Location center, double radius) {
         if (radius <= 0) return;
 
-        int totalPoints = (int) Math.min(500, Math.max(40, Math.PI * radius * radius * 2.5));
+        int count = (int) Math.min(60, Math.max(12, radius * 4));
+        double tick = radius / 2.5;
 
-        double goldenRatio = (1.0 + Math.sqrt(5)) / 2.0;
-        for (int i = 0; i < totalPoints; i++) {
-            double theta = 2 * Math.PI * i / goldenRatio;
-            double phi   = Math.acos(1.0 - 2.0 * (i + 0.5) / totalPoints);
+        world.spawnParticle(Particle.ELECTRIC_SPARK, center, 4, 0.15, 0.15, 0.15, 0.05);
+        world.spawnParticle(Particle.DUST, center, 1, 0, 0, 0, 0, CYAN_DUST);
 
-            double px = center.getX() + radius * Math.sin(phi) * Math.cos(theta);
-            double py = center.getY() + radius * Math.cos(phi);
-            double pz = center.getZ() + radius * Math.sin(phi) * Math.sin(theta);
+        spawnOrbitalRing(world, center, radius, count, tick * 0.5, 0, 1, 0, CYAN_DUST);
+        spawnOrbitalRing(world, center, radius, count, tick * 0.7 + 1.2, 1, 0, 0, WHITE_DUST);
+        spawnOrbitalRing(world, center, radius, count, tick * 0.3 + 2.5, 0, 0, 1, WHITE_DUST);
+    }
 
-            world.spawnParticle(Particle.DUST, px, py, pz, 1, 0, 0, 0, 0,
-                    (i % 8 == 0) ? CYAN_DUST : WHITE_DUST);
+    private void spawnOrbitalRing(World world, Location center, double radius, int count, double phase,
+                                   double nx, double ny, double nz, Particle.DustOptions dust) {
+        double ax = Math.abs(nx), ay = Math.abs(ny), az = Math.abs(nz);
+        double ux, uy, uz;
+        if (ax <= ay && ax <= az) { ux = 0; uy = -nz; uz = ny; }
+        else if (ay <= ax && ay <= az) { ux = -nz; uy = 0; uz = nx; }
+        else { ux = -ny; uy = nx; uz = 0; }
+        double ulen = Math.sqrt(ux * ux + uy * uy + uz * uz);
+        ux /= ulen; uy /= ulen; uz /= ulen;
+
+        double vx = ny * uz - nz * uy;
+        double vy = nz * ux - nx * uz;
+        double vz = nx * uy - ny * ux;
+
+        for (int i = 0; i < count; i++) {
+            double theta = 2 * Math.PI * i / count + phase;
+            double cos = Math.cos(theta);
+            double sin = Math.sin(theta);
+            double px = center.getX() + radius * (cos * ux + sin * vx);
+            double py = center.getY() + radius * (cos * uy + sin * vy);
+            double pz = center.getZ() + radius * (cos * uz + sin * vz);
+            world.spawnParticle(Particle.DUST, px, py, pz, 1, 0, 0, 0, 0, dust);
         }
     }
 
@@ -378,7 +380,8 @@ public class PayloadManager {
             double dist = entity.getLocation().distance(center);
             if (dist < innerBound || dist > outerBound) return;
 
-            if (entity instanceof TNTPrimed) {
+            if (entity instanceof TNTPrimed tntEntity) {
+                if (tntEntity.getPersistentDataContainer().has(empTntKey, PersistentDataType.BYTE)) return;
                 Location loc = entity.getLocation();
                 loc.getBlock().setType(Material.TNT);
                 entity.remove();
