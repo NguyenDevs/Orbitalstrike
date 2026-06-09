@@ -40,7 +40,8 @@ payload:
   stab: "Stab (Precision Strike)"
   nuke: "Nuke (Area Destruction)"
   recursion: "Recursion (Chain Reaction)"
-  invalid: "&cInvalid payload type! Available: stab, nuke, recursion"
+  emp: "EMP (Electromagnetic Pulse)"
+  invalid: "&cInvalid payload type! Available: stab, nuke, recursion, emp"
 
 log: "Initiating strike at %target%"
 error:
