@@ -187,6 +187,7 @@ public class PayloadManager {
                     return;
                 }
                 if (ticksSinceLastPulse >= pulseDelay) {
+                    dropThroughBreakable(center, destroyedBlocks, dropItems);
                     launchSingleWave(center, maxRadius, pulseSpeed, effects, destroyedBlocks, dropItems);
                     pulsesLaunched++;
                     ticksSinceLastPulse = 0;
@@ -194,6 +195,32 @@ public class PayloadManager {
                 ticksSinceLastPulse++;
             }
         }.runTaskTimer(plugin, 0L, 1L);
+    }
+
+    private void dropThroughBreakable(Location center, List<String> destroyedBlocks, boolean dropItems) {
+        World world = center.getWorld();
+        if (world == null || destroyedBlocks == null || destroyedBlocks.isEmpty()) return;
+
+        int minY = world.getMinHeight();
+        int currentY = center.getBlockY();
+
+        while (currentY > minY) {
+            currentY--;
+            Block block = world.getBlockAt(center.getBlockX(), currentY, center.getBlockZ());
+            Material type = block.getType();
+
+            if (type == Material.AIR) continue;
+            if (!destroyedBlocks.contains(type.name())) break;
+
+            if (dropItems) {
+                block.breakNaturally();
+            } else {
+                block.setType(Material.AIR);
+            }
+
+            center.setY(currentY + 0.5);
+            world.spawnParticle(Particle.ELECTRIC_SPARK, center.clone().add(0, 0.5, 0), 6, 0.2, 0.2, 0.2, 0.1);
+        }
     }
 
     private void launchSingleWave(Location center, double maxRadius, double step, 
