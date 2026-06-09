@@ -172,7 +172,7 @@ public class PayloadManager {
     }
 
     public void triggerEmpShockwave(TNTPrimed tnt, double targetY, double maxRadius, int pulses, int pulseDelay, double pulseSpeed,
-                                   List<String> effects, List<String> destroyedBlocks, boolean dropItems) {
+                                    List<String> effects, List<String> destroyedBlocks, boolean dropItems) {
         World world = tnt.getWorld();
 
         new BukkitRunnable() {
@@ -187,13 +187,19 @@ public class PayloadManager {
                     this.cancel();
                     return;
                 }
+
                 if (!reachedTarget) {
-                    if (tnt.getLocation().getY() <= targetY) {
+                    Location loc = tnt.getLocation();
+
+                    boolean blockedBelow = loc.getBlock().getRelative(0, -1, 0).getType().isSolid();
+
+                    if (loc.getY() <= targetY || blockedBelow) {
                         reachedTarget = true;
                         ticksSinceLastPulse = pulseDelay;
                     }
                     return;
                 }
+
                 if (ticksSinceLastPulse >= pulseDelay) {
                     Location center = tnt.getLocation();
                     launchSingleWave(center, maxRadius, pulseSpeed, effects, destroyedBlocks, dropItems);
