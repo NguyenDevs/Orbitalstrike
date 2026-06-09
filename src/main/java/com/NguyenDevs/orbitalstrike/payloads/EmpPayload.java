@@ -22,7 +22,8 @@ public class EmpPayload implements IPayload {
         double height = PayloadUtils.getDoubleParameter(cannon, "height", 60.0);
         Location spawnLoc = target.clone().add(0, height, 0);
 
-        TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnLoc, 0, 80, true, plugin.getPayloadManager().getEmpTntKey(), cannon.getName());
+        int fuseTicks = 600;
+        TNTPrimed tnt = PayloadUtils.spawnTNTAt(plugin, world, spawnLoc, 0, fuseTicks, true, plugin.getPayloadManager().getEmpTntKey(), cannon.getName());
         if (tnt != null) {
             double radius = PayloadUtils.getDoubleParameter(cannon, "radius", 15.0);
             int pulses = PayloadUtils.getIntParameter(cannon, "pulses", 3);
@@ -49,6 +50,8 @@ public class EmpPayload implements IPayload {
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpEffectsKey(), PersistentDataType.STRING, String.join(",", effects));
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpDestroyedBlocksKey(), PersistentDataType.STRING, String.join(",", destroyedBlocks));
             tnt.getPersistentDataContainer().set(plugin.getPayloadManager().getEmpDropItemsKey(), PersistentDataType.BYTE, dropItems ? (byte) 1 : (byte) 0);
+
+            plugin.getPayloadManager().triggerEmpShockwave(tnt, target.getY() + 1, radius, pulses, delay, speed, effects, destroyedBlocks, dropItems);
         }
     }
 }
