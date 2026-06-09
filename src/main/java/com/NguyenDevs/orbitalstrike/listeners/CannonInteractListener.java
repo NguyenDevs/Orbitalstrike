@@ -19,13 +19,10 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+
 
 public class CannonInteractListener implements Listener {
     private final OrbitalStrike plugin;
-    private final Map<UUID, Map<String, Long>> cooldowns = new HashMap<>();
 
     public CannonInteractListener(OrbitalStrike plugin) {
         this.plugin = plugin;
@@ -108,6 +105,16 @@ public class CannonInteractListener implements Listener {
             playErrorSound(player);
             return;
         }
+
+        if (cannon.getCooldown() > 0) {
+            long lastUsed = plugin.getCannonManager().getLastUsed(cannon.getName());
+            long timeLeft = (lastUsed + cannon.getCooldown() * 1000L) - System.currentTimeMillis();
+            if (timeLeft > 0) {
+                player.sendMessage(plugin.getMessageManager().getMessage("cannon.cooldown", "%time%", String.valueOf(timeLeft / 1000 + 1)));
+                playErrorSound(player);
+                return;
+            }
+        }
         
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
 
@@ -139,6 +146,7 @@ public class CannonInteractListener implements Listener {
         StrikeData strikeData = new StrikeData(cannon.getPayloadType());
 
         plugin.getPayloadManager().initiateStrike(cannon, strikeData, target);
+        plugin.getCannonManager().setLastUsed(cannon.getName(), System.currentTimeMillis());
         player.sendMessage(plugin.getMessageManager().getMessage("cannon.fired",
                 "%x%", String.valueOf(target.getBlockX()),
                 "%y%", String.valueOf(target.getBlockY()),
