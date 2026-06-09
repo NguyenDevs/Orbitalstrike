@@ -31,7 +31,8 @@ public class ConfigManager {
     }
     
     public int getMaxTntPerStrike() {
-        return Math.max(1, Math.min(5000, plugin.getConfig().getInt("settings.max-tnt-per-strike", 500)));
+        int val = plugin.getConfig().getInt("settings.max-tnt-per-strike", -1);
+        return val == -1 ? Integer.MAX_VALUE : Math.max(1, Math.min(5000, val));
     }
 }
 
